@@ -5,6 +5,7 @@ import Workout from './components/Workout.jsx'
 import Catalog from './components/Catalog.jsx'
 import Progress from './components/Progress.jsx'
 import More from './components/More.jsx'
+import Profile from './components/Profile.jsx'
 import Nutrition from './components/Nutrition.jsx'
 import Water from './components/Water.jsx'
 import Measures from './components/Measures.jsx'
@@ -22,8 +23,8 @@ const TABS = [
   { key: 'more', label: 'Ещё', icon: 'grid' }
 ]
 const SECONDARY = {
-  nutrition: 'Калории и КБЖУ', water: 'Дневник воды', measures: 'Замеры тела',
-  timer: 'Таймер отдыха', calculators: 'Калькуляторы'
+  profile: 'Профиль', nutrition: 'Калории и КБЖУ', water: 'Дневник воды',
+  measures: 'Замеры тела', timer: 'Таймер отдыха', calculators: 'Калькуляторы'
 }
 const TAB_TITLE = { workout: 'Тренировки', catalog: 'Каталог упражнений', progress: 'Прогресс', more: 'Ещё' }
 
@@ -40,7 +41,8 @@ export default function App() {
   }, [route, profile])
 
   function submit(p) { store.setProfile(p); setProfile(p); setRoute('home'); window.scrollTo(0, 0) }
-  function resetProfile() { store.clearProfile(); setProfile(null); setRoute('home') }
+  function saveProfile(p) { store.setProfile(p); setProfile(p) }
+  function restart() { store.clearProfile(); setProfile(null); setRoute('home') }
   function go(r) { haptic('light'); setRoute(r); window.scrollTo(0, 0) }
 
   if (!profile) {
@@ -57,7 +59,8 @@ export default function App() {
     workout: <Workout profile={profile} />,
     catalog: <Catalog profile={profile} />,
     progress: <Progress />,
-    more: <More go={go} onResetProfile={resetProfile} />,
+    more: <More go={go} />,
+    profile: <Profile profile={profile} onSave={saveProfile} onRestart={restart} />,
     nutrition: <Nutrition profile={profile} />,
     water: <Water profile={profile} />,
     measures: <Measures />,

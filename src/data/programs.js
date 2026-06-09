@@ -85,7 +85,14 @@ export const PROGRAMS = [
 
 export function recommendProgram({ level, daysPerWeek }) {
   if (level === 'новичок') return 'fullbody'
-  if (daysPerWeek <= 3) return level === 'продвинутый' ? 'split_synergist' : 'fullbody'
+  if (level === 'средний') {
+    if (daysPerWeek <= 3) return 'split_synergist'
+    if (daysPerWeek === 4) return 'upper_lower'
+    return 'ppl'
+  }
+  // продвинутый
+  if (daysPerWeek <= 3) return 'split_synergist'
   if (daysPerWeek === 4) return 'upper_lower'
-  return 'ppl'
+  if (daysPerWeek === 5) return 'ppl'
+  return 'bro_split'
 }

@@ -4,6 +4,13 @@ import { GROUP_META } from '../engine/exercises.js'
 import { estimateLoad } from '../engine/loads.js'
 import { haptic } from '../tg.js'
 
+const WARMUP = [
+  'Лёгкое кардио 3–5 минут: быстрая ходьба, скакалка или бег на месте',
+  'Суставная разминка: вращения шеи, плеч, локтей, таза, коленей, стоп',
+  'Динамическая растяжка рабочих мышц (махи, выпады с поворотом)',
+  '1–2 разминочных подхода первого упражнения с лёгким весом'
+]
+
 function restSeconds(rest) {
   const num = parseInt((rest || '').replace(/[^0-9].*$/, ''), 10) || 60
   return /мин/.test(rest) ? num * 60 : num
@@ -12,11 +19,11 @@ function restSeconds(rest) {
 export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
   const total = session.exercises.length
   const rest = restSeconds(session.scheme.rest)
+  const [phase, setPhase] = useState('warmup')
   const [idx, setIdx] = useState(0)
   const [done, setDone] = useState(0)
   const [resting, setResting] = useState(false)
   const [left, setLeft] = useState(rest)
-  const [finished, setFinished] = useState(false)
   const ref = useRef(null)
   const ex = session.exercises[idx]
 
@@ -32,18 +39,35 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
 
   function doSet() {
     haptic('light')
-    const nd = done + 1
-    setDone(nd)
+    const nd = done + 1; setDone(nd)
     if (nd < ex.sets) { setLeft(rest); setResting(true) }
   }
   function nextEx() {
-    if (idx + 1 >= total) { onFinish && onFinish(); setFinished(true); return }
-    setIdx(idx + 1); setDone(0); setResting(false); setLeft(rest)
-    window.scrollTo(0, 0)
+    if (idx + 1 >= total) { onFinish && onFinish(); setPhase('done'); return }
+    setIdx(idx + 1); setDone(0); setResting(false); setLeft(rest); window.scrollTo(0, 0)
   }
   function skipRest() { clearInterval(ref.current); setResting(false); setLeft(rest) }
 
-  if (finished) {
+  if (phase === 'warmup') {
+    return (
+      <div className="guided">
+        <div className="guided-top">
+          <button className="iconbtn" onClick={onExit} aria-label="Выйти"><Icon name="x" size={20} /></button>
+          <span className="guided-prog"><b style={{ fontFamily: 'Oswald', fontSize: 16 }}>Разминка</b></span>
+        </div>
+        <div className="guided-card">
+          <h2 className="display md">Сначала разомнись</h2>
+          <p className="sub" style={{ marginBottom: 14 }}>5 минут разминки = меньше травм и лучше результат в подходах.</p>
+          {WARMUP.map((w, i) => (
+            <div className="warmrow" key={i}><span className="warmnum">{i + 1}</span><span>{w}</span></div>
+          ))}
+        </div>
+        <button className="cta" onClick={() => setPhase('work')}><Icon name="play" size={18} /> Размялся, поехали</button>
+      </div>
+    )
+  }
+
+  if (phase === 'done') {
     return (
       <div className="guided done-screen">
         <div className="done-badge"><Icon name="check" size={42} /></div>
