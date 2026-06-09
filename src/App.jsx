@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import Onboarding from './components/Onboarding.jsx'
 import Home from './components/Home.jsx'
 import Workout from './components/Workout.jsx'
-import Nutrition from './components/Nutrition.jsx'
 import Catalog from './components/Catalog.jsx'
 import Progress from './components/Progress.jsx'
+import More from './components/More.jsx'
+import Nutrition from './components/Nutrition.jsx'
 import Water from './components/Water.jsx'
 import Measures from './components/Measures.jsx'
 import Timer from './components/Timer.jsx'
@@ -13,11 +14,18 @@ import Icon from './components/Icon.jsx'
 import { store } from './storage.js'
 import { initTelegram, tgBackButton, haptic, tgUserName } from './tg.js'
 
-const TITLES = {
-  home: '', workout: 'План тренировки', nutrition: 'Калории и КБЖУ',
-  catalog: 'Каталог упражнений', progress: 'Прогресс', water: 'Дневник воды',
-  measures: 'Замеры тела', timer: 'Таймер отдыха', calculators: 'Калькуляторы'
+const TABS = [
+  { key: 'home', label: 'Главная', icon: 'home' },
+  { key: 'workout', label: 'Тренировки', icon: 'dumbbell' },
+  { key: 'catalog', label: 'Каталог', icon: 'book' },
+  { key: 'progress', label: 'Прогресс', icon: 'activity' },
+  { key: 'more', label: 'Ещё', icon: 'grid' }
+]
+const SECONDARY = {
+  nutrition: 'Калории и КБЖУ', water: 'Дневник воды', measures: 'Замеры тела',
+  timer: 'Таймер отдыха', calculators: 'Калькуляторы'
 }
+const TAB_TITLE = { workout: 'Тренировки', catalog: 'Каталог упражнений', progress: 'Прогресс', more: 'Ещё' }
 
 export default function App() {
   const [profile, setProfile] = useState(null)
@@ -25,14 +33,10 @@ export default function App() {
 
   useEffect(() => { initTelegram(); setProfile(store.getProfile()) }, [])
 
-  // Нативная кнопка «Назад» Telegram
+  const isSecondary = route in SECONDARY
   useEffect(() => {
-    if (route !== 'home' && profile) {
-      const off = tgBackButton(true, () => go('home'))
-      return off
-    } else {
-      tgBackButton(false)
-    }
+    if (isSecondary && profile) { const off = tgBackButton(true, () => go('more')); return off }
+    tgBackButton(false)
   }, [route, profile])
 
   function submit(p) { store.setProfile(p); setProfile(p); setRoute('home'); window.scrollTo(0, 0) }
@@ -44,7 +48,6 @@ export default function App() {
       <div className="app">
         <header className="topbar"><span className="logo">PUMP<span className="logo-dot">.</span></span></header>
         <Onboarding onSubmit={submit} />
-        <footer className="foot">PUMP · v0.5 · Telegram Mini App</footer>
       </div>
     )
   }
@@ -52,30 +55,43 @@ export default function App() {
   const screens = {
     home: <Home profile={profile} go={go} userName={tgUserName()} />,
     workout: <Workout profile={profile} />,
-    nutrition: <Nutrition profile={profile} />,
     catalog: <Catalog profile={profile} />,
     progress: <Progress />,
+    more: <More go={go} onResetProfile={resetProfile} />,
+    nutrition: <Nutrition profile={profile} />,
     water: <Water profile={profile} />,
     measures: <Measures />,
     timer: <Timer />,
     calculators: <Calculators />
   }
+  const activeTab = isSecondary ? 'more' : route
 
   return (
-    <div className="app">
+    <div className="app withnav">
       <header className="topbar">
-        {route === 'home'
-          ? <span className="logo">PUMP<span className="logo-dot">.</span></span>
-          : <button className="iconbtn" onClick={() => go('home')} aria-label="Назад"><Icon name="back" size={22} /></button>}
-        {route !== 'home' && <span className="topbar-title">{TITLES[route]}</span>}
-        {route === 'home'
-          ? <button className="ghost" onClick={resetProfile}>Профиль</button>
-          : <span style={{ width: 36 }} />}
+        {isSecondary ? (
+          <>
+            <button className="iconbtn" onClick={() => go('more')} aria-label="Назад"><Icon name="back" size={22} /></button>
+            <span className="topbar-title">{SECONDARY[route]}</span>
+            <span style={{ width: 38 }} />
+          </>
+        ) : route === 'home' ? (
+          <span className="logo">PUMP<span className="logo-dot">.</span></span>
+        ) : (
+          <span className="topbar-title solo">{TAB_TITLE[route]}</span>
+        )}
       </header>
 
-      {screens[route]}
+      <main className="content">{screens[route]}</main>
 
-      <footer className="foot">PUMP · v0.5 · Telegram Mini App</footer>
+      <nav className="tabbar">
+        {TABS.map(t => (
+          <button key={t.key} className={'tab' + (activeTab === t.key ? ' on' : '')} onClick={() => go(t.key)}>
+            <Icon name={t.icon} size={23} stroke={activeTab === t.key ? 2.1 : 1.8} />
+            <span>{t.label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   )
 }

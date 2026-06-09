@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
 import GroupBadge from './GroupBadge.jsx'
+import GuidedWorkout from './GuidedWorkout.jsx'
 import { GROUPS, GROUP_META } from '../engine/exercises.js'
 import { generateSession } from '../engine/sessionGenerator.js'
 import { estimateLoad } from '../engine/loads.js'
@@ -10,6 +11,7 @@ export default function WorkoutBuilder({ program, profile }) {
   const [picked, setPicked] = useState([])
   const [session, setSession] = useState(null)
   const [saved, setSaved] = useState(false)
+  const [guided, setGuided] = useState(false)
 
   const toggle = (g) => setPicked(p => p.includes(g) ? p.filter(x => x !== g) : [...p, g])
 
@@ -23,10 +25,15 @@ export default function WorkoutBuilder({ program, profile }) {
     const preset = program.presets[Math.floor(Math.random() * program.presets.length)]
     setPicked(preset.groups); build(preset.groups)
   }
-  function finish() {
+  function saveWorkout() {
+    if (saved) return
     const pr = store.getProgress()
     pr.workouts.push({ date: todayKey(), groups: session.groups, count: session.exercises.length })
     store.setProgress(pr); setSaved(true)
+  }
+
+  if (guided && session) {
+    return <GuidedWorkout session={session} profile={profile} onFinish={saveWorkout} onExit={() => setGuided(false)} />
   }
 
   return (
@@ -59,12 +66,12 @@ export default function WorkoutBuilder({ program, profile }) {
         {picked.length ? 'Собрать тренировку (' + picked.length + ')' : 'Выбери хотя бы одну группу'}
       </button>
 
-      {session && <Session session={session} profile={profile} saved={saved} onFinish={finish} />}
+      {session && <Session session={session} profile={profile} saved={saved} onSave={saveWorkout} onGuide={() => setGuided(true)} />}
     </section>
   )
 }
 
-function Session({ session, profile, saved, onFinish }) {
+function Session({ session, profile, saved, onSave, onGuide }) {
   return (
     <div id="session" className="session">
       <div className="session-head">
@@ -78,6 +85,8 @@ function Session({ session, profile, saved, onFinish }) {
           <div><span>Отдых</span><b>{session.scheme.rest}</b></div>
         </div>
       </div>
+
+      <button className="cta guide-btn" onClick={onGuide}><Icon name="play" size={18} /> Гид по тренировке (по шагам)</button>
 
       {session.exercises.map((ex, i) => (
         <div className="ex" key={ex.id}>
@@ -112,9 +121,9 @@ function Session({ session, profile, saved, onFinish }) {
         </div>
       )}
 
-      <p className="load-note">Веса — ориентир под твои параметры. Слушай тело: подбирай так, чтобы последние повторы давались тяжело, но с чистой техникой.</p>
+      <p className="load-note">Веса — ориентир под твои параметры. Подбирай так, чтобы последние повторы давались тяжело, но с чистой техникой.</p>
 
-      <button className={'cta' + (saved ? ' done' : '')} onClick={onFinish} disabled={saved}>
+      <button className={'cta' + (saved ? ' done' : '')} onClick={onSave} disabled={saved}>
         {saved ? <><Icon name="check" size={18} /> Тренировка засчитана</> : <><Icon name="check" size={18} /> Отметить выполненной</>}
       </button>
     </div>

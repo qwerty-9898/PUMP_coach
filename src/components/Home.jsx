@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Icon from './Icon.jsx'
 import { calcNutrition } from '../engine/nutrition.js'
+import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store, calcStreak, todayKey } from '../storage.js'
 
 const TIPS = [
@@ -11,69 +12,68 @@ const TIPS = [
   'Вода: 30 мл на кг веса. Обезвоживание режет силу и выносливость.',
   'Не пропускай ноги. Большие мышцы ног разгоняют общий рост и гормоны.',
   'Разминка 5–10 минут снижает риск травм и улучшает результат в подходах.',
-  'Ешь профицит для массы и дефицит для сушки — но всегда держи белок высоким.',
-  'Мышца растёт не на тренировке, а во сне и от еды. Тренировка — лишь стимул.',
-  'Веди дневник: что не записано, тем не управляешь. Прогресс любит цифры.'
-]
-
-const CARDS = [
-  { route: 'workout', icon: 'dumbbell', title: 'План тренировки', sub: 'Программа и тренировка на день' },
-  { route: 'nutrition', icon: 'flame', title: 'Калории и КБЖУ', sub: 'Считай еду и БЖУ за день' },
-  { route: 'catalog', icon: 'book', title: 'Каталог упражнений', sub: 'Техника и какие мышцы' },
-  { route: 'progress', icon: 'activity', title: 'Прогресс', sub: 'Тренировки и серия' },
-  { route: 'water', icon: 'droplet', title: 'Дневник воды', sub: 'Норма и учёт за день' },
-  { route: 'measures', icon: 'ruler', title: 'Замеры тела', sub: 'Вес и объёмы' },
-  { route: 'timer', icon: 'timer', title: 'Таймер отдыха', sub: 'Между подходами' },
-  { route: 'calculators', icon: 'calc', title: 'Калькуляторы', sub: '1ПМ и блины на штангу' }
+  'Мышца растёт не на тренировке, а во сне и от еды. Тренировка — лишь стимул.'
 ]
 
 export default function Home({ profile, go, userName }) {
   const n = calcNutrition(profile)
   const date = todayKey()
   const [tipIdx, setTipIdx] = useState(() => new Date().getMinutes() % TIPS.length)
-
   useEffect(() => {
     const id = setInterval(() => setTipIdx(i => (i + 1) % TIPS.length), 120000)
     return () => clearInterval(id)
   }, [])
 
+  const recId = recommendProgram(profile)
+  const program = PROGRAMS.find(p => p.id === recId)
   const streak = calcStreak(store.getProgress().workouts.map(w => w.date))
   const eaten = store.getFoodDay(date).reduce((a, e) => a + e.kcal, 0)
   const water = store.getWater()[date] || 0
+  const did = store.getProgress().workouts.some(w => w.date === date)
 
   return (
     <div className="home">
       <div className="greet">
         <span className="greet-k">Погнали, {userName || 'чемпион'}</span>
-        <h1 className="display lg">Сегодня прокачаемся</h1>
+        <h1 className="display lg">Время прокачаться</h1>
       </div>
 
+      <button className="herocard" onClick={() => go('workout')}>
+        <div className="hero-glow" />
+        <div className="hero-top">
+          <span className="hero-kicker">{did ? 'Сегодня уже размялся' : 'Тренировка на сегодня'}</span>
+          <Icon name="dumbbell" size={26} />
+        </div>
+        <div className="hero-name">{program.name}</div>
+        <div className="hero-sub">{program.subtitle} · {profile.goal}</div>
+        <div className="hero-cta">
+          <span>{did ? 'Добить ещё раз' : 'Начать тренировку'}</span>
+          <Icon name="arrow" size={20} />
+        </div>
+      </button>
+
       <div className="today">
+        <button className="todaybox" onClick={() => go('progress')}>
+          <Icon name="trophy" size={18} />
+          <b>{streak}</b><span>серия</span>
+        </button>
         <button className="todaybox" onClick={() => go('nutrition')}>
           <Icon name="flame" size={18} />
-          <b>{eaten}<small>/{n.kcal}</small></b><span>ккал съедено</span>
+          <b>{eaten}<small>/{n.kcal}</small></b><span>ккал</span>
         </button>
         <button className="todaybox" onClick={() => go('water')}>
           <Icon name="droplet" size={18} />
           <b>{(water / 1000).toFixed(1)}<small> л</small></b><span>вода</span>
         </button>
-        <button className="todaybox" onClick={() => go('progress')}>
-          <Icon name="trophy" size={18} />
-          <b>{streak}</b><span>серия</span>
-        </button>
       </div>
 
-      <div className="cards">
-        {CARDS.map(c => (
-          <button key={c.route} className="navcard" onClick={() => go(c.route)}>
-            <span className="navcard-ic"><Icon name={c.icon} size={24} /></span>
-            <span className="navcard-txt">
-              <span className="navcard-title">{c.title}</span>
-              <span className="navcard-sub">{c.sub}</span>
-            </span>
-            <span className="navcard-arr"><Icon name="chevron" size={18} /></span>
-          </button>
-        ))}
+      <div className="quick2">
+        <button className="quickcard" onClick={() => go('catalog')}>
+          <Icon name="book" size={22} /><span>Каталог<br /><small>техника упражнений</small></span>
+        </button>
+        <button className="quickcard" onClick={() => go('more')}>
+          <Icon name="grid" size={22} /><span>Инструменты<br /><small>вода, замеры, таймер</small></span>
+        </button>
       </div>
 
       <div className="tipcard">

@@ -452,3 +452,109 @@ input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px 
 
 /* Плавный фокус инпутов */
 input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, border-color .2s ease; }
+
+
+/* ============================================================
+   v0.6 — РЕБРЕНД: нижняя навигация, главная-герой, каталог, гид
+   ============================================================ */
+.display.md { font-size: 26px; }
+.topbar-title.solo { text-align: left; }
+
+/* Контент с нижней навигацией */
+.app.withnav .content { padding-bottom: 84px; }
+.content { animation: screenIn .36s cubic-bezier(.2,.75,.3,1) both; }
+
+/* Нижняя таб-навигация */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  display: flex; justify-content: space-around; align-items: stretch;
+  background: rgba(13,16,21,.92); backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line);
+  padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
+  max-width: 540px; margin: 0 auto;
+}
+.tab {
+  flex: 1; background: none; border: none; cursor: pointer; color: var(--muted);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 10.5px; font-weight: 600; padding: 4px 0; transition: color .2s;
+}
+.tab span { letter-spacing: .2px; }
+.tab.on { color: var(--accent); }
+.tab.on svg { filter: drop-shadow(0 0 6px rgba(255,90,31,.5)); }
+.tab:active { transform: scale(.92); }
+
+/* Главная — карточка-герой */
+.herocard {
+  position: relative; width: 100%; text-align: left; cursor: pointer; color: #fff;
+  border: none; border-radius: 22px; padding: 22px; margin-bottom: 16px; overflow: hidden;
+  background: linear-gradient(135deg, #ff7a2d, #ff4d12 60%, #d63b08);
+  box-shadow: 0 14px 38px rgba(255,80,20,.34);
+}
+.herocard:active { transform: scale(.99); }
+.hero-glow { position: absolute; right: -30px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,.18); }
+.hero-top { display: flex; justify-content: space-between; align-items: center; color: #fff; position: relative; }
+.hero-kicker { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: .9; }
+.hero-name { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 30px; line-height: 1.05; margin-top: 12px; position: relative; }
+.hero-sub { font-size: 13px; opacity: .92; margin-top: 4px; position: relative; }
+.hero-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; background: rgba(0,0,0,.22); padding: 11px 18px; border-radius: 13px; font-weight: 800; font-size: 15px; position: relative; }
+
+/* Компактная сводка дня */
+.quick2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.quickcard { display: flex; align-items: center; gap: 11px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 15px; cursor: pointer; color: var(--text); text-align: left; }
+.quickcard svg { color: var(--accent); flex-shrink: 0; }
+.quickcard span { font-weight: 700; font-size: 14px; line-height: 1.25; }
+.quickcard small { font-weight: 500; font-size: 11px; color: var(--muted); }
+.quickcard:active { transform: scale(.97); border-color: var(--accent); }
+
+.more-foot { text-align: center; color: var(--muted); font-size: 12px; opacity: .6; margin-top: 22px; }
+
+/* Каталог: сетка групп */
+.groupgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.groupcard { display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px 12px; cursor: pointer; color: var(--text); }
+.groupcard:active { transform: scale(.96); border-color: var(--accent); }
+.groupcard-name { font-weight: 700; font-size: 15px; }
+.groupcard-cnt { font-size: 11px; color: var(--muted); }
+
+.backrow { display: inline-flex; align-items: center; gap: 6px; background: none; border: none; color: var(--muted); font-size: 14px; font-weight: 600; cursor: pointer; padding: 4px 0; margin-bottom: 12px; }
+.backrow:active { color: var(--accent); }
+.detail-hero { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.detail-hero h2 { margin: 0; }
+.detail-musc { font-size: 13px; color: var(--muted); }
+
+.exlist { display: flex; flex-direction: column; gap: 9px; }
+.exrow { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 15px; cursor: pointer; color: var(--text); text-align: left; }
+.exrow:active { transform: scale(.98); border-color: var(--accent); }
+.exrow-main { flex: 1; min-width: 0; }
+.exrow-name { display: block; font-weight: 700; font-size: 15px; }
+.exrow-sub { font-size: 12px; color: var(--muted); }
+.exrow-arr { color: var(--muted); flex-shrink: 0; }
+.cue { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--muted); line-height: 1.45; margin-bottom: 8px; }
+.cue svg { color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+
+/* Гид по тренировке */
+.guided { padding-top: 4px; min-height: 70vh; display: flex; flex-direction: column; }
+.guided-top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.guided-prog { flex: 1; display: flex; align-items: center; gap: 10px; }
+.gp-track { flex: 1; height: 7px; border-radius: 5px; background: var(--card2); overflow: hidden; }
+.gp-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width .4s cubic-bezier(.3,.8,.3,1); }
+.guided-prog span { font-size: 13px; font-weight: 700; color: var(--muted); }
+.guided-card { background: var(--card); border: 1px solid var(--accent); border-radius: 20px; padding: 20px; box-shadow: var(--glow); margin-bottom: 18px; }
+.guided-card h2 { margin: 10px 0 14px; }
+.guided-scheme { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; margin-bottom: 14px; }
+.guided-scheme div { background: var(--card2); border-radius: 13px; padding: 12px 8px; text-align: center; }
+.guided-scheme span { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.guided-scheme b { font-size: 17px; font-family: 'Oswald', sans-serif; }
+.guided-tip { font-size: 13px; color: var(--muted); line-height: 1.5; display: flex; gap: 7px; align-items: flex-start; }
+.guided-tip svg { color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+.setdots { display: flex; gap: 9px; justify-content: center; margin-bottom: 20px; }
+.setdot { width: 40px; height: 40px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--muted); transition: .25s; }
+.setdot.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent2); transform: scale(1.05); }
+.restbox { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; text-align: center; }
+.rest-lbl { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; }
+.rest-time { display: block; font-family: 'Oswald', sans-serif; font-size: 52px; color: var(--accent); margin: 6px 0 14px; line-height: 1; }
+.guide-btn { margin-bottom: 16px; background: var(--card2); color: var(--accent2); border: 1px solid var(--accent); box-shadow: none; }
+.ghost-cta { background: transparent; color: var(--muted); border: 1px solid var(--line); box-shadow: none; }
+
+.done-screen { align-items: center; text-align: center; justify-content: center; padding-top: 40px; }
+.done-badge { width: 88px; height: 88px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; animation: ringPop .5s cubic-bezier(.2,.8,.3,1.2) both; }
+.done-screen .sub { margin-bottom: 24px; max-width: 320px; }
