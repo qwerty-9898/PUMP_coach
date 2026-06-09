@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import ProgramPicker from './ProgramPicker.jsx'
 import WorkoutBuilder from './WorkoutBuilder.jsx'
+import WeekSchedule from './WeekSchedule.jsx'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 
 export default function Workout({ profile }) {
@@ -13,7 +14,10 @@ export default function Workout({ profile }) {
   return (
     <div className="screen">
       {!program && <ProgramPicker selected={programId} recommended={recommended} onSelect={setProgramId} />}
-      {program && <WorkoutBuilder key={program.id} program={program} profile={profile} onChangeProgram={changeProgram} />}
+      {program && <>
+        <WeekSchedule program={program} profile={profile} />
+        <WorkoutBuilder key={program.id} program={program} profile={profile} onChangeProgram={changeProgram} />
+      </>}
     </div>
   )
 }

@@ -96,3 +96,16 @@ export function recommendProgram({ level, daysPerWeek }) {
   if (daysPerWeek === 5) return 'ppl'
   return 'bro_split'
 }
+
+const DAY_PATTERNS = { 2: [0, 3], 3: [0, 2, 4], 4: [0, 1, 3, 4], 5: [0, 1, 2, 3, 4], 6: [0, 1, 2, 3, 4, 5] }
+const DAY_NAMES = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+
+export function buildWeek(program, daysPerWeek) {
+  const days = DAY_PATTERNS[daysPerWeek] || [0, 2, 4]
+  const week = DAY_NAMES.map(n => ({ day: n, label: 'Отдых', rest: true, groups: [] }))
+  days.forEach((di, i) => {
+    const preset = program.presets[i % program.presets.length]
+    week[di] = { day: DAY_NAMES[di], label: preset.name, rest: false, groups: preset.groups }
+  })
+  return week
+}

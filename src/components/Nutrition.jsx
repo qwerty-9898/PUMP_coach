@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
 import { calcNutrition } from '../engine/nutrition.js'
-import { FOODS, searchFoods, macrosFor } from '../data/foods.js'
+import { searchFoods, macrosFor } from '../data/foods.js'
 import { store, todayKey } from '../storage.js'
 
 const MEALS = [

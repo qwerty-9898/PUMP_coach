@@ -1,20 +1,15 @@
-import Icon from './Icon.jsx'
+import BodyIcon from './BodyIcon.jsx'
 import { GROUP_META } from '../engine/exercises.js'
 
-const GROUP_ICON = {
-  'грудь': 'm_chest', 'спина': 'm_back', 'ноги': 'm_legs', 'плечи': 'm_shoulders',
-  'бицепс': 'm_biceps', 'трицепс': 'm_triceps', 'пресс': 'm_abs'
-}
-
-export default function GroupBadge({ group, size = 38 }) {
+export default function GroupBadge({ group, size = 40 }) {
   const m = GROUP_META[group]
   if (!m) return null
   return (
     <span className="gbadge" style={{
-      width: size, height: size, color: m.color,
-      background: hexA(m.color, 0.14), borderColor: hexA(m.color, 0.35)
+      width: size, height: size, color: '#c9d2df',
+      background: hexA(m.color, 0.13), borderColor: hexA(m.color, 0.34)
     }}>
-      <Icon name={GROUP_ICON[group]} size={Math.round(size * 0.58)} stroke={1.7} />
+      <BodyIcon group={group} size={Math.round(size * 0.5)} />
     </span>
   )
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
 import GroupBadge from './GroupBadge.jsx'
+import BodyIcon from './BodyIcon.jsx'
 import { EXERCISES, GROUPS, GROUP_META, techExtras } from '../engine/exercises.js'
 
 const EQUIP_LABEL = { none: 'Без инвентаря', dumbbell: 'Гантели', gym: 'Зал' }
@@ -15,18 +16,22 @@ export default function Catalog() {
     return (
       <div className="screen">
         <button className="backrow" onClick={() => setExId(null)}><Icon name="back" size={18} /> К списку</button>
-        <div className="detail-hero">
-          <GroupBadge group={ex.group} size={54} />
-          <div>
-            <h2 className="display sm">{ex.name}</h2>
-            <span className="detail-musc">{ex.muscles}</span>
+        <h2 className="display sm" style={{ marginBottom: 4 }}>{ex.name}</h2>
+        <span className="detail-musc">{ex.muscles}</span>
+
+        <div className="demo-card">
+          <div className="demo-body" style={{ color: GROUP_META[ex.group].color }}>
+            <BodyIcon group={ex.group} size={84} />
           </div>
-        </div>
-        <div className="cattags">
-          <span className="tag">{GROUP_META[ex.group].label}</span>
-          <span className="tag">{EQUIP_LABEL[ex.equip]}</span>
-          <span className="tag">{ex.level}</span>
-          {ex.compound && <span className="tag base">базовое</span>}
+          <div className="demo-txt">
+            <span className="demo-h">Работают мышцы</span>
+            <p>{ex.muscles}</p>
+            <div className="cattags">
+              <span className="tag">{EQUIP_LABEL[ex.equip]}</span>
+              <span className="tag">{ex.level}</span>
+              {ex.compound && <span className="tag base">базовое</span>}
+            </div>
+          </div>
         </div>
 
         <Section title="Техника по шагам">

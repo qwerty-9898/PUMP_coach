@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
-import GroupBadge from './GroupBadge.jsx'
 import { EXERCISES, GROUPS, GROUP_META } from '../engine/exercises.js'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store, calcStreak } from '../storage.js'
