@@ -102,7 +102,12 @@ input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px 
 .bh { flex-shrink: 0; }
 .bh-figs { display: flex; gap: 8px; padding: 6px 4px; border-radius: 16px; background: radial-gradient(120px 150px at 50% 42%, rgba(255,138,61,.10), transparent 72%); }
 .bh-fig { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.bh-svg { width: 58px; height: 97px; color: #9fb0c6; }
+.bh-frame { position: relative; display: inline-block; line-height: 0; }
+.bh-img { height: 150px; width: auto; display: block; filter: drop-shadow(0 0 6px rgba(255,120,30,.25)); }
+.bh-zone { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; filter: blur(2.5px); transition: opacity .35s; }
+.bi-frame { position: relative; display: inline-block; line-height: 0; }
+.bi-img { height: 100%; width: auto; display: block; }
+.bi-zone { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; filter: blur(1.6px); }
 .bh-cap { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
 .recovery-side { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .rg { display: flex; align-items: center; gap: 9px; }
