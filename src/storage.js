@@ -7,7 +7,8 @@ const K = {
   food: 'pump_food_v1',
   fav: 'pump_fav_v1',
   favex: 'pump_favex_v1',
-  rating: 'pump_rating_v1'
+  rating: 'pump_rating_v1',
+  logs: 'pump_logs_v1'
 }
 
 function read(key, fallback) {
@@ -61,7 +62,13 @@ export const store = {
     write(K.favex, f); return f
   },
   getRating: () => read(K.rating, {}),
-  setRating: (pid, stars) => { const r = read(K.rating, {}); r[pid] = stars; write(K.rating, r) }
+  setRating: (pid, stars) => { const r = read(K.rating, {}); r[pid] = stars; write(K.rating, r) }  ,
+  getLogs: () => read(K.logs, []),
+  addLog: (entry) => { const a = read(K.logs, []); a.push(entry); write(K.logs, a) },
+  getExLogs: (exId) => read(K.logs, []).filter(e => e.exId === exId).sort((a, b) => a.date.localeCompare(b.date)),
+  getLastSets: (exId) => { const l = read(K.logs, []).filter(e => e.exId === exId); return l.length ? l[l.length - 1].sets : null },
+  loggedExIds: () => [...new Set(read(K.logs, []).map(e => e.exId))]
+
 }
 
 export function todayKey(d = new Date()) {

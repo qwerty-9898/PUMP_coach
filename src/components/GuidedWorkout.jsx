@@ -2,30 +2,48 @@ import { useState, useEffect, useRef } from 'react'
 import Icon from './Icon.jsx'
 import { GROUP_META } from '../engine/exercises.js'
 import { estimateLoad } from '../engine/loads.js'
+import { suggestNext, lastSummary, isPR } from '../engine/progress.js'
+import { store, todayKey } from '../storage.js'
 import { haptic } from '../tg.js'
 
 const WARMUP = [
-  'Лёгкое кардио 3–5 минут: быстрая ходьба, скакалка или бег на месте',
-  'Суставная разминка: вращения шеи, плеч, локтей, таза, коленей, стоп',
-  'Динамическая растяжка рабочих мышц (махи, выпады с поворотом)',
+  'Лёгкое кардио 3–5 минут: ходьба, скакалка или бег на месте',
+  'Суставная разминка: шея, плечи, локти, таз, колени, стопы',
+  'Динамическая растяжка рабочих мышц',
   '1–2 разминочных подхода первого упражнения с лёгким весом'
 ]
-
 function restSeconds(rest) {
   const num = parseInt((rest || '').replace(/[^0-9].*$/, ''), 10) || 60
   return /мин/.test(rest) ? num * 60 : num
 }
+function parseLoad(str) { const m = (str || '').match(/(\d+(\.\d+)?)/); return m ? Number(m[1]) : '' }
 
 export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
   const total = session.exercises.length
   const rest = restSeconds(session.scheme.rest)
   const [phase, setPhase] = useState('warmup')
   const [idx, setIdx] = useState(0)
-  const [done, setDone] = useState(0)
+  const [logs, setLogs] = useState({})
   const [resting, setResting] = useState(false)
   const [left, setLeft] = useState(rest)
+  const [curW, setCurW] = useState('')
+  const [curR, setCurR] = useState('')
+  const [prFlash, setPrFlash] = useState(false)
   const ref = useRef(null)
   const ex = session.exercises[idx]
+  const doneSets = (logs[idx] || []).length
+
+  // подстановка веса/повторов при входе в упражнение
+  useEffect(() => {
+    if (phase !== 'work') return
+    const sug = suggestNext(ex.id, ex.reps)
+    if (sug) { setCurW(String(sug.weight)); setCurR(String(sug.reps)) }
+    else {
+      const w = parseLoad(estimateLoad(ex, profile))
+      setCurW(w === '' ? '' : String(w))
+      setCurR(String((ex.reps || '').split(/[–-]/)[0] || 10))
+    }
+  }, [idx, phase])
 
   useEffect(() => {
     if (resting) {
@@ -37,14 +55,27 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
     return () => clearInterval(ref.current)
   }, [resting, rest])
 
-  function doSet() {
+  function recordSet() {
+    const w = Number(curW) || 0, r = Number(curR) || 0
+    if (r <= 0) return
     haptic('light')
-    const nd = done + 1; setDone(nd)
-    if (nd < ex.sets) { setLeft(rest); setResting(true) }
+    if (w > 0 && isPR(ex.id, w, r) && doneSets === 0) { setPrFlash(true); setTimeout(() => setPrFlash(false), 2000) }
+    const next = { ...logs, [idx]: [...(logs[idx] || []), { w, r }] }
+    setLogs(next)
+    if ((next[idx].length) < ex.sets) { setLeft(rest); setResting(true) }
   }
   function nextEx() {
-    if (idx + 1 >= total) { onFinish && onFinish(); setPhase('done'); return }
-    setIdx(idx + 1); setDone(0); setResting(false); setLeft(rest); window.scrollTo(0, 0)
+    if (idx + 1 >= total) { finishAll(); return }
+    setIdx(idx + 1); setResting(false); setLeft(rest); window.scrollTo(0, 0)
+  }
+  function finishAll() {
+    const date = todayKey()
+    session.exercises.forEach((e, i) => {
+      const sets = (logs[i] || []).filter(s => s.r > 0)
+      if (sets.length) store.addLog({ date, exId: e.id, name: e.name, group: e.group, sets })
+    })
+    onFinish && onFinish()
+    setPhase('done')
   }
   function skipRest() { clearInterval(ref.current); setResting(false); setLeft(rest) }
 
@@ -52,60 +83,60 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
     return (
       <div className="guided">
         <div className="guided-top">
-          <button className="iconbtn" onClick={onExit} aria-label="Выйти"><Icon name="x" size={20} /></button>
+          <button className="iconbtn" onClick={onExit}><Icon name="x" size={20} /></button>
           <span className="guided-prog"><b style={{ fontFamily: 'Oswald', fontSize: 16 }}>Разминка</b></span>
         </div>
         <div className="guided-card">
           <h2 className="display md">Сначала разомнись</h2>
-          <p className="sub" style={{ marginBottom: 14 }}>5 минут разминки = меньше травм и лучше результат в подходах.</p>
-          {WARMUP.map((w, i) => (
-            <div className="warmrow" key={i}><span className="warmnum">{i + 1}</span><span>{w}</span></div>
-          ))}
+          <p className="sub" style={{ marginBottom: 12 }}>5 минут разминки = меньше травм и лучше результат.</p>
+          {WARMUP.map((w, i) => <div className="warmrow" key={i}><span className="warmnum">{i + 1}</span><span>{w}</span></div>)}
         </div>
         <button className="cta" onClick={() => setPhase('work')}><Icon name="play" size={18} /> Размялся, поехали</button>
       </div>
     )
   }
-
   if (phase === 'done') {
     return (
       <div className="guided done-screen">
         <div className="done-badge"><Icon name="check" size={42} /></div>
         <h2 className="display lg">Готово!</h2>
-        <p className="sub">Тренировка засчитана. {total} упражнений позади — красавчик. 💪</p>
-        <button className="cta" onClick={onExit}>На главную тренировки</button>
+        <p className="sub">Тренировка засчитана, подходы записаны. Прогресс смотри во вкладке «Прогресс». 💪</p>
+        <button className="cta" onClick={onExit}>К тренировкам</button>
       </div>
     )
   }
 
-  const exDone = done >= ex.sets
+  const exDone = doneSets >= ex.sets
+  const last = lastSummary(ex.id)
+  const sug = suggestNext(ex.id, ex.reps)
   const mm = String(Math.floor(left / 60)), ss = String(left % 60).padStart(2, '0')
 
   return (
     <div className="guided">
       <div className="guided-top">
-        <button className="iconbtn" onClick={onExit} aria-label="Выйти"><Icon name="x" size={20} /></button>
+        <button className="iconbtn" onClick={onExit}><Icon name="x" size={20} /></button>
         <div className="guided-prog">
           <div className="gp-track"><div className="gp-fill" style={{ width: ((idx + (exDone ? 1 : 0)) / total) * 100 + '%' }} /></div>
           <span>{idx + 1} / {total}</span>
         </div>
       </div>
 
-      <div className="guided-card">
+      <div className={'guided-card' + (prFlash ? ' pr' : '')}>
         <span className="tag" style={tagStyle(ex.group)}>{GROUP_META[ex.group].label}</span>
         <h2 className="display md">{ex.name}</h2>
-        <div className="guided-scheme">
-          <div><span>Подходы</span><b>{ex.sets}</b></div>
-          <div><span>Повторы</span><b>{ex.reps}</b></div>
-          <div><span>Вес</span><b>{estimateLoad(ex, profile)}</b></div>
+        <div className="guided-meta">
+          <span>Цель: <b>{ex.sets}×{ex.reps}</b></span>
+          {last && <span className="last-line">Прошлый раз: {last}</span>}
+          {sug && <span className="sug-line"><Icon name="bolt" size={13} /> Сегодня: {sug.weight} кг × {sug.reps} — {sug.note}</span>}
         </div>
-        <div className="guided-tip"><Icon name="info" size={15} /> {ex.tip}</div>
+        {prFlash && <div className="pr-flash"><Icon name="trophy" size={16} /> Новый личный рекорд!</div>}
       </div>
 
       <div className="setdots">
-        {Array.from({ length: ex.sets }).map((_, i) => (
-          <span key={i} className={'setdot' + (i < done ? ' on' : '')}>{i + 1}</span>
-        ))}
+        {Array.from({ length: ex.sets }).map((_, i) => {
+          const s = (logs[idx] || [])[i]
+          return <span key={i} className={'setdot' + (i < doneSets ? ' on' : '')}>{s ? (s.w ? s.w + '×' + s.r : s.r) : i + 1}</span>
+        })}
       </div>
 
       {resting ? (
@@ -119,8 +150,21 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
           {idx + 1 >= total ? <><Icon name="flag" size={18} /> Завершить тренировку</> : <><Icon name="arrow" size={18} /> Следующее упражнение</>}
         </button>
       ) : (
-        <button className="cta" onClick={doSet}><Icon name="check" size={18} /> Подход {done + 1} сделан</button>
+        <div className="setlogger">
+          <div className="setlog-inputs">
+            <label><span>Вес, кг</span>
+              <input type="number" inputMode="decimal" value={curW} placeholder="0" onChange={e => setCurW(e.target.value)} />
+            </label>
+            <span className="setlog-x">×</span>
+            <label><span>Повторы</span>
+              <input type="number" inputMode="numeric" value={curR} onChange={e => setCurR(e.target.value)} />
+            </label>
+          </div>
+          <button className="cta" onClick={recordSet}><Icon name="check" size={18} /> Записать подход {doneSets + 1}</button>
+        </div>
       )}
+
+      <div className="guided-tip"><Icon name="info" size={15} /> {ex.tip}</div>
     </div>
   )
 }

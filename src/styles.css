@@ -694,3 +694,61 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .cal-circle.done { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #1a0a02; border-color: transparent; box-shadow: 0 4px 12px rgba(255,90,31,.3); }
 .cal-day.today .cal-circle { box-shadow: 0 0 0 2px var(--accent); }
 .cal-day.today .cal-circle.done { box-shadow: 0 0 0 2px var(--accent), 0 4px 12px rgba(255,90,31,.3); }
+
+
+/* ============================================================
+   v1.1 — ЛОГИРОВАНИЕ, ГРАФИКИ, КОМПАКТНЫЙ РЕБРЕНД
+   ============================================================ */
+/* Логирование подходов в гиде */
+.guided-meta { display: flex; flex-direction: column; gap: 5px; margin: 10px 0 2px; font-size: 13px; }
+.guided-meta b { color: var(--text); }
+.last-line { color: var(--muted); }
+.sug-line { color: var(--accent2); display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
+.guided-card.pr { border-color: #fbbf24; box-shadow: 0 0 0 1px #fbbf24, 0 10px 32px rgba(251,191,36,.22); }
+.pr-flash { margin-top: 10px; background: rgba(251,191,36,.16); color: #fbbf24; border-radius: 10px; padding: 8px 12px; font-weight: 700; font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+.setlogger { margin-bottom: 4px; }
+.setlog-inputs { display: flex; align-items: flex-end; justify-content: center; gap: 12px; margin-bottom: 14px; }
+.setlog-inputs label { display: flex; flex-direction: column; gap: 5px; flex: 1; max-width: 130px; }
+.setlog-inputs label span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; text-align: center; }
+.setlog-inputs input { background: var(--card2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: 22px; font-family: 'Oswald', sans-serif; text-align: center; color: var(--text); width: 100%; }
+.setlog-inputs input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.setlog-x { font-size: 22px; color: var(--muted); padding-bottom: 12px; }
+.setdot { min-width: 40px; height: 36px; padding: 0 8px; font-size: 13px; width: auto; }
+
+/* Карточки-боксы и графики в прогрессе */
+.card-box { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 14px; }
+.prlist { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.prrow { display: flex; justify-content: space-between; align-items: center; background: var(--card2); border-radius: 11px; padding: 11px 13px; }
+.pr-name { font-weight: 600; font-size: 14px; }
+.pr-val { font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--accent2); }
+.pr-val small { color: var(--muted); font-weight: 400; font-family: 'Manrope', sans-serif; font-size: 11px; }
+.ex-select { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin: 10px 0; }
+.ex-select::-webkit-scrollbar { display: none; }
+.ex-select .fpill { flex-shrink: 0; }
+.chart-empty { color: var(--muted); font-size: 13px; padding: 24px; text-align: center; }
+
+/* ===== Компактный рефактор: плотнее и аккуратнее ===== */
+.app { padding: 0 14px 46px; }
+.app.withnav .content { padding-bottom: 80px; }
+.block { margin-bottom: 18px; }
+.block-head { margin-bottom: 12px; }
+.field { margin-bottom: 14px; }
+.greet { margin-bottom: 14px; }
+.display.lg { font-size: 27px; }
+.display.xl { font-size: 40px; }
+.herocard { padding: 18px; margin-bottom: 14px; border-radius: 20px; }
+.hero-name { font-size: 27px; margin-top: 10px; }
+.today { gap: 9px; margin: 12px 0; }
+.quick2 { margin: 12px 0; }
+.kcard, .ring-card { padding: 16px; margin-bottom: 14px; border-radius: 18px; }
+.session { padding: 16px; margin-top: 16px; }
+.prog-head { padding: 14px 16px; }
+.calstrip { padding: 12px 8px; margin-bottom: 14px; }
+.weekcard { padding: 14px; margin-bottom: 14px; }
+.mbars { padding: 14px; margin-bottom: 14px; }
+.mealblock { margin-bottom: 10px; }
+.tipcard { padding: 13px; margin-top: 14px; }
+.ex { padding: 12px 0; }
+.muscles { gap: 8px; margin-bottom: 14px; }
+.groupgrid { gap: 10px; }
+.groupcard { padding: 16px 12px; }
