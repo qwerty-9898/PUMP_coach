@@ -8,10 +8,12 @@ export default function Workout({ profile }) {
   const [programId, setProgramId] = useState(null)
   const program = PROGRAMS.find(p => p.id === programId)
 
+  function changeProgram() { setProgramId(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+
   return (
     <div className="screen">
-      <ProgramPicker selected={programId} recommended={recommended} onSelect={setProgramId} />
-      {program && <WorkoutBuilder key={program.id} program={program} profile={profile} />}
+      {!program && <ProgramPicker selected={programId} recommended={recommended} onSelect={setProgramId} />}
+      {program && <WorkoutBuilder key={program.id} program={program} profile={profile} onChangeProgram={changeProgram} />}
     </div>
   )
 }

@@ -129,5 +129,5 @@ function tagStyle(group) {
   const c = GROUP_META[group].color
   const n = parseInt(c.slice(1), 16)
   const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255
-  return { color: c, background: 'rgba(' + r + ',' + g + ',' + b + ',0.16)' }
+  return { color: '#fff', background: 'rgba(' + r + ',' + g + ',' + b + ',0.2)', border: '1px solid rgba(' + r + ',' + g + ',' + b + ',0.45)' }
 }

@@ -5,7 +5,9 @@ const K = {
   water: 'pump_water_v1',
   measures: 'pump_measures_v1',
   food: 'pump_food_v1',
-  fav: 'pump_fav_v1'
+  fav: 'pump_fav_v1',
+  favex: 'pump_favex_v1',
+  rating: 'pump_rating_v1'
 }
 
 function read(key, fallback) {
@@ -50,7 +52,15 @@ export const store = {
     fav = fav.includes(foodId) ? fav.filter(x => x !== foodId) : [...fav, foodId]
     write(K.fav, fav)
     return fav
-  }
+  }  ,
+  getFavEx: () => read(K.favex, []),
+  toggleFavEx: (id) => {
+    let f = read(K.favex, [])
+    f = f.includes(id) ? f.filter(x => x !== id) : [...f, id]
+    write(K.favex, f); return f
+  },
+  getRating: () => read(K.rating, {}),
+  setRating: (pid, stars) => { const r = read(K.rating, {}); r[pid] = stars; write(K.rating, r) }
 }
 
 export function todayKey(d = new Date()) {

@@ -601,3 +601,50 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 /* Активная вкладка — мягкая подложка */
 .tab.on { position: relative; }
 .tab.on::before { content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 26px; height: 3px; border-radius: 3px; background: var(--accent); }
+
+
+/* ============================================================
+   v0.8 — СВЕТЛЫЕ ТЕГИ, ЗАГРУЗКА, ОЦЕНКА, СМЕНА ПЛАНА
+   ============================================================ */
+/* Теги-капсулы со светлым текстом */
+.tag { background: rgba(255,255,255,.07); color: #d9e0ec; border: 1px solid rgba(255,255,255,.09);
+  border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 600; letter-spacing: .2px; }
+.tag.base { background: rgba(255,138,61,.2); color: #ffd2b8; border-color: rgba(255,138,61,.4); }
+.tag.load { background: rgba(255,90,31,.16); color: #ffd2b8; border-color: rgba(255,90,31,.35); }
+.chip { background: rgba(255,255,255,.09); color: #e8edf5; border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 600; }
+
+/* Экран загрузки после онбординга */
+.loader { min-height: 78vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+.loader-logo { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 48px; letter-spacing: 3px; text-transform: uppercase;
+  animation: loaderPulse 1s ease-in-out infinite alternate; }
+@keyframes loaderPulse { from { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255,90,31,0)); } to { transform: scale(1.06); filter: drop-shadow(0 0 16px rgba(255,90,31,.5)); } }
+.loader-bar { width: 220px; height: 8px; border-radius: 5px; background: var(--card2); overflow: hidden; }
+.loader-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--accent2), var(--accent)); animation: loaderRun 2.6s cubic-bezier(.3,.7,.3,1) forwards; }
+@keyframes loaderRun { 0% { width: 6%; } 55% { width: 72%; } 100% { width: 100%; } }
+.loader-step { color: var(--muted); font-size: 14px; font-weight: 600; animation: fadeIn .4s ease; }
+
+/* Оценка программы */
+.ratecard { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; text-align: center; margin-bottom: 22px; }
+.rate-name { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 22px; text-transform: uppercase; margin: 6px 0 12px; }
+.stars { display: flex; justify-content: center; gap: 6px; }
+.star { background: none; border: none; color: #313a48; cursor: pointer; padding: 2px; transition: transform .15s, color .2s; }
+.star.on { color: #fbbf24; }
+.star:active { transform: scale(1.25); }
+.rate-hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+/* Любимые упражнения */
+.favchips { display: flex; flex-wrap: wrap; gap: 8px; }
+.favchip { background: var(--card); border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.favchip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent2); }
+
+/* Смена плана / замена упражнения */
+.session-actions { display: flex; gap: 10px; align-items: stretch; margin-bottom: 6px; }
+.session-actions .guide-btn { flex: 1; margin-bottom: 0; }
+.iconbtn-lg { width: 54px; flex-shrink: 0; border-radius: 14px; background: var(--card2); border: 1px solid var(--accent); color: var(--accent2); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.iconbtn-lg:active { transform: scale(.93); }
+.regen-hint { font-size: 12px; color: var(--muted); margin: 8px 0 14px; display: inline-flex; gap: 5px; align-items: center; flex-wrap: wrap; line-height: 1.5; }
+.regen-hint svg { color: var(--accent); }
+.swapbtn { align-self: flex-start; flex-shrink: 0; width: 32px; height: 32px; border-radius: 9px; background: var(--card2); border: 1px solid var(--line); color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform .25s, color .2s; }
+.swapbtn:active { transform: rotate(180deg); color: var(--accent); border-color: var(--accent); }
+.textlink { background: none; border: none; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 10px 0 2px; }
+.textlink:active { color: var(--accent); }

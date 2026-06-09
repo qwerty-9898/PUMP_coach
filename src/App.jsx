@@ -11,6 +11,7 @@ import Water from './components/Water.jsx'
 import Measures from './components/Measures.jsx'
 import Timer from './components/Timer.jsx'
 import Calculators from './components/Calculators.jsx'
+import Loader from './components/Loader.jsx'
 import Icon from './components/Icon.jsx'
 import { store } from './storage.js'
 import { initTelegram, tgBackButton, haptic, tgUserName } from './tg.js'
@@ -31,6 +32,7 @@ const TAB_TITLE = { workout: 'Тренировки', catalog: 'Каталог у
 export default function App() {
   const [profile, setProfile] = useState(null)
   const [route, setRoute] = useState('home')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => { initTelegram(); setProfile(store.getProfile()) }, [])
 
@@ -40,10 +42,12 @@ export default function App() {
     tgBackButton(false)
   }, [route, profile])
 
-  function submit(p) { store.setProfile(p); setProfile(p); setRoute('home'); window.scrollTo(0, 0) }
+  function submit(p) { store.setProfile(p); setProfile(p); setRoute('home'); setLoading(true); setTimeout(() => setLoading(false), 2600); window.scrollTo(0, 0) }
   function saveProfile(p) { store.setProfile(p); setProfile(p) }
   function restart() { store.clearProfile(); setProfile(null); setRoute('home') }
   function go(r) { haptic('light'); setRoute(r); window.scrollTo(0, 0) }
+
+  if (loading) return <div className="app"><Loader /></div>
 
   if (!profile) {
     return (
@@ -58,7 +62,7 @@ export default function App() {
     home: <Home profile={profile} go={go} userName={tgUserName()} />,
     workout: <Workout profile={profile} />,
     catalog: <Catalog profile={profile} />,
-    progress: <Progress />,
+    progress: <Progress profile={profile} />,
     more: <More go={go} />,
     profile: <Profile profile={profile} onSave={saveProfile} onRestart={restart} />,
     nutrition: <Nutrition profile={profile} />,
