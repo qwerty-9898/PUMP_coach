@@ -1,7 +1,7 @@
 // Программы тренировок с разбором. fit: 'perfect'|'ok'|'no' — насколько подходит новичку.
 export const PROGRAMS = [
   {
-    id: 'fullbody', name: 'Фуллбади', subtitle: 'Всё тело за тренировку',
+    id: 'fullbody', equip: ['none','dumbbell','gym'], name: 'Фуллбади', subtitle: 'Всё тело за тренировку',
     days: '2–3 дня/нед', freq: 'каждая мышца 2–3 раза в неделю',
     fit: 'perfect', fitLabel: 'Идеально новичку',
     about: 'Прорабатываешь всё тело на каждой тренировке. Высокая частота даёт новичку самый быстрый прогресс силы и массы.',
@@ -11,7 +11,7 @@ export const PROGRAMS = [
     presets: [{ name: 'Всё тело', groups: ['ноги', 'грудь', 'спина', 'плечи', 'пресс'] }]
   },
   {
-    id: 'upper_lower', name: 'Верх / Низ', subtitle: 'Два дня верх, два низ',
+    id: 'upper_lower', equip: ['none','dumbbell','gym'], name: 'Верх / Низ', subtitle: 'Два дня верх, два низ',
     days: '4 дня/нед', freq: 'каждая мышца 2 раза в неделю',
     fit: 'ok', fitLabel: 'Можно после 2–3 мес',
     about: 'Тело делится на верх (грудь, спина, плечи, руки) и низ (ноги, пресс). Каждую половину качаешь дважды в неделю — отличный баланс частоты и объёма.',
@@ -24,7 +24,7 @@ export const PROGRAMS = [
     ]
   },
   {
-    id: 'ppl', name: 'Тяни / Толкай / Ноги', subtitle: 'PPL — по типу движения',
+    id: 'ppl', equip: ['dumbbell','gym'], name: 'Тяни / Толкай / Ноги', subtitle: 'PPL — по типу движения',
     days: '3–6 дней/нед', freq: '1–2 раза на мышцу',
     fit: 'ok', fitLabel: 'Для среднего уровня',
     about: 'Дни по движению: «Толкай» (грудь, плечи, трицепс), «Тяни» (спина, бицепс), «Ноги». Мышцы, работающие вместе, тренируются вместе.',
@@ -38,7 +38,7 @@ export const PROGRAMS = [
     ]
   },
   {
-    id: 'split_synergist', name: 'Сплит: синергисты', subtitle: 'Грудь+трицепс / Спина+бицепс / Ноги',
+    id: 'split_synergist', equip: ['dumbbell','gym'], name: 'Сплит: синергисты', subtitle: 'Грудь+трицепс / Спина+бицепс / Ноги',
     days: '3–4 дня/нед', freq: '1–2 раза на мышцу',
     fit: 'ok', fitLabel: 'Лучший первый сплит',
     about: 'Грудь с трицепсом (оба толкают), спина с бицепсом (оба тянут). Малая мышца уже разогрета базой — экономит время и логично по биомеханике. Самый популярный 3-дневный сплит.',
@@ -52,7 +52,7 @@ export const PROGRAMS = [
     ]
   },
   {
-    id: 'split_antagonist', name: 'Сплит: антагонисты', subtitle: 'Грудь+бицепс / Спина+трицепс / Ноги',
+    id: 'split_antagonist', equip: ['dumbbell','gym'], name: 'Сплит: антагонисты', subtitle: 'Грудь+бицепс / Спина+трицепс / Ноги',
     days: '3–4 дня/нед', freq: '1–2 раза на мышцу',
     fit: 'no', fitLabel: 'Средний / продвинутый',
     about: 'Грудь с бицепсом, спина с трицепсом — мышцы-антагонисты. Малая мышца всегда свежая (бицепс не устал от жимов), удобно делать суперсеты антагонистов.',
@@ -66,7 +66,7 @@ export const PROGRAMS = [
     ]
   },
   {
-    id: 'bro_split', name: 'Сплит по группам', subtitle: 'Каждый день — своя группа',
+    id: 'bro_split', equip: ['gym'], name: 'Сплит по группам', subtitle: 'Каждый день — своя группа',
     days: '5 дней/нед', freq: 'каждая мышца 1 раз в неделю',
     fit: 'no', fitLabel: 'Для продвинутых',
     about: 'Классический бро-сплит: отдельный день на грудь, спину, ноги, плечи и руки. Максимум объёма на группу, но частота низкая — раз в неделю.',
@@ -83,18 +83,20 @@ export const PROGRAMS = [
   }
 ]
 
-export function recommendProgram({ level, daysPerWeek }) {
-  if (level === 'новичок') return 'fullbody'
-  if (level === 'средний') {
-    if (daysPerWeek <= 3) return 'split_synergist'
-    if (daysPerWeek === 4) return 'upper_lower'
-    return 'ppl'
-  }
-  // продвинутый
-  if (daysPerWeek <= 3) return 'split_synergist'
-  if (daysPerWeek === 4) return 'upper_lower'
-  if (daysPerWeek === 5) return 'ppl'
-  return 'bro_split'
+export function programsForEquip(equip) {
+  return PROGRAMS.filter(p => p.equip.includes(equip))
+}
+
+export function recommendProgram({ level, daysPerWeek, equip }) {
+  let id
+  if (level === 'новичок') id = 'fullbody'
+  else if (level === 'средний') id = daysPerWeek <= 3 ? 'split_synergist' : daysPerWeek === 4 ? 'upper_lower' : 'ppl'
+  else id = daysPerWeek <= 3 ? 'split_synergist' : daysPerWeek === 4 ? 'upper_lower' : daysPerWeek === 5 ? 'ppl' : 'bro_split'
+  const allowed = PROGRAMS.filter(p => p.equip.includes(equip)).map(p => p.id)
+  if (allowed.includes(id)) return id
+  if (daysPerWeek >= 4 && allowed.includes('upper_lower')) return 'upper_lower'
+  if (allowed.includes('fullbody')) return 'fullbody'
+  return allowed[0] || 'fullbody'
 }
 
 const DAY_PATTERNS = { 2: [0, 3], 3: [0, 2, 4], 4: [0, 1, 3, 4], 5: [0, 1, 2, 3, 4], 6: [0, 1, 2, 3, 4, 5] }

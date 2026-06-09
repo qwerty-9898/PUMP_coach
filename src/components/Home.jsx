@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Icon from './Icon.jsx'
+import CalendarStrip from './CalendarStrip.jsx'
 import { calcNutrition } from '../engine/nutrition.js'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store, calcStreak, todayKey } from '../storage.js'
@@ -14,6 +15,7 @@ const TIPS = [
   'Разминка 5–10 минут снижает риск травм и улучшает результат в подходах.',
   'Мышца растёт не на тренировке, а во сне и от еды. Тренировка — лишь стимул.'
 ]
+const PLACE = { gym: 'в зале', dumbbell: 'дома с гантелями', none: 'без инвентаря' }
 
 export default function Home({ profile, go, userName }) {
   const n = calcNutrition(profile)
@@ -24,8 +26,7 @@ export default function Home({ profile, go, userName }) {
     return () => clearInterval(id)
   }, [])
 
-  const recId = recommendProgram(profile)
-  const program = PROGRAMS.find(p => p.id === recId)
+  const program = PROGRAMS.find(p => p.id === recommendProgram(profile))
   const streak = calcStreak(store.getProgress().workouts.map(w => w.date))
   const eaten = store.getFoodDay(date).reduce((a, e) => a + e.kcal, 0)
   const water = store.getWater()[date] || 0
@@ -38,6 +39,8 @@ export default function Home({ profile, go, userName }) {
         <h1 className="display lg">Время прокачаться</h1>
       </div>
 
+      <CalendarStrip profile={profile} go={go} />
+
       <button className="herocard" onClick={() => go('workout')}>
         <div className="hero-glow" />
         <div className="hero-top">
@@ -45,7 +48,7 @@ export default function Home({ profile, go, userName }) {
           <Icon name="dumbbell" size={26} />
         </div>
         <div className="hero-name">{program.name}</div>
-        <div className="hero-sub">{program.subtitle} · {profile.goal}</div>
+        <div className="hero-sub">{program.subtitle} · {profile.goal} · {PLACE[profile.equip]}</div>
         <div className="hero-cta">
           <span>{did ? 'Добить ещё раз' : 'Начать тренировку'}</span>
           <Icon name="arrow" size={20} />
@@ -54,16 +57,13 @@ export default function Home({ profile, go, userName }) {
 
       <div className="today">
         <button className="todaybox" onClick={() => go('progress')}>
-          <Icon name="trophy" size={18} />
-          <b>{streak}</b><span>серия</span>
+          <Icon name="trophy" size={18} /><b>{streak}</b><span>серия</span>
         </button>
         <button className="todaybox" onClick={() => go('nutrition')}>
-          <Icon name="flame" size={18} />
-          <b>{eaten}<small>/{n.kcal}</small></b><span>ккал</span>
+          <Icon name="flame" size={18} /><b>{eaten}<small>/{n.kcal}</small></b><span>ккал</span>
         </button>
         <button className="todaybox" onClick={() => go('water')}>
-          <Icon name="droplet" size={18} />
-          <b>{(water / 1000).toFixed(1)}<small> л</small></b><span>вода</span>
+          <Icon name="droplet" size={18} /><b>{(water / 1000).toFixed(1)}<small> л</small></b><span>вода</span>
         </button>
       </div>
 
