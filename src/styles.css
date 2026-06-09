@@ -354,3 +354,101 @@ input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px 
 .platerow { display: flex; align-items: center; gap: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
 .platedisc { width: 46px; height: 46px; border-radius: 50%; background: var(--accent-soft); color: var(--accent2); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-weight: 700; }
 .platecount { font-family: 'Oswald', sans-serif; font-size: 20px; }
+
+
+/* ============================================================
+   v0.6 — АНИМАЦИИ И ПОЛИРОВКА ИНТЕРФЕЙСА
+   ============================================================ */
+
+/* Плавные переходы по умолчанию для интерактива */
+.navcard, .muscle, .prog, .preset, .todaybox, .pill, .seg-btn, .optcard,
+.fooditem, .catitem, .qchip, .cta, .iconbtn, .addbtn, .wbtn, .fpill {
+  transition: transform .16s cubic-bezier(.2,.7,.3,1), background .2s ease, border-color .2s ease, box-shadow .25s ease, color .2s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* Появление экранов */
+  .home, .screen, .wizard, .onb { animation: screenIn .40s cubic-bezier(.2,.75,.3,1) both; }
+  @keyframes screenIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  /* Каскадное появление карточек навигации */
+  .navcard { animation: cardIn .42s cubic-bezier(.2,.75,.3,1) both; }
+  .navcard:nth-child(1){animation-delay:.04s} .navcard:nth-child(2){animation-delay:.09s}
+  .navcard:nth-child(3){animation-delay:.14s} .navcard:nth-child(4){animation-delay:.19s}
+  .navcard:nth-child(5){animation-delay:.24s} .navcard:nth-child(6){animation-delay:.29s}
+  .navcard:nth-child(7){animation-delay:.34s} .navcard:nth-child(8){animation-delay:.39s}
+  @keyframes cardIn { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+
+  /* Сводка дня и группы мышц — лёгкий поп */
+  .todaybox { animation: popIn .4s cubic-bezier(.2,.8,.3,1.1) both; }
+  .todaybox:nth-child(2){animation-delay:.06s} .todaybox:nth-child(3){animation-delay:.12s}
+  .muscle { animation: popIn .38s cubic-bezier(.2,.8,.3,1.1) both; }
+  .muscle:nth-child(2){animation-delay:.04s} .muscle:nth-child(3){animation-delay:.08s}
+  .muscle:nth-child(4){animation-delay:.12s} .muscle:nth-child(5){animation-delay:.16s}
+  .muscle:nth-child(6){animation-delay:.20s} .muscle:nth-child(7){animation-delay:.24s}
+  @keyframes popIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
+
+  /* Программы, приёмы пищи, продукты, история */
+  .prog, .mealblock, .fooditem, .catitem, .histitem, .meal, .pctrow, .platerow { animation: cardIn .4s cubic-bezier(.2,.75,.3,1) both; }
+  .prog:nth-child(2){animation-delay:.05s} .prog:nth-child(3){animation-delay:.1s}
+  .prog:nth-child(4){animation-delay:.15s} .prog:nth-child(5){animation-delay:.2s} .prog:nth-child(6){animation-delay:.25s}
+
+  /* Раскрытие тела карточки (программа/каталог) */
+  .prog-body, .catitem-body { animation: expand .28s ease both; }
+  @keyframes expand { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+  /* Кольца: всплытие + плавный пересчёт заливки */
+  .kring, .water-ring, .timer-ring { transition: background .7s cubic-bezier(.4,0,.2,1); }
+  .kring, .water-ring { animation: ringPop .55s cubic-bezier(.2,.8,.3,1.1) both; }
+  @keyframes ringPop { from { opacity: .4; transform: scale(.9); } to { opacity: 1; transform: none; } }
+
+  /* Полосы БЖУ растут от нуля */
+  .mbar-fill { transform-origin: left; animation: barGrow .8s cubic-bezier(.3,.8,.3,1) both; }
+  @keyframes barGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  /* Тренировка — выезд снизу */
+  .session { animation: sessionIn .5s cubic-bezier(.2,.75,.3,1) both; }
+  @keyframes sessionIn { from { opacity: 0; transform: translateY(18px) scale(.99); } to { opacity: 1; transform: none; } }
+  .ex { animation: cardIn .4s ease both; }
+  .ex:nth-child(2){animation-delay:.04s} .ex:nth-child(3){animation-delay:.08s}
+  .ex:nth-child(4){animation-delay:.12s} .ex:nth-child(5){animation-delay:.16s} .ex:nth-child(6){animation-delay:.2s}
+
+  /* Блик на главных кнопках */
+  .cta:not(.disabled):not(:disabled) { position: relative; overflow: hidden; }
+  .cta:not(.disabled):not(:disabled)::after {
+    content: ''; position: absolute; top: 0; left: -70%; width: 45%; height: 100%;
+    background: linear-gradient(115deg, transparent, rgba(255,255,255,.28), transparent);
+    transform: skewX(-20deg); animation: shine 3.6s ease-in-out infinite;
+  }
+  @keyframes shine { 0%, 55% { left: -70%; } 100% { left: 140%; } }
+
+  /* Пульс точки в логотипе */
+  .logo-dot { display: inline-block; animation: dotPulse 1.9s ease-in-out infinite; }
+  @keyframes dotPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(.8); } }
+
+  /* Прогресс-точки визарда */
+  .wdot.on { animation: dotGrow .3s ease; }
+  @keyframes dotGrow { from { transform: scaleX(.5); } to { transform: scaleX(1); } }
+}
+
+/* Усиленный отклик на нажатие (работает и без motion-preference) */
+.navcard:active { transform: scale(.985); }
+.muscle:active, .todaybox:active, .prog-head:active { transform: scale(.96); }
+.cta:not(.disabled):not(:disabled):active { transform: scale(.97); }
+.iconbtn:active, .addbtn:active { transform: scale(.9); }
+
+/* Наведение мышью (на десктопе) — лёгкий подъём */
+@media (hover: hover) {
+  .navcard:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 22px rgba(255,90,31,.15); }
+  .muscle:hover, .preset:hover, .fooditem:hover, .qchip:hover { border-color: var(--accent); }
+  .prog:hover { border-color: rgba(255,90,31,.4); }
+  .todaybox:hover { border-color: var(--accent); }
+}
+
+/* Чуть мягче тени и глубина у активной программы/сессии */
+.prog.sel { box-shadow: 0 10px 34px rgba(255,90,31,.22); }
+.session { box-shadow: 0 14px 40px rgba(255,90,31,.18); }
+
+/* Плавный фокус инпутов */
+input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, border-color .2s ease; }
