@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
-import { store } from '../storage.js'
 
 const GOALS = [
   { k: 'набор массы', icon: 'flame' }, { k: 'похудение', icon: 'bolt' },
@@ -22,13 +21,6 @@ export default function Profile({ profile, onSave, onRestart }) {
       height: clamp(f.height, 120, 230, profile.height), daysPerWeek: Number(f.daysPerWeek)
     })
     setSaved(true)
-  }
-
-  function reloadApp() { window.location.reload() }
-  function wipeAll() {
-    if (window.confirm('Стереть все данные приложения? Профиль, прогресс, еда, замеры и избранное удалятся безвозвратно.')) {
-      store.clearAll(); window.location.reload()
-    }
   }
 
   return (
@@ -76,11 +68,6 @@ export default function Profile({ profile, onSave, onRestart }) {
         {saved ? <><Icon name="check" size={18} /> Сохранено</> : <><Icon name="check" size={18} /> Сохранить изменения</>}
       </button>
       <button className="cta ghost-cta" style={{ marginTop: 10 }} onClick={onRestart}>Пройти знакомство заново</button>
-
-      <div className="profile-tools">
-        <button className="tool-btn" onClick={reloadApp}><Icon name="refresh" size={18} /> Перезагрузить приложение</button>
-        <button className="tool-btn danger" onClick={wipeAll}><Icon name="trash" size={18} /> Стереть все данные</button>
-      </div>
     </div>
   )
 }

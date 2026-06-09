@@ -65,10 +65,15 @@ export default function Progress({ profile }) {
         <div className="medals">
           {medals.map(m => (
             <div className={'medal' + (m.earned ? ' on' : '')} key={m.id}>
-              <span className="medal-ic"><Icon name={m.icon} size={20} /></span>
+              <div className="medal-top">
+                <span className="medal-ic"><Icon name={m.icon} size={20} /></span>
+                {m.earned
+                  ? <span className="medal-badge"><Icon name="check" size={13} /> есть</span>
+                  : <span className="medal-pct">{Math.round(m.progress * 100)}%</span>}
+              </div>
               <span className="medal-t">{m.title}</span>
-              <span className="medal-s">{m.earned ? 'получено' : Math.round(m.progress * 100) + '%'}</span>
-              {!m.earned && <span className="medal-bar"><i style={{ width: (m.progress * 100) + '%' }} /></span>}
+              <span className="medal-d">{m.desc}</span>
+              <span className="medal-bar"><i style={{ width: (m.progress * 100) + '%' }} /></span>
             </div>
           ))}
         </div>
