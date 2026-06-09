@@ -22,6 +22,7 @@ export const store = {
   getProfile: () => read(K.profile, null),
   setProfile: (p) => write(K.profile, p),
   clearProfile: () => { try { localStorage.removeItem(K.profile) } catch (e) {} },
+  clearAll: () => { try { Object.keys(localStorage).filter(k => k.startsWith('pump_')).forEach(k => localStorage.removeItem(k)) } catch (e) {} },
 
   getProgress: () => read(K.progress, { workouts: [] }),
   setProgress: (p) => write(K.progress, p),

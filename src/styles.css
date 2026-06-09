@@ -648,3 +648,12 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .swapbtn:active { transform: rotate(180deg); color: var(--accent); border-color: var(--accent); }
 .textlink { background: none; border: none; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 10px 0 2px; }
 .textlink:active { color: var(--accent); }
+
+/* v0.8 — кнопки инструментов в профиле */
+.profile-tools { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); }
+.tool-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  background: var(--card2); border: 1px solid var(--line); color: var(--text);
+  border-radius: 13px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.tool-btn:active { transform: scale(.98); }
+.tool-btn.danger { color: #f87171; border-color: rgba(248,113,113,.4); background: rgba(248,113,113,.08); }
+.tool-btn.danger:active { background: rgba(248,113,113,.16); }
