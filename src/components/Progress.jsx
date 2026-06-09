@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
 import SparkChart from './SparkChart.jsx'
+import BodyHeatmap from './BodyHeatmap.jsx'
 import { EXERCISES, GROUPS, GROUP_META } from '../engine/exercises.js'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store, calcStreak } from '../storage.js'
 import { allRecords, exSeries, weeklyVolume } from '../engine/progress.js'
+import { coverageMap } from '../engine/recovery.js'
+import { achievements } from '../engine/achievements.js'
 
 export default function Progress({ profile }) {
   const pr = store.getProgress()
@@ -12,12 +15,20 @@ export default function Progress({ profile }) {
   const streak = calcStreak(pr.workouts.map(w => w.date))
   const total = pr.workouts.length
   const week = pr.workouts.filter(w => within(w.date, 7)).length
+  const tonTotal = store.getLogs().reduce((a, l) => a + l.sets.reduce((s, x) => s + (x.w || 0) * (x.r || 0), 0), 0)
 
   const records = allRecords()
   const loggedIds = store.loggedExIds()
   const [selEx, setSelEx] = useState(loggedIds[0] || null)
   const series = selEx ? exSeries(selEx) : []
   const wv = weeklyVolume()
+
+  const cov = coverageMap(30)
+  const covLoads = Object.fromEntries(cov.map(c => [c.group, c.load]))
+  const covActive = cov.filter(c => c.count > 0)
+
+  const medals = achievements()
+  const earned = medals.filter(m => m.earned).length
 
   const recId = recommendProgram(profile)
   const program = PROGRAMS.find(p => p.id === recId)
@@ -28,15 +39,72 @@ export default function Progress({ profile }) {
 
   return (
     <div className="screen">
-      <div className="stats3">
-        <div className="stat3"><Icon name="trophy" size={18} /><b>{streak}</b><span>серия</span></div>
-        <div className="stat3"><Icon name="activity" size={18} /><b>{week}</b><span>за 7 дней</span></div>
-        <div className="stat3"><Icon name="dumbbell" size={18} /><b>{total}</b><span>всего</span></div>
+      {/* Герой-сводка */}
+      <div className="card dash-hero">
+        <div className="dash-glow" />
+        <div className="dash-main">
+          <span className="dash-flame"><Icon name="flame" size={22} /></span>
+          <div>
+            <span className="dash-big">{streak}</span>
+            <span className="dash-unit">дней серия</span>
+          </div>
+        </div>
+        <div className="dash-row">
+          <div className="dash-m"><b>{week}</b><span>за 7 дней</span></div>
+          <div className="dash-m"><b>{total}</b><span>тренировок</span></div>
+          <div className="dash-m"><b>{fmtKg(tonTotal)}</b><span>тоннаж</span></div>
+        </div>
       </div>
 
+      {/* Медали */}
+      <div className="card">
+        <div className="card-head">
+          <span className="card-kicker"><Icon name="trophy" size={15} /> Медали</span>
+          <span className="card-meta">{earned} из {medals.length}</span>
+        </div>
+        <div className="medals">
+          {medals.map(m => (
+            <div className={'medal' + (m.earned ? ' on' : '')} key={m.id}>
+              <span className="medal-ic"><Icon name={m.icon} size={20} /></span>
+              <span className="medal-t">{m.title}</span>
+              <span className="medal-s">{m.earned ? 'получено' : Math.round(m.progress * 100) + '%'}</span>
+              {!m.earned && <span className="medal-bar"><i style={{ width: (m.progress * 100) + '%' }} /></span>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Карта за 30 дней */}
+      <div className="card">
+        <div className="card-head">
+          <span className="card-kicker"><Icon name="activity" size={15} /> Прокачано за 30 дней</span>
+          {covActive.length > 0 && <span className="card-meta">{covActive.length} групп</span>}
+        </div>
+        {covActive.length === 0 ? (
+          <div className="recovery-empty">
+            <BodyHeatmap loads={covLoads} />
+            <p>Здесь покажу, какие мышцы ты грузил за месяц — ярче значит чаще. Лови баланс.</p>
+          </div>
+        ) : (
+          <div className="recovery-body">
+            <BodyHeatmap loads={covLoads} />
+            <div className="recovery-side">
+              {cov.map(c => (
+                <div className="rg" key={c.group}>
+                  <span className="rg-dot" style={{ background: GROUP_META[c.group].color, opacity: 0.25 + c.load * 0.75 }} />
+                  <span className="rg-name">{GROUP_META[c.group].label}</span>
+                  <span className="rg-st">{c.count > 0 ? '×' + c.count : '—'}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Личные рекорды */}
       {records.length > 0 && (
-        <div className="card-box">
-          <span className="flabel">Личные рекорды</span>
+        <div className="card">
+          <span className="card-kicker" style={{ marginBottom: 12, display: 'inline-flex' }}><Icon name="trophy" size={15} /> Личные рекорды</span>
           <div className="prlist">
             {records.slice(0, 6).map(r => (
               <div className="prrow" key={r.exId}>
@@ -48,9 +116,10 @@ export default function Progress({ profile }) {
         </div>
       )}
 
+      {/* График роста */}
       {loggedIds.length > 0 && (
-        <div className="card-box">
-          <span className="flabel">Рост веса в упражнении</span>
+        <div className="card">
+          <span className="card-kicker" style={{ marginBottom: 12, display: 'inline-flex' }}><Icon name="activity" size={15} /> Рост веса в упражнении</span>
           <div className="ex-select">
             {loggedIds.slice(0, 8).map(id => {
               const nm = EXERCISES.find(e => e.id === id)?.name || id
@@ -62,19 +131,20 @@ export default function Progress({ profile }) {
       )}
 
       {wv.length > 0 && (
-        <div className="card-box">
-          <span className="flabel">Тоннаж по неделям (кг)</span>
+        <div className="card">
+          <span className="card-kicker" style={{ marginBottom: 12, display: 'inline-flex' }}><Icon name="bolt" size={15} /> Тоннаж по неделям (кг)</span>
           <SparkChart data={wv.map(w => w.vol)} color="#3b82f6" />
         </div>
       )}
 
       {loggedIds.length === 0 && (
         <div className="empty"><Icon name="activity" size={30} />
-          <p>Пройди тренировку в режиме «Гид по шагам» и записывай веса — здесь появятся графики роста и рекорды.</p></div>
+          <p>Пройди тренировку в режиме «Гид по шагам» и записывай веса — здесь оживут графики роста и рекорды.</p></div>
       )}
 
-      <div className="ratecard">
-        <span className="flabel">Оценка программы · {program.name}</span>
+      {/* Оценка программы */}
+      <div className="card ratecard">
+        <span className="card-kicker" style={{ marginBottom: 12, display: 'inline-flex' }}><Icon name="star" size={15} /> Оценка программы · {program.name}</span>
         <div className="stars">
           {[1, 2, 3, 4, 5].map(s => (
             <button key={s} className={'star' + (s <= stars ? ' on' : '')} onClick={() => { setStars(s); store.setRating(recId, s) }}><Icon name="star" size={26} /></button>
@@ -82,6 +152,7 @@ export default function Progress({ profile }) {
         </div>
       </div>
 
+      {/* Любимые упражнения */}
       <div className="block-head"><h2 className="display sm">Любимые упражнения</h2></div>
       <div className="favchips">
         {GROUPS.map(g => <button key={g} className={'favchip' + (favGroup === g ? ' on' : '')} onClick={() => setFavGroup(favGroup === g ? null : g)}>{GROUP_META[g].label}</button>)}
@@ -97,6 +168,7 @@ export default function Progress({ profile }) {
         </div>
       )}
 
+      {/* История */}
       <div className="block-head" style={{ marginTop: 20 }}><h2 className="display sm">История</h2></div>
       {workouts.length === 0 ? (
         <div className="empty"><Icon name="activity" size={28} /><p>Отметь тренировку выполненной — появится здесь.</p></div>
@@ -117,3 +189,4 @@ export default function Progress({ profile }) {
 
 function within(d, days) { return (new Date() - new Date(d)) / 86400000 <= days }
 function fmt(s) { return new Date(s).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) }
+function fmtKg(kg) { return kg >= 1000 ? (kg / 1000).toFixed(1) + 'т' : Math.round(kg) + 'кг' }

@@ -42,14 +42,13 @@ function Figure({ zones, loads, onPick }) {
   )
 }
 
-export default function BodyHeatmap({ onPick }) {
-  const map = recoveryMap()
-  const loads = Object.fromEntries(map.map(m => [m.group, m.load]))
+export default function BodyHeatmap({ onPick, loads }) {
+  const src = loads || Object.fromEntries(recoveryMap().map(m => [m.group, m.load]))
   return (
     <div className="bh">
       <div className="bh-figs">
-        <div className="bh-fig"><Figure zones={FRONT} loads={loads} onPick={onPick} /><span className="bh-cap">спереди</span></div>
-        <div className="bh-fig"><Figure zones={BACK} loads={loads} onPick={onPick} /><span className="bh-cap">сзади</span></div>
+        <div className="bh-fig"><Figure zones={FRONT} loads={src} onPick={onPick} /><span className="bh-cap">спереди</span></div>
+        <div className="bh-fig"><Figure zones={BACK} loads={src} onPick={onPick} /><span className="bh-cap">сзади</span></div>
       </div>
     </div>
   )

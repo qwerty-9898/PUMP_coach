@@ -42,6 +42,21 @@ export function recoveryMap() {
   })
 }
 
+// Покрытие за период: насколько часто грузил каждую группу за N дней (для дашборда).
+// load 0..1, где 1 ~ target тренировок группы за месяц.
+export function coverageMap(days = 30, target = 8) {
+  const since = Date.now() - days * 86400000
+  const cnt = {}
+  const add = (g) => { if (g) cnt[g] = (cnt[g] || 0) + 1 }
+  for (const w of store.getProgress().workouts) {
+    if (new Date(w.date).getTime() >= since) for (const g of (w.groups || [])) add(g)
+  }
+  for (const l of store.getLogs()) {
+    if (new Date(l.date).getTime() >= since) add(l.group || EX_GROUP[l.exId])
+  }
+  return GROUPS.map(g => ({ group: g, count: cnt[g] || 0, load: Math.min(1, (cnt[g] || 0) / target) }))
+}
+
 // Что качать сегодня: самые свежие/давние группы (низкий load), не качанные — вперёд
 export function freshFocus(limit = 3) {
   return [...recoveryMap()]
