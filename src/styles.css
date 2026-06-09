@@ -100,9 +100,9 @@ input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px 
 .recovery-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .recovery-empty p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.5; text-align: center; }
 .bh { flex-shrink: 0; }
-.bh-figs { display: flex; gap: 8px; }
+.bh-figs { display: flex; gap: 8px; padding: 6px 4px; border-radius: 16px; background: radial-gradient(120px 150px at 50% 42%, rgba(255,138,61,.10), transparent 72%); }
 .bh-fig { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.bh-svg { width: 60px; height: 90px; color: #8b97a9; }
+.bh-svg { width: 58px; height: 97px; color: #9fb0c6; }
 .bh-cap { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
 .recovery-side { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .rg { display: flex; align-items: center; gap: 9px; }
@@ -812,7 +812,7 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .medal-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
 .medal-ic { width: 42px; height: 42px; border-radius: 13px; display: flex; align-items: center; justify-content: center;
   background: var(--card); color: var(--muted); flex-shrink: 0; }
-.medal.on .medal-ic { background: var(--accent-soft); color: var(--accent); }
+.medal.on .medal-ic { background: var(--accent-soft); color: var(--accent); box-shadow: 0 0 14px rgba(255,90,31,.4), inset 0 0 0 1px rgba(255,90,31,.35); }
 .medal-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: #1a0a02;
   background: linear-gradient(135deg, var(--accent2), var(--accent)); padding: 4px 9px; border-radius: 999px; }
 .medal-pct { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); }
