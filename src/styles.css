@@ -1,5 +1,5 @@
 :root {
-  --bg: #0b0d10; --bg2: #11141a; --card: #161a22; --card2: #1d222c;
+  --bg: #05060a; --bg2: #0c0e13; --card: #14171f; --card2: #1b1f29;
   --line: #262c38; --text: #f1f4f9; --muted: #98a2b3;
   --accent: #ff5a1f; --accent2: #ff8a3d; --accent-soft: rgba(255,90,31,.14);
   --good: #34d399; --warn: #fbbf24; --bad: #f87171; --blue: #3b82f6;
@@ -96,20 +96,18 @@ input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px 
 .card-meta { font-size: 11px; color: var(--muted); font-weight: 600; }
 
 /* Карта восстановления */
-.recovery-body { display: flex; gap: 14px; align-items: center; }
-.recovery-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.recovery-empty p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.5; text-align: center; }
-.bh { flex-shrink: 0; }
-.bh-figs { display: flex; gap: 8px; padding: 6px 4px; border-radius: 16px; background: radial-gradient(120px 150px at 50% 42%, rgba(255,138,61,.10), transparent 72%); }
-.bh-fig { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.bh-frame { position: relative; display: inline-block; line-height: 0; }
-.bh-img { height: 150px; width: auto; display: block; filter: drop-shadow(0 0 6px rgba(255,120,30,.25)); }
-.bh-zone { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; filter: blur(2.5px); transition: opacity .35s; }
-.bi-frame { position: relative; display: inline-block; line-height: 0; }
-.bi-img { height: 100%; width: auto; display: block; }
-.bi-zone { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; filter: blur(1.6px); }
-.bh-cap { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-.recovery-side { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+/* Большая карта тела со скелетом */
+.bh2 { margin: 2px 0 4px; }
+.bh2-toggle { display: flex; gap: 6px; background: #0a0c10; border: 1px solid var(--line); border-radius: 12px; padding: 4px; width: max-content; margin: 0 auto 12px; }
+.bh2-tab { background: transparent; border: none; color: var(--muted); font-family: inherit; font-weight: 700; font-size: 13px; padding: 7px 20px; border-radius: 9px; cursor: pointer; transition: .15s; }
+.bh2-tab.on { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #1a0a02; }
+.bh2-stage { display: flex; justify-content: center; padding: 12px 0 8px; border-radius: 18px;
+  background: radial-gradient(160px 250px at 50% 46%, rgba(255,120,30,.16), transparent 72%), #05060a; }
+.bh2-frame { position: relative; display: inline-block; line-height: 0; }
+.bh2-img { height: 256px; width: auto; display: block; filter: drop-shadow(0 0 12px rgba(255,120,30,.4)); }
+.bh2-zone { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; filter: blur(2px); transition: opacity .35s; }
+.recovery-hint { margin: 13px 2px 0; font-size: 13px; color: var(--muted); line-height: 1.5; text-align: center; }
+.rg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-top: 14px; }
 .rg { display: flex; align-items: center; gap: 9px; }
 .rg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .rg-name { font-size: 13px; font-weight: 600; flex: 1; }
@@ -174,7 +172,8 @@ input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px 
 .muscle:active { transform: scale(.95); }
 .muscle.on { background: var(--accent-soft); border-color: var(--accent); }
 .m-name { font-size: 11px; font-weight: 700; }
-.gbadge { display: inline-flex; align-items: center; justify-content: center; border-radius: 11px; border: 1px solid; font-family: 'Unbounded', sans-serif; font-weight: 700; letter-spacing: .5px; }
+.gbadge { display: inline-flex; align-items: center; justify-content: center; border-radius: 11px; border: 1px solid; overflow: hidden; background: #06070b; }
+.gbadge-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* Session */
 .session { margin-top: 22px; background: var(--card); border: 1px solid var(--accent); border-radius: 20px; padding: 18px; box-shadow: var(--glow); }
@@ -856,3 +855,30 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .mr-arr { color: var(--muted); flex-shrink: 0; }
 .more-row.danger .mr-title { color: #ff6b6b; }
 .more-foot { text-align: center; color: var(--muted); font-size: 12px; margin-top: 22px; opacity: .7; }
+
+/* ===== Каталог: крупные карточки тела ===== */
+.musclegrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.musclecard { position: relative; height: 168px; padding: 0; border: 1px solid var(--line); border-radius: 18px;
+  overflow: hidden; cursor: pointer; color: var(--text); background: #05060a; box-shadow: inset 0 -3px 0 0 var(--mc); }
+.musclecard-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 32%; }
+.musclecard-scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(2,3,6,.92) 6%, rgba(2,3,6,.25) 48%, transparent 70%); }
+.musclecard-info { position: absolute; left: 13px; right: 12px; bottom: 11px; display: flex; flex-direction: column; gap: 1px; text-align: left; }
+.musclecard-name { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: .2px; }
+.musclecard-cnt { font-size: 12px; color: var(--muted); }
+.musclecard:active { transform: scale(.98); }
+@media (hover: hover) { .musclecard:hover { border-color: var(--mc); } }
+
+.muscle-banner { position: relative; height: 150px; border-radius: 18px; overflow: hidden; border: 1px solid var(--line);
+  background: #05060a; margin-bottom: 16px; box-shadow: inset 0 -3px 0 0 var(--mc); }
+.muscle-banner-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+.muscle-banner-scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(2,3,6,.9) 8%, transparent 60%); }
+.muscle-banner-info { position: absolute; left: 16px; bottom: 12px; }
+.muscle-banner-info h2 { margin: 0; }
+.muscle-banner-cnt { font-size: 13px; color: var(--muted); }
+
+.muscle-hero { border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: #05060a; margin-bottom: 16px; box-shadow: inset 0 -3px 0 0 var(--mc); }
+.muscle-hero-art { position: relative; height: 190px; background: radial-gradient(180px 160px at 50% 40%, rgba(255,120,30,.16), transparent 70%), #05060a; }
+.muscle-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+.muscle-hero-info { padding: 14px 16px 16px; }
+.muscle-hero-info h2 { margin: 0; }
+.muscle-tagline { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--mc); }

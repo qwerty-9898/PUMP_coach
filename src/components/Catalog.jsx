@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
-import GroupBadge from './GroupBadge.jsx'
-import BodyIcon from './BodyIcon.jsx'
+import { MUSCLE_ART } from './muscleArt.js'
 import { EXERCISES, GROUPS, GROUP_META, techExtras } from '../engine/exercises.js'
 
 const EQUIP_LABEL = { none: 'Без инвентаря', dumbbell: 'Гантели', gym: 'Зал' }
@@ -16,16 +15,14 @@ export default function Catalog() {
     return (
       <div className="screen">
         <button className="backrow" onClick={() => setExId(null)}><Icon name="back" size={18} /> К списку</button>
-        <h2 className="display sm" style={{ marginBottom: 4 }}>{ex.name}</h2>
-        <span className="detail-musc">{ex.muscles}</span>
-
-        <div className="demo-card">
-          <div className="demo-body" style={{ color: GROUP_META[ex.group].color }}>
-            <BodyIcon group={ex.group} size={84} />
+        <div className="muscle-hero" style={{ '--mc': GROUP_META[ex.group].color }}>
+          <div className="muscle-hero-art">
+            <img className="muscle-hero-img" src={MUSCLE_ART[ex.group]} alt="" />
           </div>
-          <div className="demo-txt">
-            <span className="demo-h">Работают мышцы</span>
-            <p>{ex.muscles}</p>
+          <div className="muscle-hero-info">
+            <span className="muscle-tagline">{GROUP_META[ex.group].label}</span>
+            <h2 className="display sm" style={{ marginTop: 4 }}>{ex.name}</h2>
+            <span className="detail-musc">{ex.muscles}</span>
             <div className="cattags">
               <span className="tag">{EQUIP_LABEL[ex.equip]}</span>
               <span className="tag">{ex.level}</span>
@@ -55,9 +52,13 @@ export default function Catalog() {
     return (
       <div className="screen">
         <button className="backrow" onClick={() => setGroup(null)}><Icon name="back" size={18} /> Все группы</button>
-        <div className="detail-hero">
-          <GroupBadge group={group} size={48} />
-          <div><h2 className="display sm">{GROUP_META[group].label}</h2><span className="detail-musc">{list.length} упражнений</span></div>
+        <div className="muscle-banner" style={{ '--mc': GROUP_META[group].color }}>
+          <img className="muscle-banner-img" src={MUSCLE_ART[group]} alt="" />
+          <div className="muscle-banner-scrim" />
+          <div className="muscle-banner-info">
+            <h2 className="display md">{GROUP_META[group].label}</h2>
+            <span className="muscle-banner-cnt">{list.length} упражнений</span>
+          </div>
         </div>
         <div className="exlist">
           {list.map(ex => (
@@ -77,14 +78,17 @@ export default function Catalog() {
   return (
     <div className="screen">
       <p className="sub" style={{ marginTop: 0, marginBottom: 14 }}>Выбери группу мышц — внутри техника каждого упражнения и какие мышцы работают.</p>
-      <div className="groupgrid">
+      <div className="musclegrid">
         {GROUPS.map(g => {
           const cnt = EXERCISES.filter(e => e.group === g).length
           return (
-            <button className="groupcard" key={g} onClick={() => setGroup(g)}>
-              <GroupBadge group={g} size={46} />
-              <span className="groupcard-name">{GROUP_META[g].label}</span>
-              <span className="groupcard-cnt">{cnt} упр.</span>
+            <button className="musclecard" key={g} style={{ '--mc': GROUP_META[g].color }} onClick={() => setGroup(g)}>
+              <img className="musclecard-img" src={MUSCLE_ART[g]} alt="" />
+              <div className="musclecard-scrim" />
+              <div className="musclecard-info">
+                <span className="musclecard-name">{GROUP_META[g].label}</span>
+                <span className="musclecard-cnt">{cnt} упражнений</span>
+              </div>
             </button>
           )
         })}

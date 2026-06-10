@@ -85,23 +85,18 @@ export default function Progress({ profile }) {
           <span className="card-kicker"><Icon name="activity" size={15} /> Прокачано за 30 дней</span>
           {covActive.length > 0 && <span className="card-meta">{covActive.length} групп</span>}
         </div>
+        <BodyHeatmap loads={covLoads} />
         {covActive.length === 0 ? (
-          <div className="recovery-empty">
-            <BodyHeatmap loads={covLoads} />
-            <p>Здесь покажу, какие мышцы ты грузил за месяц — ярче значит чаще. Лови баланс.</p>
-          </div>
+          <p className="recovery-hint">Здесь покажу, какие мышцы ты грузил за месяц — ярче значит чаще. Лови баланс.</p>
         ) : (
-          <div className="recovery-body">
-            <BodyHeatmap loads={covLoads} />
-            <div className="recovery-side">
-              {cov.map(c => (
-                <div className="rg" key={c.group}>
-                  <span className="rg-dot" style={{ background: GROUP_META[c.group].color, opacity: 0.25 + c.load * 0.75 }} />
-                  <span className="rg-name">{GROUP_META[c.group].label}</span>
-                  <span className="rg-st">{c.count > 0 ? '×' + c.count : '—'}</span>
-                </div>
-              ))}
-            </div>
+          <div className="rg-grid">
+            {cov.map(c => (
+              <div className="rg" key={c.group}>
+                <span className="rg-dot" style={{ background: GROUP_META[c.group].color, opacity: 0.3 + c.load * 0.7 }} />
+                <span className="rg-name">{GROUP_META[c.group].label}</span>
+                <span className="rg-st">{c.count > 0 ? '×' + c.count : '—'}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>

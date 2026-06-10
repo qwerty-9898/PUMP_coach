@@ -54,23 +54,19 @@ export default function Home({ profile, go, userName }) {
           {trainedCount > 0 && <span className="card-meta">{trainedCount} из 7 групп</span>}
         </div>
 
+        <BodyHeatmap onPick={() => go('workout')} />
+
         {trainedCount === 0 ? (
-          <div className="recovery-empty">
-            <BodyHeatmap onPick={() => go('workout')} />
-            <p>Здесь оживёт карта твоего тела. Проведи первую тренировку — мышцы загорятся по нагрузке, а тусклые подскажут, что качать дальше.</p>
-          </div>
+          <p className="recovery-hint">Здесь оживёт карта твоего тела. Проведи первую тренировку — мышцы загорятся по нагрузке, а тусклые подскажут, что качать дальше.</p>
         ) : (
-          <div className="recovery-body">
-            <BodyHeatmap onPick={() => go('workout')} />
-            <div className="recovery-side">
-              {map.map(m => (
-                <div className="rg" key={m.group}>
-                  <span className="rg-dot" style={{ background: GROUP_META[m.group].color, opacity: 0.25 + m.load * 0.75 }} />
-                  <span className="rg-name">{GROUP_META[m.group].label}</span>
-                  <span className="rg-st">{m.status}</span>
-                </div>
-              ))}
-            </div>
+          <div className="rg-grid">
+            {map.map(m => (
+              <div className="rg" key={m.group}>
+                <span className="rg-dot" style={{ background: GROUP_META[m.group].color, opacity: 0.3 + m.load * 0.7 }} />
+                <span className="rg-name">{GROUP_META[m.group].label}</span>
+                <span className="rg-st">{m.status}</span>
+              </div>
+            ))}
           </div>
         )}
 
