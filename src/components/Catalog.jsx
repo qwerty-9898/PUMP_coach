@@ -1,9 +1,15 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
-import { MUSCLE_ART } from './muscleArt.js'
+import { MUSCLE_ART, MUSCLE_HL } from './muscleArt.js'
 import { EXERCISES, GROUPS, GROUP_META, techExtras } from '../engine/exercises.js'
 
 const EQUIP_LABEL = { none: 'Без инвентаря', dumbbell: 'Гантели', gym: 'Зал' }
+
+function Hl({ group }) {
+  return (MUSCLE_HL[group] || []).map((h, i) => (
+    <span key={i} className="m-hl" style={{ left: h[0] + '%', top: h[1] + '%', width: h[2] + '%', height: h[3] + '%' }} />
+  ))
+}
 
 export default function Catalog() {
   const [group, setGroup] = useState(null)
@@ -18,6 +24,7 @@ export default function Catalog() {
         <div className="muscle-hero" style={{ '--mc': GROUP_META[ex.group].color }}>
           <div className="muscle-hero-art">
             <img className="muscle-hero-img" src={MUSCLE_ART[ex.group]} alt="" />
+            <Hl group={ex.group} />
           </div>
           <div className="muscle-hero-info">
             <span className="muscle-tagline">{GROUP_META[ex.group].label}</span>
@@ -54,6 +61,7 @@ export default function Catalog() {
         <button className="backrow" onClick={() => setGroup(null)}><Icon name="back" size={18} /> Все группы</button>
         <div className="muscle-banner" style={{ '--mc': GROUP_META[group].color }}>
           <img className="muscle-banner-img" src={MUSCLE_ART[group]} alt="" />
+          <Hl group={group} />
           <div className="muscle-banner-scrim" />
           <div className="muscle-banner-info">
             <h2 className="display md">{GROUP_META[group].label}</h2>
@@ -84,6 +92,7 @@ export default function Catalog() {
           return (
             <button className="musclecard" key={g} style={{ '--mc': GROUP_META[g].color }} onClick={() => setGroup(g)}>
               <img className="musclecard-img" src={MUSCLE_ART[g]} alt="" />
+              <Hl group={g} />
               <div className="musclecard-scrim" />
               <div className="musclecard-info">
                 <span className="musclecard-name">{GROUP_META[g].label}</span>

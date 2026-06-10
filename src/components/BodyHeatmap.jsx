@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import frontImg from '../assets/skeleton/front.png'
-import backImg from '../assets/skeleton/back.png'
+import frontImg from '../assets/skeleton/muscle_front.png'
+import backImg from '../assets/skeleton/muscle_back.png'
 import { GROUP_META } from '../engine/exercises.js'
 import { recoveryMap } from '../engine/recovery.js'
 import { FRONT_ZONES, BACK_ZONES } from './bodyZones.js'

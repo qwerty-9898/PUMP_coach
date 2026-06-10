@@ -820,7 +820,8 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .medal-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: #1a0a02;
   background: linear-gradient(135deg, var(--accent2), var(--accent)); padding: 4px 9px; border-radius: 999px; }
 .medal-pct { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); }
-.medal-t { font-weight: 700; font-size: 14px; line-height: 1.2; }
+.medal-cat { font-size: 9.5px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--accent); opacity: .85; }
+.medal-t { font-weight: 700; font-size: 14px; line-height: 1.2; margin-top: 1px; }
 .medal-d { font-size: 11.5px; color: var(--muted); line-height: 1.35; min-height: 31px; }
 .medal-bar { display: block; width: 100%; height: 5px; border-radius: 3px; background: var(--card); overflow: hidden; margin-top: 2px; }
 .medal-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 3px; transition: width .4s; }
@@ -882,3 +883,42 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .muscle-hero-info { padding: 14px 16px 16px; }
 .muscle-hero-info h2 { margin: 0; }
 .muscle-tagline { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--mc); }
+
+/* Красная неон-подсветка целевой мышцы в каталоге */
+.m-hl { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; z-index: 1;
+  background: radial-gradient(closest-side, rgba(255,32,32,.78), rgba(255,42,28,.32) 52%, transparent 74%);
+  box-shadow: 0 0 18px 4px rgba(255,40,30,.35); filter: blur(1.5px);
+  animation: hlPulse 2.4s ease-in-out infinite; }
+@keyframes hlPulse { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
+.musclecard-scrim, .muscle-banner-scrim { z-index: 2; }
+.musclecard-info, .muscle-banner-info { z-index: 3; }
+
+/* «Ещё»: премиальная шапка профиля */
+.profilecard { display: flex; gap: 14px; align-items: flex-start; width: 100%; text-align: left; cursor: pointer; color: var(--text);
+  background: linear-gradient(135deg, rgba(255,90,31,.18), var(--card2) 62%); border: 1px solid var(--line);
+  border-radius: 20px; padding: 16px; margin-bottom: 20px; box-shadow: 0 10px 28px rgba(0,0,0,.34); }
+.profilecard:active { transform: scale(.99); }
+.pc-ava { width: 56px; height: 56px; border-radius: 17px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 26px; color: #1a0a02;
+  background: linear-gradient(135deg, var(--accent2), var(--accent)); box-shadow: 0 6px 18px rgba(255,90,31,.4); }
+.pc-main { flex: 1; min-width: 0; }
+.pc-row { display: flex; align-items: center; justify-content: space-between; }
+.pc-name { font-weight: 800; font-size: 19px; }
+.pc-arr { color: var(--muted); }
+.pc-sub { font-size: 13px; color: var(--muted); text-transform: capitalize; display: block; margin-top: 2px; }
+.pc-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 13px; }
+.pc-stat { background: rgba(0,0,0,.24); border-radius: 12px; padding: 9px 6px; text-align: center; }
+.pc-stat b { font-family: 'Unbounded', sans-serif; font-size: 17px; display: block; line-height: 1; }
+.pc-stat span { font-size: 10.5px; color: var(--muted); display: block; margin-top: 4px; }
+.more-row .mr-ic { transition: transform .15s; }
+.more-row:active .mr-ic { transform: scale(.92); }
+
+/* Совет дня — премиальная карточка */
+.tip2 { position: relative; overflow: hidden; margin-top: 18px; padding: 16px 17px; border-radius: 18px;
+  background: linear-gradient(150deg, rgba(255,90,31,.14), var(--card2) 65%); border: 1px solid rgba(255,90,31,.28);
+  box-shadow: 0 8px 22px rgba(0,0,0,.28); }
+.tip2-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.tip2-ic { width: 28px; height: 28px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+  color: #1a0a02; background: linear-gradient(135deg, var(--accent2), var(--accent)); box-shadow: 0 4px 12px rgba(255,90,31,.4); }
+.tip2-kicker { font-size: 11px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent2); }
+.tip2-text { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--text); font-weight: 500; }

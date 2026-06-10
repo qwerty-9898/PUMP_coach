@@ -71,6 +71,7 @@ export default function Progress({ profile }) {
                   ? <span className="medal-badge"><Icon name="check" size={13} /> есть</span>
                   : <span className="medal-pct">{Math.round(m.progress * 100)}%</span>}
               </div>
+              <span className="medal-cat">{m.cat}</span>
               <span className="medal-t">{m.title}</span>
               <span className="medal-d">{m.desc}</span>
               <span className="medal-bar"><i style={{ width: (m.progress * 100) + '%' }} /></span>
