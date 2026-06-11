@@ -33,6 +33,7 @@ export default function App() {
   const [profile, setProfile] = useState(null)
   const [route, setRoute] = useState('home')
   const [loading, setLoading] = useState(false)
+  const [catGroup, setCatGroup] = useState(null)
 
   useEffect(() => { initTelegram(); setProfile(store.getProfile()) }, [])
 
@@ -45,7 +46,8 @@ export default function App() {
   function submit(p) { store.setProfile(p); setProfile(p); setRoute('home'); setLoading(true); setTimeout(() => setLoading(false), 2600); window.scrollTo(0, 0) }
   function saveProfile(p) { store.setProfile(p); setProfile(p) }
   function restart() { store.clearProfile(); setProfile(null); setRoute('home') }
-  function go(r) { haptic('light'); setRoute(r); window.scrollTo(0, 0) }
+  function go(r) { haptic('light'); if (r === 'catalog') setCatGroup(null); setRoute(r); window.scrollTo(0, 0) }
+  function openMuscle(g) { haptic('light'); setCatGroup(g); setRoute('catalog'); window.scrollTo(0, 0) }
 
   if (loading) return <div className="app"><Loader /></div>
 
@@ -59,9 +61,9 @@ export default function App() {
   }
 
   const screens = {
-    home: <Home profile={profile} go={go} userName={tgUserName()} />,
+    home: <Home profile={profile} go={go} onMuscle={openMuscle} userName={tgUserName()} />,
     workout: <Workout profile={profile} />,
-    catalog: <Catalog profile={profile} />,
+    catalog: <Catalog key={catGroup || 'all'} initialGroup={catGroup} />,
     progress: <Progress profile={profile} />,
     more: <More go={go} />,
     profile: <Profile profile={profile} onSave={saveProfile} onRestart={restart} />,

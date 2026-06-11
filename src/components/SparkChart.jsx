@@ -24,7 +24,7 @@ export default function SparkChart({ data, color = '#ff5a1f', height = 120, unit
       {data.length > 1 && <path d={area} fill={'url(#' + uid + ')'} />}
       {data.length > 1 && <path d={line} fill="none" stroke={color} strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />}
       <circle cx={lastPt[0]} cy={lastPt[1]} r="4.5" fill={color} />
-      <text x={Math.min(lastPt[0], w - 30)} y={Math.max(lastPt[1] - 8, 14)} fill={color} fontSize="14" fontFamily="Oswald, sans-serif" fontWeight="700" textAnchor="middle">{data[data.length - 1]}{unit}</text>
+      <text x={Math.min(lastPt[0], w - 30)} y={Math.max(lastPt[1] - 8, 14)} fill={color} fontSize="14" fontFamily="Unbounded, sans-serif" fontWeight="700" textAnchor="middle">{data[data.length - 1]}{unit}</text>
     </svg>
   )
 }

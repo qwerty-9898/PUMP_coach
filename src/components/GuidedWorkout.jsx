@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Icon from './Icon.jsx'
 import { GROUP_META } from '../engine/exercises.js'
+import { MUSCLE_ART } from './muscleArt.js'
 import { estimateLoad } from '../engine/loads.js'
 import { suggestNext, lastSummary, isPR } from '../engine/progress.js'
 import { store, todayKey } from '../storage.js'
@@ -84,7 +85,7 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
       <div className="guided">
         <div className="guided-top">
           <button className="iconbtn" onClick={onExit}><Icon name="x" size={20} /></button>
-          <span className="guided-prog"><b style={{ fontFamily: 'Oswald', fontSize: 16 }}>Разминка</b></span>
+          <span className="guided-prog"><b style={{ fontFamily: 'Unbounded', fontSize: 15 }}>Разминка</b></span>
         </div>
         <div className="guided-card">
           <h2 className="display md">Сначала разомнись</h2>
@@ -122,6 +123,7 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
       </div>
 
       <div className={'guided-card' + (prFlash ? ' pr' : '')}>
+        <img className="guided-art" src={MUSCLE_ART[ex.group]} alt="" />
         <span className="tag" style={tagStyle(ex.group)}>{GROUP_META[ex.group].label}</span>
         <h2 className="display md">{ex.name}</h2>
         <div className="guided-meta">

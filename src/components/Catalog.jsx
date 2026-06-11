@@ -11,8 +11,8 @@ function Hl({ group }) {
   ))
 }
 
-export default function Catalog() {
-  const [group, setGroup] = useState(null)
+export default function Catalog({ initialGroup }) {
+  const [group, setGroup] = useState(initialGroup || null)
   const [exId, setExId] = useState(null)
 
   if (exId) {

@@ -20,7 +20,7 @@ const TIPS = [
 ]
 const PLACE = { gym: 'в зале', dumbbell: 'дома с гантелями', none: 'без инвентаря' }
 
-export default function Home({ profile, go, userName }) {
+export default function Home({ profile, go, onMuscle, userName }) {
   const n = calcNutrition(profile)
   const date = todayKey()
   const [tipIdx, setTipIdx] = useState(() => new Date().getMinutes() % TIPS.length)
@@ -35,6 +35,7 @@ export default function Home({ profile, go, userName }) {
   const water = store.getWater()[date] || 0
   const did = store.getProgress().workouts.some(w => w.date === date)
 
+  const firstRun = store.getProgress().workouts.length === 0
   const map = recoveryMap()
   const trainedCount = map.filter(m => m.days != null).length
   const focus = freshFocus(3)
@@ -47,6 +48,17 @@ export default function Home({ profile, go, userName }) {
         <h1 className="display lg">Время прокачаться</h1>
       </div>
 
+      {firstRun && (
+        <button className="welcome" onClick={() => go('workout')}>
+          <span className="welcome-ic"><Icon name="bolt" size={22} /></span>
+          <div className="welcome-txt">
+            <span className="welcome-h">Добро пожаловать в PUMP</span>
+            <p>Проведи первую тренировку — карта тела загорится, пойдут серия, рекорды и медали.</p>
+          </div>
+          <Icon name="arrow" size={20} className="welcome-arr" />
+        </button>
+      )}
+
       {/* Карта восстановления — центральный блок */}
       <div className="card recovery">
         <div className="card-head">
@@ -54,7 +66,7 @@ export default function Home({ profile, go, userName }) {
           {trainedCount > 0 && <span className="card-meta">{trainedCount} из 7 групп</span>}
         </div>
 
-        <BodyHeatmap onPick={() => go('workout')} />
+        <BodyHeatmap onPick={onMuscle} />
 
         {trainedCount === 0 ? (
           <p className="recovery-hint">Здесь оживёт карта твоего тела. Проведи первую тренировку — мышцы загорятся по нагрузке, а тусклые подскажут, что качать дальше.</p>
