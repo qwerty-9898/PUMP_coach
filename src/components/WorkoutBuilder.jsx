@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
-import GroupBadge from './GroupBadge.jsx'
+import { MUSCLE_ART } from './muscleArt.js'
 import GuidedWorkout from './GuidedWorkout.jsx'
 import { GROUPS, GROUP_META } from '../engine/exercises.js'
 import { generateSession, pickAlternative, shapeExercise } from '../engine/sessionGenerator.js'
@@ -68,8 +68,10 @@ export default function WorkoutBuilder({ program, profile, onChangeProgram }) {
 
       <div className="muscles">
         {GROUPS.map(g => (
-          <button key={g} className={'muscle' + (picked.includes(g) ? ' on' : '')} onClick={() => toggle(g)}>
-            <GroupBadge group={g} size={36} />
+          <button key={g} className={'muscle' + (picked.includes(g) ? ' on' : '')} style={{ '--mc': GROUP_META[g].color }} onClick={() => toggle(g)}>
+            <img className="mcard-img" src={MUSCLE_ART[g]} alt="" />
+            <div className="mcard-scrim" />
+            {picked.includes(g) && <span className="mcard-check"><Icon name="check" size={13} /></span>}
             <span className="m-name">{GROUP_META[g].label}</span>
           </button>
         ))}

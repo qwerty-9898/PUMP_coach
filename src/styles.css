@@ -105,7 +105,7 @@ input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px 
   background: radial-gradient(160px 250px at 50% 46%, rgba(255,120,30,.16), transparent 72%), #05060a; }
 .bh2-frame { position: relative; display: inline-block; line-height: 0; }
 .bh2-img { height: 256px; width: auto; display: block; filter: drop-shadow(0 0 12px rgba(255,120,30,.4)); }
-.bh2-zone { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; filter: blur(2px); transition: opacity .35s; }
+.bh2-zone { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; filter: blur(1.5px) saturate(1.2); transition: opacity .35s; }
 .recovery-hint { margin: 13px 2px 0; font-size: 13px; color: var(--muted); line-height: 1.5; text-align: center; }
 .rg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-top: 14px; }
 .rg { display: flex; align-items: center; gap: 9px; }
@@ -167,11 +167,15 @@ input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px 
 .divider { text-align: center; position: relative; margin: 18px 0; }
 .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--line); }
 .divider span { position: relative; background: var(--bg); padding: 0 12px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-.muscles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin-bottom: 16px; }
-.muscle { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 4px; display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer; transition: .15s; }
-.muscle:active { transform: scale(.95); }
-.muscle.on { background: var(--accent-soft); border-color: var(--accent); }
-.m-name { font-size: 11px; font-weight: 700; }
+.muscles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.muscle { position: relative; height: 94px; padding: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #05060a; cursor: pointer; transition: .15s; box-shadow: inset 0 -3px 0 0 var(--mc); }
+.mcard-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 32%; opacity: .92; }
+.mcard-scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(2,3,6,.92) 12%, transparent 62%); }
+.muscle .m-name { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 12px; font-weight: 700; color: #fff; z-index: 2; }
+.mcard-check { position: absolute; top: 6px; right: 6px; z-index: 3; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #1a0a02; background: linear-gradient(135deg, var(--accent2), var(--accent)); box-shadow: 0 2px 9px rgba(255,90,31,.55); }
+.muscle:active { transform: scale(.96); }
+.muscle.on { border-color: var(--mc); box-shadow: inset 0 -3px 0 0 var(--mc), 0 0 0 2px var(--accent), 0 8px 22px rgba(255,90,31,.3); }
+.muscle.on .mcard-img { opacity: 1; }
 .gbadge { display: inline-flex; align-items: center; justify-content: center; border-radius: 11px; border: 1px solid; overflow: hidden; background: #06070b; }
 .gbadge-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
@@ -886,10 +890,10 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 
 /* Красная неон-подсветка целевой мышцы в каталоге */
 .m-hl { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; z-index: 1;
-  background: radial-gradient(closest-side, rgba(255,32,32,.78), rgba(255,42,28,.32) 52%, transparent 74%);
-  box-shadow: 0 0 18px 4px rgba(255,40,30,.35); filter: blur(1.5px);
-  animation: hlPulse 2.4s ease-in-out infinite; }
-@keyframes hlPulse { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
+  background: radial-gradient(closest-side, rgba(255,60,55,.98), rgba(255,45,25,.6) 48%, transparent 72%);
+  box-shadow: 0 0 30px 9px rgba(255,45,22,.55); filter: blur(1px) saturate(1.25);
+  animation: hlPulse 2s ease-in-out infinite; }
+@keyframes hlPulse { 0%, 100% { opacity: .82; } 50% { opacity: 1; } }
 .musclecard-scrim, .muscle-banner-scrim { z-index: 2; }
 .musclecard-info, .muscle-banner-info { z-index: 3; }
 

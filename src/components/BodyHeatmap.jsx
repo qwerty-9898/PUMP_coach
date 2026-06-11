@@ -28,8 +28,8 @@ export default function BodyHeatmap({ onPick, loads }) {
                   onClick={onPick ? () => onPick(g) : undefined}
                   style={{
                     left: e[0] + '%', top: e[1] + '%', width: e[2] + '%', height: e[3] + '%',
-                    background: `radial-gradient(closest-side, ${GROUP_META[g].color}, transparent 80%)`,
-                    opacity: 0.18 + load * 0.82,
+                    background: `radial-gradient(closest-side, ${GROUP_META[g].color}, transparent 72%)`,
+                    opacity: 0.3 + load * 0.7,
                     cursor: onPick ? 'pointer' : 'default'
                   }} />
               )
