@@ -943,3 +943,37 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .welcome-h { display: block; font-weight: 800; font-size: 15px; margin-bottom: 2px; }
 .welcome-txt p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
 .welcome-arr { color: var(--accent); flex-shrink: 0; }
+
+/* ===== Питание: новые блоки ===== */
+.goal-edit { display: inline-flex; align-items: center; gap: 5px; background: var(--card2); border: 1px solid var(--line);
+  color: var(--text); border-radius: 10px; padding: 7px 11px; font-size: 12px; font-weight: 700; cursor: pointer; align-self: flex-start; }
+.goal-edit:active { transform: scale(.96); }
+.goalbox { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 14px; }
+.goal-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.goal-row input { flex: 1; }
+.goal-row .cta { width: auto; padding: 12px 18px; margin: 0; }
+
+.nut-tabs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 2px; -webkit-overflow-scrolling: touch; }
+.nut-tab { flex: 0 0 auto; background: var(--card); border: 1px solid var(--line); color: var(--muted); border-radius: 999px;
+  padding: 9px 15px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: inherit; }
+.nut-tab.on { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #1a0a02; border-color: transparent; }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.iconbtn.sm { width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; }
+
+/* Шит-редактор порции */
+.sheet { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; backdrop-filter: blur(2px); animation: fadeIn .2s; }
+.sheet-card { width: 100%; background: var(--bg2); border-top: 1px solid var(--line); border-radius: 22px 22px 0 0;
+  padding: 20px 18px calc(20px + env(safe-area-inset-bottom)); animation: sheetUp .26s cubic-bezier(.2,.8,.3,1); }
+.sheet-card .addhead-t { display: block; margin-bottom: 14px; }
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Конструктор блюда */
+.dish-items { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 8px 12px; margin-bottom: 14px; }
+.dish-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.dish-item:last-of-type { border-bottom: none; }
+.dish-item-name { flex: 1; font-size: 14px; font-weight: 600; min-width: 0; }
+.dish-item-g { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--accent2); }
+.dish-total { padding: 11px 0 4px; font-size: 13px; color: var(--muted); }
+.dish-total b { color: var(--text); font-family: 'Unbounded', sans-serif; }

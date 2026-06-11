@@ -8,7 +8,10 @@ const K = {
   fav: 'pump_fav_v1',
   favex: 'pump_favex_v1',
   rating: 'pump_rating_v1',
-  logs: 'pump_logs_v1'
+  logs: 'pump_logs_v1',
+  freq: 'pump_foodfreq_v1',
+  dishes: 'pump_dishes_v1',
+  kcalgoal: 'pump_kcalgoal_v1'
 }
 
 function read(key, fallback) {
@@ -34,19 +37,42 @@ export const store = {
   getMeasures: () => read(K.measures, []),
   setMeasures: (m) => write(K.measures, m),
 
-  // Дневник еды: { 'YYYY-MM-DD': [ {uid,name,grams,meal,kcal,p,f,c} ] }
+  // Дневник еды: { 'YYYY-MM-DD': [ {uid,name,grams,meal,kcal,p,f,c,foodId} ] }
   getFoodDay: (date) => read(K.food, {})[date] || [],
   addFood: (date, entry) => {
     const all = read(K.food, {})
     all[date] = all[date] || []
     all[date].push({ ...entry, uid: Date.now() + '' + Math.floor(Math.random() * 1000) })
     write(K.food, all)
+    if (entry.foodId) { const m = read(K.freq, {}); m[entry.foodId] = (m[entry.foodId] || 0) + 1; write(K.freq, m) }
   },
   removeFood: (date, uid) => {
     const all = read(K.food, {})
     all[date] = (all[date] || []).filter(e => e.uid !== uid)
     write(K.food, all)
   },
+  updateFood: (date, uid, patch) => {
+    const all = read(K.food, {})
+    all[date] = (all[date] || []).map(e => e.uid === uid ? { ...e, ...patch } : e)
+    write(K.food, all)
+  },
+  frequentFoods: (limit = 12) => {
+    const m = read(K.freq, {})
+    return Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, limit).map(([id]) => id)
+  },
+  foodWeek: (days = 7) => {
+    const all = read(K.food, {}); const out = []
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i); const key = todayKey(d)
+      out.push({ date: key, kcal: (all[key] || []).reduce((a, e) => a + e.kcal, 0) })
+    }
+    return out
+  },
+  getDishes: () => read(K.dishes, []),
+  addDish: (dish) => { const a = read(K.dishes, []); a.push({ ...dish, id: 'd' + Date.now() }); write(K.dishes, a); return a },
+  removeDish: (id) => { const a = read(K.dishes, []).filter(d => d.id !== id); write(K.dishes, a); return a },
+  getKcalGoal: () => read(K.kcalgoal, null),
+  setKcalGoal: (n) => write(K.kcalgoal, n),
 
   getFavorites: () => read(K.fav, []),
   toggleFavorite: (foodId) => {
@@ -54,7 +80,7 @@ export const store = {
     fav = fav.includes(foodId) ? fav.filter(x => x !== foodId) : [...fav, foodId]
     write(K.fav, fav)
     return fav
-  }  ,
+  },
   getFavEx: () => read(K.favex, []),
   toggleFavEx: (id) => {
     let f = read(K.favex, [])
@@ -62,13 +88,12 @@ export const store = {
     write(K.favex, f); return f
   },
   getRating: () => read(K.rating, {}),
-  setRating: (pid, stars) => { const r = read(K.rating, {}); r[pid] = stars; write(K.rating, r) }  ,
+  setRating: (pid, stars) => { const r = read(K.rating, {}); r[pid] = stars; write(K.rating, r) },
   getLogs: () => read(K.logs, []),
   addLog: (entry) => { const a = read(K.logs, []); a.push(entry); write(K.logs, a) },
   getExLogs: (exId) => read(K.logs, []).filter(e => e.exId === exId).sort((a, b) => a.date.localeCompare(b.date)),
   getLastSets: (exId) => { const l = read(K.logs, []).filter(e => e.exId === exId); return l.length ? l[l.length - 1].sets : null },
   loggedExIds: () => [...new Set(read(K.logs, []).map(e => e.exId))]
-
 }
 
 export function todayKey(d = new Date()) {

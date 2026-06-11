@@ -13,6 +13,7 @@ import Timer from './components/Timer.jsx'
 import Calculators from './components/Calculators.jsx'
 import Loader from './components/Loader.jsx'
 import Icon from './components/Icon.jsx'
+import NavIcon from './components/NavIcon.jsx'
 import { store } from './storage.js'
 import { initTelegram, tgBackButton, haptic, tgUserName } from './tg.js'
 
@@ -96,7 +97,7 @@ export default function App() {
       <nav className="tabbar">
         {TABS.map(t => (
           <button key={t.key} className={'tab' + (activeTab === t.key ? ' on' : '')} onClick={() => go(t.key)}>
-            <Icon name={t.icon} size={23} stroke={activeTab === t.key ? 2.1 : 1.8} />
+            <NavIcon name={t.key} size={24} active={activeTab === t.key} />
             <span>{t.label}</span>
           </button>
         ))}

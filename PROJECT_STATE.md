@@ -1,7 +1,7 @@
 # PUMP — паспорт проекта (выжимка чата)
 
 > Единый источник правды. Работаем дальше только по этому файлу.
-> Обновляется по мере работы. Версия приложения в коде: **v1.0**.
+> Обновляется по мере работы. Версия приложения в коде: **v1.1**.
 
 ---
 
@@ -60,14 +60,14 @@
 
 ### Данные
 - `data/programs.js` — `PROGRAMS` (6: Фуллбади, Верх/Низ, PPL, 2 сплита синергист/антагонист, бро-сплит), у каждой `equip:[]`. `programsForEquip`, `recommendProgram({level,daysPerWeek,equip})` (учёт уровня И инвентаря), `buildWeek` (`DAY_PATTERNS`).
-- `data/foods.js` — ~89 продуктов СНГ, `searchFoods`, `macrosFor`.
+- `data/foods.js` — **174 продукта СНГ** (10 категорий), `searchFoods`, `macrosFor`.
 
 ### storage.js
 Ключи `K`: profile `pump_profile_v3`, progress, water, measures, food, fav, favex, rating, logs `pump_logs_v1`.
 Методы: профиль (get/set/clear/`clearAll`=стереть все `pump_`), `getProgress/setProgress` (`workouts[]`), дневник еды, избранное (еда+упр `getFavEx/toggleFavEx`), рейтинг, **логи** (`addLog/getExLogs/getLastSets/loggedExIds`), `todayKey()`, `calcStreak(dates)`.
 
 ### Компоненты (главные)
-- `App.jsx` — корень: profile/route/loading state. Нижняя таб-навигация `TABS=[home,workout,catalog,progress,more]`; вторичные экраны `{profile,nutrition,water,measures,timer,calculators}`; Loader ~2.6с после онбординга; Telegram BackButton.
+- `App.jsx` — корень: profile/route/loading/`catGroup` state. Нижняя таб-навигация (`NavIcon` — duotone, заливка при активной) `TABS=[home,workout,catalog,progress,more]`; `openMuscle(g)` → каталог группы; вторичные экраны `{profile,nutrition,water,measures,timer,calculators}`; Loader ~2.6с после онбординга; Telegram BackButton.
 - `Home.jsx` — **новая главная**: приветствие → **карта восстановления** (центральный блок `BodyHeatmap` + список групп со статусом + подсказка «Сегодня свежее всего») → герокарта «Начать тренировку» → `CalendarStrip` → сводка дня (серия/ккал/вода) → плитки (Каталог/Инструменты) → совет дня.
 - `BodyHeatmap.jsx` — **большая карта тела на мышечной анатомии** (PNG `assets/skeleton/muscle_front|back.png`), переключатель Спереди/Сзади, яркая заливка мышц по `load`. Зоны в `bodyZones.js` (%). Каталог — на скелет-кропах (`g_*.png`) с красной неон-подсветкой целевой мышцы (`MUSCLE_HL`).
 - `muscleArt.js` — `MUSCLE_ART` (группа→скелет-кроп) + `MUSCLE_HL` (красная подсветка зоны). `MenuIcon.jsx` — кастомные duotone-иконки для «Ещё». (`BodyIcon.jsx` удалён.)
@@ -76,7 +76,7 @@
 - `Workout.jsx` / `ProgramPicker.jsx` / `WorkoutBuilder.jsx` — выбор программы (фильтр по инвентарю), пресеты, «Собери за меня», ручной выбор групп, генерация сессии, «Гид по шагам», «Другой вариант», замена упражнения, смена программы.
 - `GuidedWorkout.jsx` — пошаговый режим: разминка→работа→финиш. По упражнению: прошлый результат + подсказка прогрессии, ввод вес/повторы по подходам, лог в `logs`, вспышка при PR, таймер отдыха, сохранение тренировки.
 - `Catalog.jsx` — группы (`GroupBadge`+счёт) → список → деталь (demo-карта с большим `BodyIcon` + техника/ошибки/темп-дыхание-разминка).
-- `Nutrition.jsx` — «живой» счётчик: кольцо ккал, бары БЖУ, приёмы пищи, поиск еды, ручной ввод, избранное; тизер «счётчик по фото».
+- `Nutrition.jsx` — счётчик 2.0: кольцо + **редактируемая цель ккал** (авто под цель / ручная), бары БЖУ, **график калорий за 7 дней**, приёмы пищи с **правкой порции** (шит) и удалением, AddPanel со **вкладками** (Поиск/Частые/Избранное/Мои блюда/Вручную), **конструктор своих блюд** (`DishBuilder`). Частые считаются по `frequentFoods`.
 - Прочее: `CalendarStrip.jsx`, `WeekSchedule.jsx`, `Water.jsx`, `Measures.jsx`, `Timer.jsx`, `Calculators.jsx`, `Onboarding.jsx` (пошаговый визард), `Profile.jsx` (быстрый редактор + «Пройти знакомство заново»; системные кнопки убраны в «Ещё»), `Loader.jsx`, `SparkChart.jsx`, `BodyIcon.jsx`, `GroupBadge.jsx`, `Icon.jsx`.
 
 ---

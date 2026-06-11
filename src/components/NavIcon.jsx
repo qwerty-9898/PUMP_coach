@@ -1,0 +1,23 @@
+// Иконки нижней навигации: контур в покое, заливка при активной вкладке.
+const ICONS = {
+  home: 'M4 11.4 12 4.2l8 7.2V19.5a1.2 1.2 0 0 1-1.2 1.2H15v-5.6a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1V20.7H5.2A1.2 1.2 0 0 1 4 19.5Z',
+  workout: 'M2.6 9.8h2.1v4.4H2.6zM5.2 8.1h2.2v7.8H5.2zM16.6 8.1h2.2v7.8h-2.2zM19.3 9.8h2.1v4.4h-2.1zM7.8 10.9h8.4v2.2H7.8z',
+  catalog: 'M4.5 5h15v3.4h-15zM4.5 10.3h15v3.4h-15zM4.5 15.6h15V19h-15z',
+  progress: 'M4.6 13h3.1v6H4.6zM10.4 8.6h3.1V19h-3.1zM16.3 4.8h3.1V19h-3.1z',
+  more: 'M4.6 5h5.4v5.4H4.6zM14 5h5.4v5.4H14zM4.6 13.6h5.4V19H4.6zM14 13.6h5.4V19H14z'
+}
+
+export default function NavIcon({ name, size = 24, active = false }) {
+  const d = ICONS[name]
+  if (!d) return null
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d={d}
+        fill={active ? 'currentColor' : 'none'}
+        fillOpacity={active ? 0.95 : 0}
+        stroke="currentColor"
+        strokeWidth={active ? 1.3 : 1.7}
+        strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  )
+}
