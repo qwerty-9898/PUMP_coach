@@ -1,5 +1,6 @@
 import Icon from './Icon.jsx'
 import MenuIcon from './MenuIcon.jsx'
+import muscleBg from '../assets/skeleton/muscle_front.png'
 import { store, calcStreak } from '../storage.js'
 
 const SECTIONS = [
@@ -36,21 +37,26 @@ export default function More({ go, profile, userName }) {
 
   return (
     <div className="screen">
-      <button className="profilecard" onClick={() => go('profile')}>
-        <span className="pc-ava">{initial}</span>
-        <div className="pc-main">
-          <div className="pc-row">
-            <span className="pc-name">{userName || 'Атлет'}</span>
-            <Icon name="chevronR" size={18} className="pc-arr" />
-          </div>
-          <span className="pc-sub">{cap(profile?.level)} · цель: {profile?.goal || '—'}</span>
-          <div className="pc-stats">
-            <div className="pc-stat"><b>{streak}</b><span>серия</span></div>
-            <div className="pc-stat"><b>{total}</b><span>тренировок</span></div>
-            <div className="pc-stat"><b>{fmtKg(ton)}</b><span>поднято</span></div>
+      {/* Профиль-герой */}
+      <div className="profilehero">
+        <img className="ph-bg" src={muscleBg} alt="" aria-hidden="true" />
+        <div className="ph-top">
+          <span className="ph-ava2">{initial}</span>
+          <div className="ph-info">
+            <span className="ph-name2">{userName || 'Атлет'}</span>
+            <div className="ph-chips">
+              <span className="ph-chip">{cap(profile?.level)}</span>
+              <span className="ph-chip">Цель: {profile?.goal || '—'}</span>
+            </div>
           </div>
         </div>
-      </button>
+        <div className="ph-stats3">
+          <div className="ph-s"><b>{streak}</b><span>серия</span></div>
+          <div className="ph-s"><b>{total}</b><span>тренировок</span></div>
+          <div className="ph-s"><b>{fmtKg(ton)}</b><span>поднято</span></div>
+        </div>
+        <button className="ph-edit" onClick={() => go('profile')}><Icon name="edit" size={15} /> Изменить профиль</button>
+      </div>
 
       {SECTIONS.map(sec => (
         <div className="more-sect" key={sec.label}>
@@ -92,7 +98,7 @@ export default function More({ go, profile, userName }) {
         </div>
       </div>
 
-      <p className="more-foot">PUMP · v1.0 · Telegram Mini App</p>
+      <p className="more-foot">PUMP · v1.4 · Telegram Mini App</p>
     </div>
   )
 }

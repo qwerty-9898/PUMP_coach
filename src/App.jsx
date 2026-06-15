@@ -23,13 +23,13 @@ const TABS = [
   { key: 'workout', label: 'Тренировки', icon: 'dumbbell' },
   { key: 'catalog', label: 'Каталог', icon: 'book' },
   { key: 'progress', label: 'Прогресс', icon: 'activity' },
-  { key: 'more', label: 'Ещё', icon: 'grid' }
+  { key: 'more', label: 'Профиль', icon: 'grid' }
 ]
 const SECONDARY = {
   profile: 'Профиль', nutrition: 'Калории и КБЖУ', water: 'Дневник воды',
   measures: 'Замеры тела', timer: 'Таймер отдыха', calculators: 'Калькуляторы'
 }
-const TAB_TITLE = { workout: 'Тренировки', catalog: 'Каталог упражнений', progress: 'Прогресс', more: 'Ещё' }
+const TAB_TITLE = { workout: 'Тренировки', catalog: 'Каталог упражнений', progress: 'Прогресс', more: 'Профиль' }
 
 export default function App() {
   const [profile, setProfile] = useState(null)
@@ -67,7 +67,7 @@ export default function App() {
     workout: <Workout profile={profile} />,
     catalog: <Catalog key={catGroup || 'all'} initialGroup={catGroup} />,
     progress: <Progress profile={profile} />,
-    more: <More go={go} />,
+    more: <More go={go} profile={profile} userName={tgUserName()} />,
     profile: <Profile profile={profile} onSave={saveProfile} onRestart={restart} />,
     nutrition: <Nutrition profile={profile} />,
     water: <Water profile={profile} />,

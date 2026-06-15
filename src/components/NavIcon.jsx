@@ -4,7 +4,7 @@ const ICONS = {
   workout: 'M2.6 9.8h2.1v4.4H2.6zM5.2 8.1h2.2v7.8H5.2zM16.6 8.1h2.2v7.8h-2.2zM19.3 9.8h2.1v4.4h-2.1zM7.8 10.9h8.4v2.2H7.8z',
   catalog: 'M4.5 5h15v3.4h-15zM4.5 10.3h15v3.4h-15zM4.5 15.6h15V19h-15z',
   progress: 'M4.6 13h3.1v6H4.6zM10.4 8.6h3.1V19h-3.1zM16.3 4.8h3.1V19h-3.1z',
-  more: 'M4.6 5h5.4v5.4H4.6zM14 5h5.4v5.4H14zM4.6 13.6h5.4V19H4.6zM14 13.6h5.4V19H14z'
+  more: 'M12 4.4a3.4 3.4 0 1 1 0 6.8 3.4 3.4 0 0 1 0-6.8ZM5.6 19.4a6.4 6.4 0 0 1 12.8 0Z'
 }
 
 export default function NavIcon({ name, size = 24, active = false }) {

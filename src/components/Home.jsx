@@ -59,25 +59,25 @@ export default function Home({ profile, go, onMuscle, userName }) {
         </button>
       )}
 
-      {/* Карта восстановления — центральный блок */}
-      <div className="card recovery">
-        <div className="card-head">
+      {/* Карта тела — фон-сцена, элементы поверх */}
+      <div className="bodystage">
+        <div className="bs-head">
           <span className="card-kicker"><Icon name="activity" size={15} /> Карта восстановления</span>
-          {trainedCount > 0 && <span className="card-meta">{trainedCount} из 7 групп</span>}
+          {trainedCount > 0 && <span className="card-meta">{trainedCount} / 7</span>}
         </div>
 
         <BodyHeatmap onPick={onMuscle} />
 
         {trainedCount === 0 ? (
-          <p className="recovery-hint">Здесь оживёт карта твоего тела. Проведи первую тренировку — мышцы загорятся по нагрузке, а тусклые подскажут, что качать дальше.</p>
+          <p className="recovery-hint">Здесь оживёт карта твоего тела — мышцы загорятся по нагрузке, а тусклые подскажут, что качать дальше.</p>
         ) : (
-          <div className="rg-grid">
+          <div className="bs-chips">
             {map.map(m => (
-              <div className="rg" key={m.group}>
-                <span className="rg-dot" style={{ background: GROUP_META[m.group].color, opacity: 0.3 + m.load * 0.7 }} />
-                <span className="rg-name">{GROUP_META[m.group].label}</span>
-                <span className="rg-st">{m.status}</span>
-              </div>
+              <button className="bs-chip" key={m.group} onClick={() => onMuscle(m.group)}>
+                <span className="bs-dot" style={{ background: GROUP_META[m.group].color, opacity: 0.4 + m.load * 0.6 }} />
+                <span className="bs-cn">{GROUP_META[m.group].label}</span>
+                <span className="bs-cs">{m.status}</span>
+              </button>
             ))}
           </div>
         )}

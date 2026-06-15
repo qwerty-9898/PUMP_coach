@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
+import muscleBg from '../assets/skeleton/muscle_front.png'
 import { programsForEquip } from '../data/programs.js'
 
 const FIT = {
@@ -11,40 +12,53 @@ const EQUIP_LABEL = { none: 'без инвентаря', dumbbell: 'дома с 
 
 export default function ProgramPicker({ selected, recommended, onSelect, equip }) {
   const list = programsForEquip(equip)
-  const [openId, setOpenId] = useState(recommended)
+  const reco = list.find(p => p.id === recommended) || list[0]
+  const others = list.filter(p => p.id !== reco.id)
+  const [openId, setOpenId] = useState(null)
 
   return (
     <section className="block">
       <div className="block-head">
         <h2 className="display sm">Выбери программу</h2>
-        <p className="sub">Показаны программы под твои условия: <b className="accent">{EQUIP_LABEL[equip]}</b>.</p>
+        <p className="sub">Под твои условия: <b className="accent">{EQUIP_LABEL[equip]}</b></p>
       </div>
 
-      <div className="progs">
-        {list.map(p => {
+      {/* Рекомендованная — герой */}
+      <div className={'prog-hero' + (selected === reco.id ? ' sel' : '')}>
+        <img className="prog-hero-bg" src={muscleBg} alt="" aria-hidden="true" />
+        <span className="prog-hero-badge"><Icon name="bolt" size={13} /> Рекомендуем тебе</span>
+        <h3 className="prog-hero-name">{reco.name}</h3>
+        <p className="prog-hero-sub">{reco.subtitle}</p>
+        <div className="prog-hero-stats">
+          <span><Icon name="calc" size={14} /> {reco.days}</span>
+          <span><Icon name="activity" size={14} /> {reco.freq}</span>
+        </div>
+        <div className="prog-hero-pros">
+          {reco.pros.slice(0, 2).map((x, i) => <div key={i}><Icon name="check" size={13} /> {x}</div>)}
+        </div>
+        <button className={'cta' + (selected === reco.id ? ' done' : '')} onClick={() => onSelect(reco.id)}>
+          {selected === reco.id ? <><Icon name="check" size={18} /> Программа выбрана</> : 'Выбрать эту программу'}
+        </button>
+      </div>
+
+      <span className="more-lbl" style={{ margin: '18px 4px 10px' }}>Другие программы</span>
+      <div className="proglist">
+        {others.map(p => {
           const fit = FIT[p.fit]
           const open = openId === p.id
           const isSel = selected === p.id
-          const isReco = recommended === p.id
           return (
-            <div key={p.id} className={'prog' + (isSel ? ' sel' : '')}>
-              <button className="prog-head" onClick={() => setOpenId(open ? null : p.id)}>
-                <div className="prog-title">
-                  <span className="prog-name">{p.name}</span>
-                  <span className="prog-sub">{p.subtitle}</span>
+            <div key={p.id} className={'progrow' + (isSel ? ' sel' : '')}>
+              <button className="progrow-head" onClick={() => setOpenId(open ? null : p.id)}>
+                <div className="progrow-main">
+                  <span className="progrow-name">{p.name}</span>
+                  <span className="progrow-sub">{p.subtitle}</span>
                 </div>
-                <div className="prog-tags">
-                  {isReco && <span className="badge reco">Тебе</span>}
-                  <span className={'badge ' + fit.cls}><Icon name={fit.icon} size={12} /> {p.fitLabel}</span>
-                  <Icon name="chevron" size={18} className={'prog-chev' + (open ? ' up' : '')} />
-                </div>
+                <span className={'badge ' + fit.cls}><Icon name={fit.icon} size={11} /> {p.fitLabel}</span>
+                <Icon name="chevron" size={17} className={'progrow-chev' + (open ? ' up' : '')} />
               </button>
               {open && (
-                <div className="prog-body">
-                  <div className="prog-stats">
-                    <div><span>Частота</span><b>{p.days}</b></div>
-                    <div><span>Нагрузка</span><b>{p.freq}</b></div>
-                  </div>
+                <div className="progrow-body">
                   <p className="prog-about">{p.about}</p>
                   <div className="proscons">
                     <div className="pc pros"><span className="pc-h">Плюсы</span>

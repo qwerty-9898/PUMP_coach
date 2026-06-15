@@ -1043,3 +1043,69 @@ body {
 .app.withnav { position: relative; }
 .app.withnav > .content { position: relative; z-index: 1; }
 .app.withnav > .topbar { position: sticky; z-index: 6; }
+
+/* ===== Главная: тело как фон-сцена ===== */
+.bodystage { position: relative; margin: 6px 0 18px; }
+.bs-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+.bodystage .bh2-stage { background: none; padding: 4px 0 0; }
+.bodystage .bh2-img { height: 330px; }
+.bs-chips { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 2px; margin-top: 8px; -webkit-overflow-scrolling: touch; }
+.bs-chips::-webkit-scrollbar { display: none; }
+.bs-chip { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 98px;
+  background: var(--glass); border: 1px solid var(--glassbd); border-radius: 14px; padding: 9px 12px; cursor: pointer;
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.bs-chip:active { transform: scale(.96); }
+.bs-dot { width: 9px; height: 9px; border-radius: 50%; }
+.bs-cn { font-size: 12.5px; font-weight: 700; }
+.bs-cs { font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+
+/* ===== Тренировки: герой программы + список ===== */
+.prog-hero { position: relative; overflow: hidden; border-radius: 22px; padding: 18px; margin-bottom: 4px;
+  background: linear-gradient(150deg, rgba(255,90,31,.9), rgba(214,58,8,.92)); color: #fff;
+  box-shadow: 0 14px 36px rgba(255,80,20,.3); }
+.prog-hero.sel { box-shadow: 0 0 0 2px #fff, 0 14px 36px rgba(255,80,20,.4); }
+.prog-hero-bg { position: absolute; right: -40px; top: -10px; height: 200%; opacity: .16; pointer-events: none;
+  mix-blend-mode: screen; filter: contrast(1.1); }
+.prog-hero-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .8px; background: rgba(0,0,0,.25); padding: 5px 10px; border-radius: 999px; position: relative; }
+.prog-hero-name { font-family: 'Unbounded', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 23px; line-height: 1.1; margin: 12px 0 2px; position: relative; }
+.prog-hero-sub { font-size: 13px; opacity: .92; margin: 0 0 12px; position: relative; }
+.prog-hero-stats { display: flex; gap: 16px; font-size: 13px; font-weight: 700; margin-bottom: 12px; position: relative; }
+.prog-hero-stats span { display: inline-flex; align-items: center; gap: 5px; }
+.prog-hero-pros { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; position: relative; }
+.prog-hero-pros div { display: flex; align-items: center; gap: 7px; font-size: 13px; opacity: .95; }
+.prog-hero .cta { position: relative; background: #fff; color: #c2410c; box-shadow: none; }
+.prog-hero .cta.done { background: rgba(0,0,0,.25); color: #fff; }
+
+.proglist { display: flex; flex-direction: column; gap: 10px; }
+.progrow { background: var(--glass); border: 1px solid var(--glassbd); border-radius: 16px; overflow: hidden;
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.progrow.sel { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.progrow-head { width: 100%; background: transparent; border: none; color: var(--text); display: flex; align-items: center; gap: 10px; padding: 15px 16px; cursor: pointer; text-align: left; }
+.progrow-main { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.progrow-name { font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 15px; text-transform: uppercase; letter-spacing: .3px; }
+.progrow-sub { font-size: 12px; color: var(--muted); }
+.progrow-chev { color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+.progrow-chev.up { transform: rotate(180deg); }
+.progrow-body { padding: 0 16px 16px; }
+
+/* ===== «Профиль» (бывш. Ещё): герой ===== */
+.profilehero { position: relative; overflow: hidden; border-radius: 22px; padding: 18px; margin-bottom: 20px;
+  background: linear-gradient(150deg, rgba(255,90,31,.22), var(--glass2) 60%); border: 1px solid var(--glassbd);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 12px 30px rgba(0,0,0,.34); }
+.ph-bg { position: absolute; right: -50px; top: -30px; height: 150%; opacity: .12; mix-blend-mode: screen; pointer-events: none; }
+.ph-top { display: flex; align-items: center; gap: 14px; position: relative; }
+.ph-ava2 { width: 60px; height: 60px; border-radius: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 28px; color: #1a0a02;
+  background: linear-gradient(135deg, var(--accent2), var(--accent)); box-shadow: 0 6px 18px rgba(255,90,31,.45); }
+.ph-info { min-width: 0; }
+.ph-name2 { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 21px; display: block; }
+.ph-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.ph-chip { font-size: 11.5px; font-weight: 700; color: var(--accent2); background: var(--accent-soft); border: 1px solid rgba(255,90,31,.3); padding: 4px 10px; border-radius: 999px; text-transform: capitalize; }
+.ph-stats3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; margin: 16px 0 14px; position: relative; }
+.ph-s { background: rgba(0,0,0,.24); border-radius: 13px; padding: 10px 6px; text-align: center; }
+.ph-s b { font-family: 'Unbounded', sans-serif; font-size: 18px; display: block; line-height: 1; }
+.ph-s span { font-size: 10.5px; color: var(--muted); display: block; margin-top: 4px; }
+.ph-edit { display: inline-flex; align-items: center; gap: 7px; width: 100%; justify-content: center; position: relative;
+  background: var(--glass); border: 1px solid var(--glassbd); color: var(--text); border-radius: 13px; padding: 12px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
+.ph-edit:active { transform: scale(.98); }
