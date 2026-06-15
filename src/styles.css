@@ -994,16 +994,17 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 
 /* ===================== FROSTED GLASS THEME (v1.3) ===================== */
 :root {
-  --glass: rgba(19, 23, 31, .55);
-  --glass2: rgba(26, 31, 41, .5);
-  --glassbd: rgba(255, 255, 255, .10);
+  --glass: rgba(24, 28, 37, .40);
+  --glass2: rgba(30, 35, 46, .38);
+  --glassbd: rgba(255, 255, 255, .14);
 }
 /* фон со свечением, закреплён */
 body {
   background:
-    radial-gradient(460px 360px at 50% -60px, rgba(255,120,30,.22), transparent 60%),
-    radial-gradient(700px 600px at 115% 6%, rgba(255,90,31,.07), transparent 55%),
-    radial-gradient(700px 700px at -15% 105%, rgba(60,90,160,.07), transparent 55%),
+    radial-gradient(520px 420px at 50% -40px, rgba(255,120,30,.42), transparent 62%),
+    radial-gradient(420px 420px at 88% 26%, rgba(255,70,20,.20), transparent 60%),
+    radial-gradient(460px 460px at 10% 60%, rgba(80,110,210,.18), transparent 60%),
+    radial-gradient(520px 520px at 95% 92%, rgba(150,60,220,.16), transparent 60%),
     var(--bg) fixed;
   background-attachment: fixed;
 }
@@ -1014,8 +1015,8 @@ body {
 .measlast, .measgrid .field, .prrow, .pc-stat {
   background: var(--glass);
   border-color: var(--glassbd);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
-  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  backdrop-filter: blur(20px) saturate(1.3);
 }
 /* строки внутри списков — прозрачные, чтобы стекло было у контейнера */
 .more-row, .mealblock-items .foodrow { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
@@ -1032,3 +1033,13 @@ body {
 /* чуть больше скругление и тонкая светлая окантовка для «стекла» */
 .card { border-radius: 22px; box-shadow: 0 10px 30px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.05); }
 .tile, .navcard, .todaybox, .quickcard, .ring-card, .watercard { box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+
+/* Frosted Glass: размытый силуэт тела фоном (просвечивает сквозь стекло) */
+.app-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-repeat: no-repeat; background-position: center 12%; background-size: auto 88vh;
+  filter: blur(16px) saturate(1.1); opacity: .2;
+}
+.app.withnav { position: relative; }
+.app.withnav > .content { position: relative; z-index: 1; }
+.app.withnav > .topbar { position: sticky; z-index: 6; }

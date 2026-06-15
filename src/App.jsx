@@ -14,6 +14,7 @@ import Calculators from './components/Calculators.jsx'
 import Loader from './components/Loader.jsx'
 import Icon from './components/Icon.jsx'
 import NavIcon from './components/NavIcon.jsx'
+import bgBody from './assets/skeleton/muscle_front.png'
 import { store } from './storage.js'
 import { initTelegram, tgBackButton, haptic, tgUserName } from './tg.js'
 
@@ -78,6 +79,7 @@ export default function App() {
 
   return (
     <div className="app withnav">
+      <div className="app-bg" aria-hidden="true" style={{ backgroundImage: `url(${bgBody})` }} />
       <header className="topbar">
         {isSecondary ? (
           <>
