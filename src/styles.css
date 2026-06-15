@@ -991,3 +991,44 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 @keyframes scrIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .block-head { margin-bottom: 14px; }
 .block-head .sub { margin-top: 4px; }
+
+/* ===================== FROSTED GLASS THEME (v1.3) ===================== */
+:root {
+  --glass: rgba(19, 23, 31, .55);
+  --glass2: rgba(26, 31, 41, .5);
+  --glassbd: rgba(255, 255, 255, .10);
+}
+/* фон со свечением, закреплён */
+body {
+  background:
+    radial-gradient(460px 360px at 50% -60px, rgba(255,120,30,.22), transparent 60%),
+    radial-gradient(700px 600px at 115% 6%, rgba(255,90,31,.07), transparent 55%),
+    radial-gradient(700px 700px at -15% 105%, rgba(60,90,160,.07), transparent 55%),
+    var(--bg) fixed;
+  background-attachment: fixed;
+}
+/* матовые поверхности (только контейнеры без цветных active-состояний) */
+.card, .mealblock, .more-list, .tile, .todaybox, .quickcard, .stat, .navcard,
+.tipcard, .goalbox, .ring-card, .watercard, .dish-items, .manualcard, .portioncard,
+.medal, .ratecard, .card-box, .histitem, .scheme, .ex, .guided-card, .restbox,
+.measlast, .measgrid .field, .prrow, .pc-stat {
+  background: var(--glass);
+  border-color: var(--glassbd);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  backdrop-filter: blur(14px) saturate(1.15);
+}
+/* строки внутри списков — прозрачные, чтобы стекло было у контейнера */
+.more-row, .mealblock-items .foodrow { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* верх/низ бары — frosted */
+.tabbar {
+  background: rgba(7, 8, 12, .6) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.2); backdrop-filter: blur(20px) saturate(1.2);
+  border-top: 1px solid var(--glassbd);
+}
+.topbar {
+  background: linear-gradient(rgba(5,6,10,.55), rgba(5,6,10,.0)) !important;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+/* чуть больше скругление и тонкая светлая окантовка для «стекла» */
+.card { border-radius: 22px; box-shadow: 0 10px 30px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.05); }
+.tile, .navcard, .todaybox, .quickcard, .ring-card, .watercard { box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
