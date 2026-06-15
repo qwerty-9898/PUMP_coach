@@ -3,7 +3,7 @@ import Icon from './Icon.jsx'
 import CalendarStrip from './CalendarStrip.jsx'
 import BodyHeatmap from './BodyHeatmap.jsx'
 import { calcNutrition } from '../engine/nutrition.js'
-import { PROGRAMS, recommendProgram } from '../data/programs.js'
+import { PROGRAMS, recommendProgram, activeOrRecommended } from '../data/programs.js'
 import { recoveryMap, freshFocus } from '../engine/recovery.js'
 import { GROUP_META } from '../engine/exercises.js'
 import { store, calcStreak, todayKey } from '../storage.js'
@@ -29,7 +29,7 @@ export default function Home({ profile, go, onMuscle, userName }) {
     return () => clearInterval(id)
   }, [])
 
-  const program = PROGRAMS.find(p => p.id === recommendProgram(profile))
+  const program = activeOrRecommended(profile, store.getActiveProgram())
   const streak = calcStreak(store.getProgress().workouts.map(w => w.date))
   const eaten = store.getFoodDay(date).reduce((a, e) => a + e.kcal, 0)
   const water = store.getWater()[date] || 0

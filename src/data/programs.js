@@ -111,3 +111,8 @@ export function buildWeek(program, daysPerWeek) {
   })
   return week
 }
+
+// Активная программа пользователя или рекомендованная по профилю
+export function activeOrRecommended(profile, activeId) {
+  return PROGRAMS.find(p => p.id === activeId) || PROGRAMS.find(p => p.id === recommendProgram(profile))
+}

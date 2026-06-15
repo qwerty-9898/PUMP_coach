@@ -2,6 +2,7 @@
 const P = {
   home: ['M4 11l8-7 8 7', 'M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9'],
   grid: 'M4 5h6v6H4zM14 5h6v6h-6zM4 15h6v4H4zM14 15h6v4h-6z',
+  share: ['M21 3 10 14', 'M21 3l-7 19-4-8-8-4 19-7Z'],
   flag: 'M5 21V4M5 4h11l-2 4 2 4H5',
   chevronR: 'M9 6l6 6-6 6',
   clock: 'M12 8v5l3 2M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z',

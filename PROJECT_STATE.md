@@ -1,7 +1,7 @@
 # PUMP — паспорт проекта (выжимка чата)
 
 > Единый источник правды. Работаем дальше только по этому файлу.
-> Обновляется по мере работы. Версия приложения в коде: **v1.1**.
+> Обновляется по мере работы. Версия приложения в коде: **v1.2**.
 
 ---
 
@@ -59,12 +59,12 @@
 - `engine/achievements.js` — **медали** (9, без дублей механик, категории Регулярность/Объём/Сила): первый шаг, неделя огня (серия 7), полная неделя (4 за 7д), 30/100 тренировок, 100 подходов, 25 тонн, личный рекорд, +10 кг к старту. `achievementsSummary()`.
 
 ### Данные
-- `data/programs.js` — `PROGRAMS` (6: Фуллбади, Верх/Низ, PPL, 2 сплита синергист/антагонист, бро-сплит), у каждой `equip:[]`. `programsForEquip`, `recommendProgram({level,daysPerWeek,equip})` (учёт уровня И инвентаря), `buildWeek` (`DAY_PATTERNS`).
+- `data/programs.js` — `PROGRAMS` (6: Фуллбади, Верх/Низ, PPL, 2 сплита синергист/антагонист, бро-сплит), у каждой `equip:[]`. `programsForEquip`, `recommendProgram({level,daysPerWeek,equip})` (учёт уровня И инвентаря), `buildWeek` (`DAY_PATTERNS`), `activeOrRecommended(profile,activeId)`.
 - `data/foods.js` — **174 продукта СНГ** (10 категорий), `searchFoods`, `macrosFor`.
 
 ### storage.js
 Ключи `K`: profile `pump_profile_v3`, progress, water, measures, food, fav, favex, rating, logs `pump_logs_v1`.
-Методы: профиль (get/set/clear/`clearAll`=стереть все `pump_`), `getProgress/setProgress` (`workouts[]`), дневник еды, избранное (еда+упр `getFavEx/toggleFavEx`), рейтинг, **логи** (`addLog/getExLogs/getLastSets/loggedExIds`), `todayKey()`, `calcStreak(dates)`.
+Методы: профиль (get/set/clear/`clearAll`=стереть все `pump_`), `getProgress/setProgress` (`workouts[]`), дневник еды, избранное (еда+упр `getFavEx/toggleFavEx`), рейтинг, **логи**, питание 2.0 (freq/dishes/kcalgoal/foodWeek/updateFood), **активная программа** (`getActiveProgram/setActiveProgram`), `todayKey()`, `calcStreak(dates)`.
 
 ### Компоненты (главные)
 - `App.jsx` — корень: profile/route/loading/`catGroup` state. Нижняя таб-навигация (`NavIcon` — duotone, заливка при активной) `TABS=[home,workout,catalog,progress,more]`; `openMuscle(g)` → каталог группы; вторичные экраны `{profile,nutrition,water,measures,timer,calculators}`; Loader ~2.6с после онбординга; Telegram BackButton.
@@ -107,3 +107,18 @@
 
 ---
 *Конкуренты для ориентира: Hevy (логирование-first, соц-лента, авто-подстановка весов), Fitbod (ИИ-план, карта восстановления мышц), Strong (минимализм/скорость), Cal AI / @vkusai_bot (калории по фото).*
+
+---
+
+## 6. Аудит v1.2 (чекап) — сделано
+- Бренд-фиксы: манифест `PUMP` + единый цвет `#05060a` (манифест/`index.html`/`tg.js`); убран мёртвый `GROUP_VIEW`.
+- **Активный план**: выбранная программа сохраняется (`pump_active_v1`) и используется на Главной/в Календаре/Прогрессе (`activeOrRecommended`).
+- **Шеринг в Telegram**: `tg.shareText` (через `openTelegramLink` → `t.me/share/url`, `BOT_URL` заменить на свой бот); кнопки на финише тренировки и в Прогрессе.
+- Виз-апгрейд: плавный вход экранов (`scrIn`), ритм заголовков.
+
+## 7. Бэклог (из аудита, не сделано)
+- Сохраняемые свои тренировки/шаблоны (как Hevy).
+- История по конкретному упражнению (экран «все мои жимы»).
+- Заметки/RPE к подходам, отметка разминочных.
+- Генератор «Собери за меня» с учётом карты восстановления (свежие группы вперёд).
+- График веса в Замерах; счётчик калорий по фото (нужен внешний ИИ-API).

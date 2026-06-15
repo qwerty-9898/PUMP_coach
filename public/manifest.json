@@ -1,11 +1,11 @@
 {
-  "name": "FitCoach — ИИ-тренер",
-  "short_name": "FitCoach",
-  "description": "Персональный план тренировок и калории под твою цель",
+  "name": "PUMP — твой ИИ-тренер",
+  "short_name": "PUMP",
+  "description": "Тренировки, карта тела, прогресс и калории под твою цель",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0f1115",
-  "theme_color": "#0f1115",
+  "background_color": "#05060a",
+  "theme_color": "#05060a",
   "icons": [
     { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png" }

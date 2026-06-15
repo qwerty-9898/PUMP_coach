@@ -1,4 +1,4 @@
-import { recommendProgram, PROGRAMS, buildWeek } from '../data/programs.js'
+import { recommendProgram, PROGRAMS, buildWeek, activeOrRecommended } from '../data/programs.js'
 import { store, todayKey } from '../storage.js'
 
 const WD = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс']
@@ -8,7 +8,7 @@ export default function CalendarStrip({ profile, go }) {
   const dow = (today.getDay() + 6) % 7 // 0=Mon
   const monday = new Date(today); monday.setDate(today.getDate() - dow)
 
-  const program = PROGRAMS.find(p => p.id === recommendProgram(profile))
+  const program = activeOrRecommended(profile, store.getActiveProgram())
   const week = buildWeek(program, profile.daysPerWeek)
   const done = new Set(store.getProgress().workouts.map(w => w.date))
   const tKey = todayKey()

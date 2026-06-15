@@ -4,8 +4,8 @@ import { GROUP_META } from '../engine/exercises.js'
 import { MUSCLE_ART } from './muscleArt.js'
 import { estimateLoad } from '../engine/loads.js'
 import { suggestNext, lastSummary, isPR } from '../engine/progress.js'
-import { store, todayKey } from '../storage.js'
-import { haptic } from '../tg.js'
+import { store, todayKey, calcStreak } from '../storage.js'
+import { haptic, shareText } from '../tg.js'
 
 const WARMUP = [
   'Лёгкое кардио 3–5 минут: ходьба, скакалка или бег на месте',
@@ -97,12 +97,18 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
     )
   }
   if (phase === 'done') {
+    const names = session.groups.map(g => GROUP_META[g].label).join(' + ')
+    const streak = calcStreak(store.getProgress().workouts.map(w => w.date))
+    const shareMsg = '🔥 Затренил в PUMP: ' + names + ' — ' + session.exercises.length + ' упр.' + (streak > 1 ? ' Серия ' + streak + ' дней!' : '') + '\nГо тренироваться со мной 💪'
     return (
       <div className="guided done-screen">
         <div className="done-badge"><Icon name="check" size={42} /></div>
         <h2 className="display lg">Готово!</h2>
-        <p className="sub">Тренировка засчитана, подходы записаны. Прогресс смотри во вкладке «Прогресс». 💪</p>
-        <button className="cta" onClick={onExit}>К тренировкам</button>
+        <p className="sub">Тренировка засчитана, подходы записаны. Прогресс смотри во вкладке «Прогресс».</p>
+        <div className="done-actions">
+          <button className="cta" onClick={onExit}>К тренировкам</button>
+          <button className="cta ghost-cta" onClick={() => shareText(shareMsg)}><Icon name="share" size={18} /> Поделиться</button>
+        </div>
       </div>
     )
   }

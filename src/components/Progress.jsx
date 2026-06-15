@@ -5,6 +5,7 @@ import BodyHeatmap from './BodyHeatmap.jsx'
 import { EXERCISES, GROUPS, GROUP_META } from '../engine/exercises.js'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store, calcStreak } from '../storage.js'
+import { shareText } from '../tg.js'
 import { allRecords, exSeries, weeklyVolume } from '../engine/progress.js'
 import { coverageMap } from '../engine/recovery.js'
 import { achievements } from '../engine/achievements.js'
@@ -30,7 +31,7 @@ export default function Progress({ profile }) {
   const medals = achievements()
   const earned = medals.filter(m => m.earned).length
 
-  const recId = recommendProgram(profile)
+  const recId = store.getActiveProgram() || recommendProgram(profile)
   const program = PROGRAMS.find(p => p.id === recId)
   const [stars, setStars] = useState(() => store.getRating()[recId] || 0)
   const [favGroup, setFavGroup] = useState(null)
@@ -42,6 +43,7 @@ export default function Progress({ profile }) {
       {/* Герой-сводка */}
       <div className="card dash-hero">
         <div className="dash-glow" />
+        <button className="dash-share" onClick={() => shareText('🔥 Мой прогресс в PUMP: серия ' + streak + ' дн., ' + total + ' тренировок, поднято ' + fmtKg(tonTotal) + '. Го со мной 💪')} aria-label="Поделиться"><Icon name="share" size={17} /></button>
         <div className="dash-main">
           <span className="dash-flame"><Icon name="flame" size={22} /></span>
           <div>

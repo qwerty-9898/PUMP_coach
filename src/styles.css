@@ -977,3 +977,17 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .dish-item-g { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--accent2); }
 .dish-total { padding: 11px 0 4px; font-size: 13px; color: var(--muted); }
 .dish-total b { color: var(--text); font-family: 'Unbounded', sans-serif; }
+
+/* ===== Шеринг ===== */
+.dash-share { position: absolute; top: 14px; right: 14px; z-index: 2; width: 34px; height: 34px; border-radius: 11px;
+  background: rgba(0,0,0,.22); color: #fff; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; }
+.dash-share:active { transform: scale(.92); }
+.done-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 8px; }
+
+/* ===== Виз-апгрейд: единый плавный вход экранов и ритм ===== */
+@media (prefers-reduced-motion: no-preference) {
+  .content > .screen, .content > .home { animation: scrIn .3s cubic-bezier(.2,.7,.3,1) both; }
+}
+@keyframes scrIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.block-head { margin-bottom: 14px; }
+.block-head .sub { margin-top: 4px; }

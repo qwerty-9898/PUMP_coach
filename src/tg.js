@@ -10,8 +10,8 @@ export function initTelegram() {
   try {
     wa.ready()
     wa.expand()
-    if (wa.setHeaderColor) wa.setHeaderColor('#0b0d10')
-    if (wa.setBackgroundColor) wa.setBackgroundColor('#0b0d10')
+    if (wa.setHeaderColor) wa.setHeaderColor('#05060a')
+    if (wa.setBackgroundColor) wa.setBackgroundColor('#05060a')
     if (wa.enableClosingConfirmation) wa.enableClosingConfirmation()
   } catch (e) {}
 }
@@ -34,4 +34,12 @@ export function tgUserName() {
     const u = wa && wa.initDataUnsafe && wa.initDataUnsafe.user
     return u ? u.first_name : null
   } catch (e) { return null }
+}
+
+const BOT_URL = 'https://t.me/pump_coach_bot' // замени на адрес своего бота
+
+export function shareText(text) {
+  const url = 'https://t.me/share/url?url=' + encodeURIComponent(BOT_URL) + '&text=' + encodeURIComponent(text)
+  try { if (wa && wa.openTelegramLink) { wa.openTelegramLink(url); return } } catch (e) {}
+  try { window.open(url, '_blank') } catch (e) {}
 }
