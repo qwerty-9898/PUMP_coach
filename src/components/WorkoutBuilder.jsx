@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Icon from './Icon.jsx'
 import { MUSCLE_ART } from './muscleArt.js'
 import GuidedWorkout from './GuidedWorkout.jsx'
@@ -7,12 +7,13 @@ import { generateSession, pickAlternative, shapeExercise } from '../engine/sessi
 import { estimateLoad } from '../engine/loads.js'
 import { store, todayKey } from '../storage.js'
 
-export default function WorkoutBuilder({ program, profile, onChangeProgram }) {
+export default function WorkoutBuilder({ program, profile, initialGroup, onChangeProgram }) {
   const [picked, setPicked] = useState([])
   const [session, setSession] = useState(null)
   const [saved, setSaved] = useState(false)
   const [guided, setGuided] = useState(false)
   const favorites = store.getFavEx()
+  useEffect(() => { if (initialGroup) { setPicked([initialGroup]); build([initialGroup], true) } }, [])
 
   const toggle = (g) => setPicked(p => p.includes(g) ? p.filter(x => x !== g) : [...p, g])
 

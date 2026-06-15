@@ -12,7 +12,8 @@ const K = {
   freq: 'pump_foodfreq_v1',
   dishes: 'pump_dishes_v1',
   kcalgoal: 'pump_kcalgoal_v1',
-  active: 'pump_active_v1'
+  active: 'pump_active_v1',
+  fast: 'pump_fast_v1'
 }
 
 function read(key, fallback) {
@@ -76,6 +77,8 @@ export const store = {
   setKcalGoal: (n) => write(K.kcalgoal, n),
   getActiveProgram: () => read(K.active, null),
   setActiveProgram: (id) => write(K.active, id),
+  getFast: () => read(K.fast, null),
+  setFast: (f) => write(K.fast, f),
 
   getFavorites: () => read(K.fav, []),
   toggleFavorite: (foodId) => {

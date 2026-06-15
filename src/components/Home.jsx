@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Icon from './Icon.jsx'
 import CalendarStrip from './CalendarStrip.jsx'
 import BodyHeatmap from './BodyHeatmap.jsx'
+import MuscleSheet from './MuscleSheet.jsx'
 import { calcNutrition } from '../engine/nutrition.js'
 import { PROGRAMS, recommendProgram, activeOrRecommended } from '../data/programs.js'
 import { recoveryMap, freshFocus } from '../engine/recovery.js'
@@ -20,10 +21,11 @@ const TIPS = [
 ]
 const PLACE = { gym: 'в зале', dumbbell: 'дома с гантелями', none: 'без инвентаря' }
 
-export default function Home({ profile, go, onMuscle, userName }) {
+export default function Home({ profile, go, onMuscle, onTrain, userName }) {
   const n = calcNutrition(profile)
   const date = todayKey()
   const [tipIdx, setTipIdx] = useState(() => new Date().getMinutes() % TIPS.length)
+  const [sheetG, setSheetG] = useState(null)
   useEffect(() => {
     const id = setInterval(() => setTipIdx(i => (i + 1) % TIPS.length), 120000)
     return () => clearInterval(id)
@@ -66,7 +68,7 @@ export default function Home({ profile, go, onMuscle, userName }) {
           {trainedCount > 0 && <span className="card-meta">{trainedCount} / 7</span>}
         </div>
 
-        <BodyHeatmap onPick={onMuscle} />
+        <BodyHeatmap onPick={setSheetG} />
 
         {trainedCount === 0 ? (
           <p className="recovery-hint">Здесь оживёт карта твоего тела — мышцы загорятся по нагрузке, а тусклые подскажут, что качать дальше.</p>
@@ -138,6 +140,16 @@ export default function Home({ profile, go, onMuscle, userName }) {
         </div>
         <p key={tipIdx} className="tip2-text tip-anim">{TIPS[tipIdx]}</p>
       </div>
+
+      {sheetG && (() => {
+        const m = map.find(x => x.group === sheetG)
+        return (
+          <MuscleSheet group={sheetG} days={m && m.days} status={m && m.status}
+            onClose={() => setSheetG(null)}
+            onTrain={() => { setSheetG(null); onTrain(sheetG) }}
+            onExercises={() => { setSheetG(null); onMuscle(sheetG) }} />
+        )
+      })()}
     </div>
   )
 }

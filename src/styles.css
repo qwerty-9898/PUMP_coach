@@ -891,10 +891,10 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 
 /* Красная неон-подсветка целевой мышцы в каталоге */
 .m-hl { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; z-index: 1;
-  background: radial-gradient(closest-side, rgba(255,60,55,.98), rgba(255,45,25,.6) 48%, transparent 72%);
-  box-shadow: 0 0 30px 9px rgba(255,45,22,.55); filter: blur(1px) saturate(1.25);
-  animation: hlPulse 2s ease-in-out infinite; }
-@keyframes hlPulse { 0%, 100% { opacity: .82; } 50% { opacity: 1; } }
+  background: radial-gradient(closest-side, rgba(255,75,70,1), rgba(255,45,25,.75) 46%, transparent 70%);
+  box-shadow: 0 0 36px 12px rgba(255,45,22,.7); filter: blur(.6px) saturate(1.35);
+  animation: hlPulse 1.8s ease-in-out infinite; }
+@keyframes hlPulse { 0%, 100% { opacity: .9; } 50% { opacity: 1; } }
 .musclecard-scrim, .muscle-banner-scrim { z-index: 2; }
 .musclecard-info, .muscle-banner-info { z-index: 3; }
 
@@ -1109,3 +1109,61 @@ body {
 .ph-edit { display: inline-flex; align-items: center; gap: 7px; width: 100%; justify-content: center; position: relative;
   background: var(--glass); border: 1px solid var(--glassbd); color: var(--text); border-radius: 13px; padding: 12px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
 .ph-edit:active { transform: scale(.98); }
+
+/* ===== Шит детали мышцы ===== */
+.sheet-card.ms { display: flex; flex-direction: column; gap: 12px; }
+.ms-grip { width: 40px; height: 4px; border-radius: 3px; background: rgba(255,255,255,.18); margin: -6px auto 4px; }
+.ms-head { display: flex; gap: 14px; align-items: center; }
+.ms-img { width: 92px; height: 80px; border-radius: 16px; overflow: hidden; flex-shrink: 0; background: #05060a; display: flex; align-items: center; justify-content: center; }
+.ms-img img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+.ms-meta { min-width: 0; }
+.ms-name { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 21px; text-transform: uppercase; display: block; }
+.ms-status { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); margin-top: 3px; }
+.ms-dot { width: 9px; height: 9px; border-radius: 50%; }
+.ms-hint { margin: 7px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+
+/* ===== Калории 3.0 ===== */
+.nuthero { display: flex; gap: 16px; align-items: center; }
+.nutring { position: relative; width: 152px; height: 152px; flex-shrink: 0; }
+.nutring-svg { width: 152px; height: 152px; display: block; }
+.nutring-c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.nutring-num { font-family: 'Unbounded', sans-serif; font-size: 30px; line-height: 1; }
+.nutring-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.nutring-goal { font-size: 11px; color: var(--muted); }
+.nh-side { flex: 1; min-width: 0; }
+.nh-rem { display: flex; flex-direction: column; }
+.nh-rem span { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 700; }
+.nh-rem b { font-family: 'Unbounded', sans-serif; font-size: 30px; color: var(--accent); line-height: 1; }
+.nh-bal { display: flex; flex-direction: column; gap: 4px; margin: 12px 0; }
+.nh-bal div { display: flex; justify-content: space-between; font-size: 13px; }
+.nh-bal span { color: var(--muted); }
+.nh-bal b { font-weight: 700; }
+.goal-edit { display: inline-flex; align-items: center; gap: 5px; background: var(--glass); border: 1px solid var(--glassbd); color: var(--text); border-radius: 10px; padding: 6px 11px; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+.macrolegend { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 0 16px; }
+.leg { display: flex; flex-direction: column; gap: 3px; background: var(--glass); border: 1px solid var(--glassbd); border-radius: 13px; padding: 10px; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.leg-dot { width: 9px; height: 9px; border-radius: 50%; }
+.leg-l { font-size: 11px; color: var(--muted); }
+.leg-v { font-size: 13px; font-weight: 700; }
+
+.mb-title { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+.mb-target { font-size: 11.5px; color: var(--muted); }
+.mb-bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin: 8px 0 2px; }
+.mb-bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width .4s; }
+
+.nut-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.card.mini { padding: 14px; }
+.mini-h { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+.mini-h svg { color: var(--accent); }
+.mini-big { font-family: 'Unbounded', sans-serif; font-size: 24px; margin: 8px 0 4px; line-height: 1; }
+.mini-big small { font-size: 12px; color: var(--muted); font-family: 'Rubik', sans-serif; }
+.mini-sub { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.mini-btns { display: flex; gap: 6px; margin-top: 10px; }
+.mini-btns button { flex: 1; background: var(--accent-soft); border: 1px solid rgba(255,90,31,.3); color: var(--accent2); border-radius: 9px; padding: 8px 0; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.mini-btns button.ghost { background: transparent; color: var(--muted); border-color: var(--glassbd); }
+.mini-start, .mini-stop { width: 100%; margin-top: 10px; border: none; border-radius: 10px; padding: 10px; font-weight: 800; font-size: 13px; cursor: pointer; font-family: inherit; }
+.mini-start { background: linear-gradient(135deg, #b27bf0, #a855f7); color: #1a0a02; }
+.mini-stop { background: var(--glass); border: 1px solid var(--glassbd); color: var(--text); }
+.fast-wins { display: flex; gap: 6px; margin: 10px 0; }
+.fast-w { flex: 1; background: var(--glass); border: 1px solid var(--glassbd); color: var(--muted); border-radius: 9px; padding: 8px 0; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.fast-w.on { background: rgba(168,85,247,.2); color: #c79cf5; border-color: #a855f7; }

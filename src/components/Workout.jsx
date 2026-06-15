@@ -5,7 +5,7 @@ import WeekSchedule from './WeekSchedule.jsx'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store } from '../storage.js'
 
-export default function Workout({ profile }) {
+export default function Workout({ profile, initialGroup }) {
   const recommended = recommendProgram(profile)
   const [programId, setProgramId] = useState(() => store.getActiveProgram() || null)
   const program = PROGRAMS.find(p => p.id === programId)
@@ -18,7 +18,7 @@ export default function Workout({ profile }) {
       {!program && <ProgramPicker selected={programId || store.getActiveProgram()} recommended={recommended} onSelect={select} equip={profile.equip} />}
       {program && <>
         <WeekSchedule program={program} profile={profile} />
-        <WorkoutBuilder key={program.id} program={program} profile={profile} onChangeProgram={changeProgram} />
+        <WorkoutBuilder key={program.id} program={program} profile={profile} initialGroup={initialGroup} onChangeProgram={changeProgram} />
       </>}
     </div>
   )
