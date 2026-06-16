@@ -1173,3 +1173,47 @@ body {
 .musclecard-img, .muscle-banner-img, .muscle-hero-img, .mcard-img, .ms-img img { filter: brightness(.96); }
 .prog-hero-bg, .ph-bg { filter: brightness(.85); }
 .app-bg { filter: blur(16px) brightness(.5) saturate(.85); }
+
+/* ===== Свои тренировки ===== */
+.routines { margin-bottom: 14px; }
+.routine { display: flex; align-items: center; gap: 8px; background: var(--glass); border: 1px solid var(--glassbd); border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.routine-main { flex: 1; display: flex; flex-direction: column; gap: 2px; text-align: left; background: transparent; border: none; color: var(--text); cursor: pointer; min-width: 0; }
+.routine-name { font-weight: 700; font-size: 14px; }
+.routine-sub { font-size: 11.5px; color: var(--muted); }
+.routine-play { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #1a0a02; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.routine-play:active { transform: scale(.94); }
+.save-routine { margin-top: 8px; }
+
+/* История подходов по упражнению */
+.exhist { display: flex; flex-direction: column; }
+.exhist-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--glassbd); }
+.exhist-row:last-child { border-bottom: none; }
+.exhist-date { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+.exhist-sets { font-size: 13px; font-weight: 600; text-align: right; }
+
+/* Гид: разминка, суперсет-подход, вехи */
+.warm-line { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent2); margin-bottom: 8px; }
+.setlog-actions { display: flex; gap: 8px; }
+.setlog-actions .cta { margin: 0; }
+.setlog-actions .cta.sm { flex: 0 0 auto; width: auto; padding: 13px 16px; }
+.setlog-actions .cta:not(.sm) { flex: 1; }
+.done-miles { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; width: 100%; }
+.done-miles div { display: flex; align-items: center; gap: 8px; background: var(--accent-soft); border: 1px solid rgba(255,90,31,.3); color: var(--accent2); border-radius: 12px; padding: 10px 13px; font-size: 13.5px; font-weight: 700; }
+
+/* ===== Прогресс-фото ===== */
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.ba-col { display: flex; flex-direction: column; gap: 6px; }
+.ba-col img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 14px; border: 1px solid var(--glassbd); cursor: pointer; }
+.ba-col span { font-size: 11.5px; color: var(--muted); text-align: center; }
+.photo-add { display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+.photogrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.photo { position: relative; }
+.photo img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; border: 1px solid var(--glassbd); cursor: pointer; }
+.photo-del { position: absolute; top: 5px; right: 5px; width: 22px; height: 22px; border-radius: 50%; background: rgba(0,0,0,.6); color: #fff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.photo-date { position: absolute; left: 6px; bottom: 6px; font-size: 10px; background: rgba(0,0,0,.55); padding: 2px 6px; border-radius: 6px; color: #fff; }
+.sheet-center { align-items: center !important; justify-content: center; }
+.photo-full { max-width: 92%; max-height: 80vh; border-radius: 16px; display: block; }
+
+/* недельная серия + прогноз онбординга */
+.dash-weeks { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; align-self: flex-start; font-size: 12px; font-weight: 700; background: rgba(0,0,0,.22); padding: 6px 10px; border-radius: 999px; }
+.proj-note { display: flex; align-items: center; gap: 7px; margin-top: 14px; font-size: 13px; color: var(--accent2); background: var(--accent-soft); border: 1px solid rgba(255,90,31,.28); border-radius: 12px; padding: 11px 13px; line-height: 1.4; }

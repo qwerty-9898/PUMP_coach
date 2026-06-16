@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
+import { calcNutrition } from '../engine/nutrition.js'
 
 const GOALS = [
   { k: 'набор массы', icon: 'flame' },
@@ -128,6 +129,18 @@ function Block({ title, hint, children }) {
       <div className="wiz-input">{children}</div>
     </div>
   )
+}
+
+function projection(f) {
+  const w = Number(f.weight), h = Number(f.height), a = Number(f.age)
+  if (!w || !h || !a) return ''
+  const n = calcNutrition({ gender: f.gender, age: a, weight: w, height: h, goal: f.goal, daysPerWeek: Number(f.daysPerWeek) })
+  const perWeek = (n.tdee - n.kcal) * 7 / 7700
+  const kg = Math.abs(perWeek * 4)
+  if (kg < 0.2) return 'Поддержание формы: вес будет держаться стабильно.'
+  return f.goal === 'набор массы'
+    ? 'При профиците ~+' + kg.toFixed(1) + ' кг/мес. Норма: ' + n.kcal + ' ккал.'
+    : 'При дефиците ~−' + kg.toFixed(1) + ' кг/мес. Норма: ' + n.kcal + ' ккал.'
 }
 
 function clamp(v, min, max, fb) {

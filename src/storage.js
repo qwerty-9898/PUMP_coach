@@ -13,7 +13,9 @@ const K = {
   dishes: 'pump_dishes_v1',
   kcalgoal: 'pump_kcalgoal_v1',
   active: 'pump_active_v1',
-  fast: 'pump_fast_v1'
+  fast: 'pump_fast_v1',
+  routines: 'pump_routines_v1',
+  photos: 'pump_photos_v1'
 }
 
 function read(key, fallback) {
@@ -79,6 +81,12 @@ export const store = {
   setActiveProgram: (id) => write(K.active, id),
   getFast: () => read(K.fast, null),
   setFast: (f) => write(K.fast, f),
+  getRoutines: () => read(K.routines, []),
+  addRoutine: (r) => { const a = read(K.routines, []); a.unshift({ ...r, id: 'r' + Date.now() }); write(K.routines, a); return a },
+  removeRoutine: (id) => { const a = read(K.routines, []).filter(x => x.id !== id); write(K.routines, a); return a },
+  getPhotos: () => read(K.photos, []),
+  addPhoto: (dataUrl) => { const a = read(K.photos, []); a.unshift({ id: 'ph' + Date.now(), date: todayKey(), url: dataUrl }); const cut = a.slice(0, 12); write(K.photos, cut); return cut },
+  removePhoto: (id) => { const a = read(K.photos, []).filter(x => x.id !== id); write(K.photos, a); return a },
 
   getFavorites: () => read(K.fav, []),
   toggleFavorite: (foodId) => {
@@ -114,4 +122,19 @@ export function calcStreak(dates) {
   if (!set.has(todayKey(d))) d.setDate(d.getDate() - 1)
   while (set.has(todayKey(d))) { streak++; d.setDate(d.getDate() - 1) }
   return streak
+}
+
+export function calcWeekStreak(dates) {
+  if (!dates.length) return 0
+  const weeks = new Set(dates.map(d => weekKey(d)))
+  let streak = 0
+  let cur = new Date()
+  if (!weeks.has(weekKey(cur))) cur.setDate(cur.getDate() - 7)
+  while (weeks.has(weekKey(cur))) { streak++; cur.setDate(cur.getDate() - 7) }
+  return streak
+}
+function weekKey(d) {
+  const x = new Date(d); const day = (x.getDay() + 6) % 7
+  x.setDate(x.getDate() - day)
+  return x.toISOString().slice(0, 10)
 }

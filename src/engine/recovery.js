@@ -67,3 +67,10 @@ export function freshFocus(limit = 3) {
     })
     .slice(0, limit)
 }
+
+// Средняя «свежесть» групп пресета (больше дней без нагрузки = свежее)
+export function presetFreshness(groups) {
+  const map = Object.fromEntries(recoveryMap().map(m => [m.group, m.days == null ? 99 : m.days]))
+  const vals = (groups || []).map(g => map[g] == null ? 99 : map[g])
+  return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0
+}

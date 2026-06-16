@@ -30,9 +30,12 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
   const [curW, setCurW] = useState('')
   const [curR, setCurR] = useState('')
   const [prFlash, setPrFlash] = useState(false)
+  const [milestones, setMilestones] = useState([])
   const ref = useRef(null)
   const ex = session.exercises[idx]
-  const doneSets = (logs[idx] || []).length
+  const working = (logs[idx] || []).filter(s => !s.warm)
+  const doneSets = working.length
+  const warmSets = (logs[idx] || []).filter(s => s.warm).length
 
   // подстановка веса/повторов при входе в упражнение
   useEffect(() => {
@@ -56,14 +59,15 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
     return () => clearInterval(ref.current)
   }, [resting, rest])
 
-  function recordSet() {
+  function recordSet(warm) {
     const w = Number(curW) || 0, r = Number(curR) || 0
     if (r <= 0) return
     haptic('light')
-    if (w > 0 && isPR(ex.id, w, r) && doneSets === 0) { setPrFlash(true); setTimeout(() => setPrFlash(false), 2000) }
-    const next = { ...logs, [idx]: [...(logs[idx] || []), { w, r }] }
+    if (!warm && w > 0 && isPR(ex.id, w, r) && doneSets === 0) { setPrFlash(true); setTimeout(() => setPrFlash(false), 2000) }
+    const next = { ...logs, [idx]: [...(logs[idx] || []), { w, r, warm: !!warm }] }
     setLogs(next)
-    if ((next[idx].length) < ex.sets) { setLeft(rest); setResting(true) }
+    const workCount = next[idx].filter(s => !s.warm).length
+    if (!warm && workCount < ex.sets) { setLeft(rest); setResting(true) }
   }
   function nextEx() {
     if (idx + 1 >= total) { finishAll(); return }
@@ -71,10 +75,17 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
   }
   function finishAll() {
     const date = todayKey()
+    const miles = []
+    const TH = [20, 30, 40, 50, 60, 80, 100, 120, 140, 160, 180, 200]
     session.exercises.forEach((e, i) => {
-      const sets = (logs[i] || []).filter(s => s.r > 0)
-      if (sets.length) store.addLog({ date, exId: e.id, name: e.name, group: e.group, sets })
+      const sets = (logs[i] || []).filter(s => s.r > 0 && !s.warm)
+      if (!sets.length) return
+      const prev = store.getExLogs(e.id).reduce((m, l) => Math.max(m, l.sets.reduce((mm, s) => Math.max(mm, s.w || 0), 0)), 0)
+      const newMax = sets.reduce((m, s) => Math.max(m, s.w || 0), 0)
+      for (const t of TH) { if (newMax >= t && prev < t) miles.push(e.name + ' — взял ' + t + ' кг!') }
+      store.addLog({ date, exId: e.id, name: e.name, group: e.group, sets })
     })
+    setMilestones(miles)
     onFinish && onFinish()
     setPhase('done')
   }
@@ -105,6 +116,11 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
         <div className="done-badge"><Icon name="check" size={42} /></div>
         <h2 className="display lg">Готово!</h2>
         <p className="sub">Тренировка засчитана, подходы записаны. Прогресс смотри во вкладке «Прогресс».</p>
+        {milestones.length > 0 && (
+          <div className="done-miles">
+            {milestones.map((m, i) => <div key={i}><Icon name="trophy" size={15} /> {m}</div>)}
+          </div>
+        )}
         <div className="done-actions">
           <button className="cta" onClick={onExit}>К тренировкам</button>
           <button className="cta ghost-cta" onClick={() => shareText(shareMsg)}><Icon name="share" size={18} /> Поделиться</button>
@@ -140,9 +156,10 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
         {prFlash && <div className="pr-flash"><Icon name="trophy" size={16} /> Новый личный рекорд!</div>}
       </div>
 
+      {warmSets > 0 && <div className="warm-line"><Icon name="flame" size={13} /> Разминка: {warmSets} подх.</div>}
       <div className="setdots">
         {Array.from({ length: ex.sets }).map((_, i) => {
-          const s = (logs[idx] || [])[i]
+          const s = working[i]
           return <span key={i} className={'setdot' + (i < doneSets ? ' on' : '')}>{s ? (s.w ? s.w + '×' + s.r : s.r) : i + 1}</span>
         })}
       </div>
@@ -168,7 +185,10 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
               <input type="number" inputMode="numeric" value={curR} onChange={e => setCurR(e.target.value)} />
             </label>
           </div>
-          <button className="cta" onClick={recordSet}><Icon name="check" size={18} /> Записать подход {doneSets + 1}</button>
+          <div className="setlog-actions">
+            <button className="cta sm ghost-cta" onClick={() => recordSet(true)}><Icon name="flame" size={16} /> Разминка</button>
+            <button className="cta" onClick={() => recordSet(false)}><Icon name="check" size={18} /> Подход {doneSets + 1}</button>
+          </div>
         </div>
       )}
 

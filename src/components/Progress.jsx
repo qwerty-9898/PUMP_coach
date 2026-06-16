@@ -4,7 +4,7 @@ import SparkChart from './SparkChart.jsx'
 import BodyHeatmap from './BodyHeatmap.jsx'
 import { EXERCISES, GROUPS, GROUP_META } from '../engine/exercises.js'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
-import { store, calcStreak } from '../storage.js'
+import { store, calcStreak, calcWeekStreak } from '../storage.js'
 import { shareText } from '../tg.js'
 import { allRecords, exSeries, weeklyVolume } from '../engine/progress.js'
 import { coverageMap } from '../engine/recovery.js'
@@ -23,6 +23,7 @@ export default function Progress({ profile }) {
   const streak = calcStreak(pr.workouts.map(w => w.date))
   const total = pr.workouts.length
   const week = pr.workouts.filter(w => within(w.date, 7)).length
+  const weekStreak = calcWeekStreak(pr.workouts.map(w => w.date))
   const tonTotal = store.getLogs().reduce((a, l) => a + l.sets.reduce((s, x) => s + (x.w || 0) * (x.r || 0), 0), 0)
 
   const records = allRecords()
@@ -54,6 +55,7 @@ export default function Progress({ profile }) {
         <div className="dash-main">
           <span className="dash-flame"><Icon name="flame" size={22} /></span>
           <div><span className="dash-big">{streak}</span><span className="dash-unit">дней серия</span></div>
+          {weekStreak > 0 && <span className="dash-weeks"><Icon name="flame" size={13} /> {weekStreak} нед. подряд</span>}
         </div>
         <div className="dash-row">
           <div className="dash-m"><b>{week}</b><span>за 7 дней</span></div>
@@ -131,6 +133,17 @@ export default function Progress({ profile }) {
                 })}
               </div>
               <SparkChart data={series.map(s => s.best)} unit=" кг" />
+            </div>
+            <div className="card">
+              <span className="card-kicker" style={{ marginBottom: 12, display: 'inline-flex' }}><Icon name="clock" size={15} /> История подходов</span>
+              <div className="exhist">
+                {store.getExLogs(selEx).slice().reverse().slice(0, 20).map((l, i) => (
+                  <div className="exhist-row" key={i}>
+                    <span className="exhist-date">{fmt(l.date)}</span>
+                    <span className="exhist-sets">{l.sets.map(x => (x.w ? x.w : '—') + '×' + x.r).join(', ')}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             {wv.length > 0 && (
               <div className="card">

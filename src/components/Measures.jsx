@@ -13,6 +13,8 @@ const FIELDS = [
 export default function Measures() {
   const [list, setList] = useState(() => store.getMeasures())
   const [f, setF] = useState({})
+  const [photos, setPhotos] = useState(() => store.getPhotos())
+  const [view, setView] = useState(null)
 
   function save() {
     const entry = { date: todayKey() }
@@ -23,8 +25,29 @@ export default function Measures() {
     setList(next); store.setMeasures(next); setF({})
   }
 
+  function onPhoto(e) {
+    const file = e.target.files && e.target.files[0]; if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => {
+      const img = new Image()
+      img.onload = () => {
+        const max = 540
+        const scale = Math.min(1, max / Math.max(img.width, img.height))
+        const w = Math.round(img.width * scale), h = Math.round(img.height * scale)
+        const cv = document.createElement('canvas'); cv.width = w; cv.height = h
+        cv.getContext('2d').drawImage(img, 0, 0, w, h)
+        try { setPhotos(store.addPhoto(cv.toDataURL('image/jpeg', 0.72))) } catch (err) { window.alert('Не удалось сохранить фото — закончилось место.') }
+      }
+      img.src = ev.target.result
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ''
+  }
+  function delPhoto(id) { setPhotos(store.removePhoto(id)) }
+
   const last = list[list.length - 1]
   const prev = list[list.length - 2]
+  const oldest = photos[photos.length - 1], newest = photos[0]
 
   return (
     <div className="screen">
@@ -51,9 +74,7 @@ export default function Measures() {
                   <span>{fl.label}</span>
                   <b>{last[fl.k]}</b>
                   {diff != null && diff !== 0 && (
-                    <span className={'measdiff ' + (diff > 0 ? 'up' : 'down')}>
-                      {diff > 0 ? '+' : ''}{diff.toFixed(1)}
-                    </span>
+                    <span className={'measdiff ' + (diff > 0 ? 'up' : 'down')}>{diff > 0 ? '+' : ''}{diff.toFixed(1)}</span>
                   )}
                 </div>
               )
@@ -63,14 +84,43 @@ export default function Measures() {
         </>
       )}
 
-      {!last && (
-        <div className="empty" style={{ marginTop: 18 }}>
-          <Icon name="ruler" size={32} />
-          <p>Запиши первый замер, чтобы потом видеть динамику. Делай раз в 1–2 недели в одно время.</p>
+      {/* Прогресс-фото */}
+      <div className="block-head" style={{ marginTop: 24 }}><h2 className="display sm">Прогресс-фото</h2></div>
+      {photos.length >= 2 && (
+        <div className="ba">
+          <div className="ba-col"><img src={oldest.url} alt="до" onClick={() => setView(oldest.url)} /><span>До · {fmt(oldest.date)}</span></div>
+          <div className="ba-col"><img src={newest.url} alt="сейчас" onClick={() => setView(newest.url)} /><span>Сейчас · {fmt(newest.date)}</span></div>
+        </div>
+      )}
+      <label className="cta ghost-cta photo-add">
+        <Icon name="plus" size={18} /> Добавить фото
+        <input type="file" accept="image/*" onChange={onPhoto} hidden />
+      </label>
+      {photos.length > 0 && (
+        <div className="photogrid">
+          {photos.map(p => (
+            <div className="photo" key={p.id}>
+              <img src={p.url} alt="" onClick={() => setView(p.url)} />
+              <button className="photo-del" onClick={() => delPhoto(p.id)} aria-label="Удалить"><Icon name="x" size={13} /></button>
+              <span className="photo-date">{fmt(p.date)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {photos.length === 0 && !last && (
+        <div className="empty" style={{ marginTop: 14 }}>
+          <Icon name="ruler" size={30} />
+          <p>Записывай замеры и делай фото раз в 1–2 недели в одном свете — увидишь реальную динамику.</p>
+        </div>
+      )}
+
+      {view && (
+        <div className="sheet sheet-center" onClick={() => setView(null)}>
+          <img className="photo-full" src={view} alt="" onClick={e => e.stopPropagation()} />
         </div>
       )}
     </div>
   )
 }
 
-function fmt(s) { return new Date(s).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) }
+function fmt(s) { return new Date(s).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) }

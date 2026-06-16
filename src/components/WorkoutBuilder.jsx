@@ -4,6 +4,7 @@ import { MUSCLE_ART } from './muscleArt.js'
 import GuidedWorkout from './GuidedWorkout.jsx'
 import { GROUPS, GROUP_META } from '../engine/exercises.js'
 import { generateSession, pickAlternative, shapeExercise } from '../engine/sessionGenerator.js'
+import { presetFreshness } from '../engine/recovery.js'
 import { estimateLoad } from '../engine/loads.js'
 import { store, todayKey } from '../storage.js'
 
@@ -12,6 +13,7 @@ export default function WorkoutBuilder({ program, profile, initialGroup, onChang
   const [session, setSession] = useState(null)
   const [saved, setSaved] = useState(false)
   const [guided, setGuided] = useState(false)
+  const [routines, setRoutines] = useState(() => store.getRoutines())
   const favorites = store.getFavEx()
   useEffect(() => { if (initialGroup) { setPicked([initialGroup]); build([initialGroup], true) } }, [])
 
@@ -24,9 +26,23 @@ export default function WorkoutBuilder({ program, profile, initialGroup, onChang
     setTimeout(() => document.getElementById('session')?.scrollIntoView({ behavior: 'smooth' }), 60)
   }
   function autoPick() {
-    const preset = program.presets[Math.floor(Math.random() * program.presets.length)]
+    // самая свежая связка по карте восстановления
+    const preset = [...program.presets].sort((a, b) => presetFreshness(b.groups) - presetFreshness(a.groups))[0]
     setPicked(preset.groups); build(preset.groups, true)
   }
+  function startRoutine(r) {
+    setPicked(r.groups || [])
+    setSession({ exercises: r.exercises, scheme: r.scheme, groups: r.groups, cardio: r.cardio })
+    setSaved(false)
+    setTimeout(() => document.getElementById('session') && document.getElementById('session').scrollIntoView({ behavior: 'smooth' }), 60)
+  }
+  function saveRoutine() {
+    const def = session.groups.map(g => GROUP_META[g].label).join(' + ')
+    const name = window.prompt('Название своей тренировки:', def)
+    if (!name) return
+    setRoutines(store.addRoutine({ name, groups: session.groups, exercises: session.exercises, scheme: session.scheme, cardio: session.cardio }))
+  }
+  function deleteRoutine(id) { setRoutines(store.removeRoutine(id)) }
   function regen() { if (session) build(session.groups, true) }
   function swap(i) {
     const ex = session.exercises[i]
@@ -54,6 +70,22 @@ export default function WorkoutBuilder({ program, profile, initialGroup, onChang
         <h2 className="display sm">Тренировка на сегодня</h2>
         <p className="sub">Программа: <b className="accent">{program.name}</b> · {place}.</p>
       </div>
+
+      {routines.length > 0 && (
+        <div className="routines">
+          <span className="more-lbl" style={{ margin: '0 2px 8px' }}>Мои тренировки</span>
+          {routines.map(r => (
+            <div className="routine" key={r.id}>
+              <button className="routine-main" onClick={() => startRoutine(r)}>
+                <span className="routine-name">{r.name}</span>
+                <span className="routine-sub">{(r.groups || []).map(g => GROUP_META[g].label).join(' · ')} · {r.exercises.length} упр</span>
+              </button>
+              <button className="routine-play" onClick={() => startRoutine(r)} aria-label="Запустить"><Icon name="play" size={16} /></button>
+              <button className="delbtn" onClick={() => deleteRoutine(r.id)} aria-label="Удалить"><Icon name="trash" size={15} /></button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="presets">
         {program.presets.map((p, i) => (
@@ -83,12 +115,12 @@ export default function WorkoutBuilder({ program, profile, initialGroup, onChang
       </button>
 
       {session && <Session session={session} profile={profile} saved={saved}
-        onSave={saveWorkout} onGuide={() => setGuided(true)} onRegen={regen} onSwap={swap} />}
+        onSave={saveWorkout} onGuide={() => setGuided(true)} onRegen={regen} onSwap={swap} onSaveRoutine={saveRoutine} />}
     </section>
   )
 }
 
-function Session({ session, profile, saved, onSave, onGuide, onRegen, onSwap }) {
+function Session({ session, profile, saved, onSave, onGuide, onRegen, onSwap, onSaveRoutine }) {
   return (
     <div id="session" className="session">
       <div className="session-head">
@@ -108,6 +140,7 @@ function Session({ session, profile, saved, onSave, onGuide, onRegen, onSwap }) 
         <button className="iconbtn-lg" onClick={onRegen} aria-label="Другой вариант"><Icon name="refresh" size={20} /></button>
       </div>
       <p className="regen-hint">Не нравится подбор? Жми <Icon name="refresh" size={12} /> — соберём другой вариант, или меняй упражнения по одному.</p>
+      <button className="textlink save-routine" onClick={onSaveRoutine}><Icon name="plus" size={14} /> Сохранить как свою тренировку</button>
 
       {session.exercises.map((ex, i) => (
         <div className="ex" key={ex.id}>
