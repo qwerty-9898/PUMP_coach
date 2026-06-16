@@ -1167,3 +1167,9 @@ body {
 .fast-wins { display: flex; gap: 6px; margin: 10px 0; }
 .fast-w { flex: 1; background: var(--glass); border: 1px solid var(--glassbd); color: var(--muted); border-radius: 9px; padding: 8px 0; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .fast-w.on { background: rgba(168,85,247,.2); color: #c79cf5; border-color: #a855f7; }
+
+/* Приглушить яркость неона на телах */
+.bh2-img { filter: brightness(.95) drop-shadow(0 0 7px rgba(255,120,30,.2)); }
+.musclecard-img, .muscle-banner-img, .muscle-hero-img, .mcard-img, .ms-img img { filter: brightness(.96); }
+.prog-hero-bg, .ph-bg { filter: brightness(.85); }
+.app-bg { filter: blur(16px) brightness(.5) saturate(.85); }

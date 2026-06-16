@@ -50,17 +50,6 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
         <h1 className="display lg">Время прокачаться</h1>
       </div>
 
-      {firstRun && (
-        <button className="welcome" onClick={() => go('workout')}>
-          <span className="welcome-ic"><Icon name="bolt" size={22} /></span>
-          <div className="welcome-txt">
-            <span className="welcome-h">Добро пожаловать в PUMP</span>
-            <p>Проведи первую тренировку — карта тела загорится, пойдут серия, рекорды и медали.</p>
-          </div>
-          <Icon name="arrow" size={20} className="welcome-arr" />
-        </button>
-      )}
-
       {/* Карта тела — фон-сцена, элементы поверх */}
       <div className="bodystage">
         <div className="bs-head">
@@ -94,6 +83,17 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
           </button>
         )}
       </div>
+
+      {firstRun && (
+        <button className="welcome" onClick={() => go('workout')}>
+          <span className="welcome-ic"><Icon name="bolt" size={22} /></span>
+          <div className="welcome-txt">
+            <span className="welcome-h">Добро пожаловать в PUMP</span>
+            <p>Проведи первую тренировку — карта тела загорится, пойдут серия, рекорды и медали.</p>
+          </div>
+          <Icon name="arrow" size={20} className="welcome-arr" />
+        </button>
+      )}
 
       {/* Главное действие — старт программы */}
       <button className="card herocard" onClick={() => go('workout')}>

@@ -1,7 +1,7 @@
 # PUMP — паспорт проекта (выжимка чата)
 
 > Единый источник правды. Работаем дальше только по этому файлу.
-> Обновляется по мере работы. Версия приложения в коде: **v1.5** (карта мышц + калории 3.0).
+> Обновляется по мере работы. Версия приложения в коде: **v1.6** (каталог 135 + строгий инвентарь).
 
 ---
 
@@ -50,7 +50,7 @@
 ## 4. Структура (src/)
 
 ### Движки (чистый JS, тестируемые)
-- `engine/exercises.js` — `GROUPS` (7), `GROUP_META` (label/short/color), `levelGE`, **`EXERCISES` (~95 упр)**: `{id,name,group,equip:'none'|'dumbbell'|'gym',compound,level,muscles,technique[],mistakes[],tip}`, `techExtras(ex)`. Счёт: грудь 15, спина 14, ноги 19, плечи 12, бицепс 9, трицепс 11, пресс 15.
+- `engine/exercises.js` — `GROUPS` (7), `GROUP_META` (label/short/color), `levelGE`, **`EXERCISES` (135 упр)**: `{id,name,group,equip:'none'|'dumbbell'|'gym',compound,level,muscles,technique[],mistakes[],tip}`, `techExtras(ex)`. Счёт: грудь 20, спина 21, ноги 27, плечи 17, бицепс 14, трицепс 16, пресс 20. Расширен научно-обоснованно (EMG/гипертрофия).
 - `engine/sessionGenerator.js` — `generateSession({groups,goal,level,equip,favorites,varied})`, `pickAlternative(...)`, `shapeExercise(...)`. Учитывает избранное и инвентарь.
 - `engine/nutrition.js` — `calcNutrition` (Mifflin-St Jeor) → `{bmr,tdee,kcal,protein,fat,carbs}`.
 - `engine/loads.js` — `estimateLoad(ex,profile)` → «≈ X кг» / «кг/рука» / «вес тела».
@@ -61,6 +61,7 @@
 ### Данные
 - `data/programs.js` — `PROGRAMS` (6: Фуллбади, Верх/Низ, PPL, 2 сплита синергист/антагонист, бро-сплит), у каждой `equip:[]`. `programsForEquip`, `recommendProgram({level,daysPerWeek,equip})` (учёт уровня И инвентаря), `buildWeek` (`DAY_PATTERNS`), `activeOrRecommended(profile,activeId)`.
 - `data/foods.js` — **174 продукта СНГ** (10 категорий), `searchFoods`, `macrosFor`.
+- **Строгий инвентарь** (`sessionGenerator.allowedEquip`): зал=`['dumbbell','gym']` (без «веса тела»), гантели=`['none','dumbbell']`, без инвентаря=`['none']`. Порядок = приоритет (предпочтительный последним).
 
 ### storage.js
 Ключи `K`: profile `pump_profile_v3`, progress, water, measures, food, fav, favex, rating, logs `pump_logs_v1`.

@@ -8,7 +8,9 @@ export const SCHEME = {
 }
 
 function allowedEquip(equip) {
-  return equip === 'gym' ? ['none', 'dumbbell', 'gym']
+  // Строго по инвентарю: зал не предлагает упражнения «с весом тела/дома»
+  // порядок = приоритет (предпочтительный инвентарь последним); зал без «веса тела»
+  return equip === 'gym' ? ['dumbbell', 'gym']
     : equip === 'dumbbell' ? ['none', 'dumbbell']
     : ['none']
 }
