@@ -892,7 +892,7 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 /* Красная неон-подсветка целевой мышцы в каталоге */
 .m-hl { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; z-index: 5;
   background: radial-gradient(closest-side, #ff3b30, #e01b10 52%, rgba(220,0,0,.35) 72%, transparent 82%);
-  box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 26px 8px rgba(255,40,25,.85);
+  box-shadow: 0 0 0 1.2px rgba(255,255,255,.4), 0 0 13px 3px rgba(255,40,25,.7);
   filter: saturate(1.4); animation: hlPulse 1.6s ease-in-out infinite; }
 @keyframes hlPulse { 0%, 100% { opacity: .9; } 50% { opacity: 1; } }
 .musclecard-scrim, .muscle-banner-scrim { z-index: 2; }
