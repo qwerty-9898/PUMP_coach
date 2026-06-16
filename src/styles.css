@@ -343,7 +343,7 @@ input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px 
 .mealblock-items { border-top: 1px solid var(--line); }
 .foodrow { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); }
 .foodrow:last-child { border-bottom: none; }
-.foodrow-main { flex: 1; min-width: 0; }
+.foodrow-main { flex: 1; min-width: 0; background: transparent; border: none; padding: 0; text-align: left; color: inherit; cursor: pointer; font-family: inherit; }
 .foodrow-name { display: block; font-weight: 600; font-size: 14px; }
 .foodrow-sub { font-size: 11px; color: var(--muted); }
 .foodrow-kcal { font-family: 'Unbounded', sans-serif; font-weight: 600; color: var(--accent2); }
@@ -890,13 +890,13 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .muscle-tagline { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--mc); }
 
 /* Красная неон-подсветка целевой мышцы в каталоге */
-.m-hl { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; z-index: 1;
-  background: radial-gradient(closest-side, rgba(255,75,70,1), rgba(255,45,25,.75) 46%, transparent 70%);
-  box-shadow: 0 0 36px 12px rgba(255,45,22,.7); filter: blur(.6px) saturate(1.35);
-  animation: hlPulse 1.8s ease-in-out infinite; }
+.m-hl { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; z-index: 5;
+  background: radial-gradient(closest-side, #ff3b30, #e01b10 52%, rgba(220,0,0,.35) 72%, transparent 82%);
+  box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 26px 8px rgba(255,40,25,.85);
+  filter: saturate(1.4); animation: hlPulse 1.6s ease-in-out infinite; }
 @keyframes hlPulse { 0%, 100% { opacity: .9; } 50% { opacity: 1; } }
 .musclecard-scrim, .muscle-banner-scrim { z-index: 2; }
-.musclecard-info, .muscle-banner-info { z-index: 3; }
+.musclecard-info, .muscle-banner-info { z-index: 6; }
 
 /* «Ещё»: премиальная шапка профиля */
 .profilecard { display: flex; gap: 14px; align-items: flex-start; width: 100%; text-align: left; cursor: pointer; color: var(--text);
@@ -962,11 +962,11 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .iconbtn.sm { width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; }
 
 /* Шит-редактор порции */
-.sheet { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; backdrop-filter: blur(2px); animation: fadeIn .2s; }
-.sheet-card { width: 100%; background: var(--bg2); border-top: 1px solid var(--line); border-radius: 22px 22px 0 0;
-  padding: 20px 18px calc(20px + env(safe-area-inset-bottom)); animation: sheetUp .26s cubic-bezier(.2,.8,.3,1); }
+.sheet { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 0 14px; backdrop-filter: blur(3px); animation: fadeIn .2s; }
+.sheet-card { width: 100%; max-width: 460px; background: var(--bg2); border: 1px solid var(--line); border-radius: 22px;
+  padding: 20px 18px; margin-bottom: 12vh; box-shadow: 0 20px 60px rgba(0,0,0,.5); animation: sheetUp .24s cubic-bezier(.2,.8,.3,1.05); }
 .sheet-card .addhead-t { display: block; margin-bottom: 14px; }
-@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes sheetUp { from { transform: translateY(22px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* Конструктор блюда */
@@ -1217,3 +1217,9 @@ body {
 /* недельная серия + прогноз онбординга */
 .dash-weeks { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; align-self: flex-start; font-size: 12px; font-weight: 700; background: rgba(0,0,0,.22); padding: 6px 10px; border-radius: 999px; }
 .proj-note { display: flex; align-items: center; gap: 7px; margin-top: 14px; font-size: 13px; color: var(--accent2); background: var(--accent-soft); border: 1px solid rgba(255,90,31,.28); border-radius: 12px; padding: 11px 13px; line-height: 1.4; }
+
+/* Количество одинаковых продуктов */
+.qtybox { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.qtybox button { width: 26px; height: 26px; border-radius: 8px; background: var(--glass); border: 1px solid var(--glassbd); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.qtybox button:active { transform: scale(.9); }
+.qtybox span { min-width: 18px; text-align: center; font-weight: 700; font-size: 13px; }

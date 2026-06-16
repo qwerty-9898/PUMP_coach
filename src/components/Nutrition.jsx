@@ -39,9 +39,29 @@ export default function Nutrition({ profile }) {
   const pct = Math.min(100, Math.round((eaten.kcal / goalKcal) * 100))
   const week = store.foodWeek(7)
 
-  function addEntry(food, grams, meal) { store.addFood(date, { foodId: food.id, name: food.name, grams, meal, ...macrosFor(food, grams) }); setAddMeal(null); refresh() }
-  function addDishEntry(dish, meal) { store.addFood(date, { foodId: null, name: dish.name, grams: dish.portion, meal, kcal: dish.kcal, p: dish.p, f: dish.f, c: dish.c }); setAddMeal(null); refresh() }
-  function addManual(name, kcal, p, meal) { store.addFood(date, { foodId: null, name, grams: 0, meal, kcal: Number(kcal) || 0, p: Number(p) || 0, f: 0, c: 0 }); setAddMeal(null); refresh() }
+  function addEntry(food, grams, meal) {
+    const base = macrosFor(food, grams)
+    const ex = store.getFoodDay(date).find(e => e.foodId === food.id && e.meal === meal && e.grams === grams)
+    if (ex) { const qty = (ex.qty || 1) + 1; store.updateFood(date, ex.uid, { qty, base, kcal: base.kcal * qty, p: base.p * qty, f: base.f * qty, c: base.c * qty }) }
+    else { store.addFood(date, { foodId: food.id, name: food.name, grams, meal, qty: 1, base, ...base }) }
+    setAddMeal(null); refresh()
+  }
+  function addDishEntry(dish, meal) {
+    const base = { kcal: dish.kcal, p: dish.p, f: dish.f, c: dish.c }
+    const ex = store.getFoodDay(date).find(e => e.name === dish.name && e.meal === meal && !e.foodId)
+    if (ex) { const qty = (ex.qty || 1) + 1; store.updateFood(date, ex.uid, { qty, base, kcal: base.kcal * qty, p: base.p * qty, f: base.f * qty, c: base.c * qty }) }
+    else { store.addFood(date, { foodId: null, name: dish.name, grams: dish.portion, meal, qty: 1, base, ...base }) }
+    setAddMeal(null); refresh()
+  }
+  function addManual(name, kcal, p, meal) { const base = { kcal: Number(kcal) || 0, p: Number(p) || 0, f: 0, c: 0 }; store.addFood(date, { foodId: null, name, grams: 0, meal, qty: 1, base, ...base }); setAddMeal(null); refresh() }
+  function changeQty(e, delta) {
+    const qty = (e.qty || 1) + delta
+    if (qty < 1) { store.removeFood(date, e.uid); refresh(); return }
+    const u = e.qty || 1
+    const base = e.base || { kcal: Math.round(e.kcal / u), p: Math.round(e.p / u), f: Math.round(e.f / u), c: Math.round(e.c / u) }
+    store.updateFood(date, e.uid, { qty, base, kcal: base.kcal * qty, p: base.p * qty, f: base.f * qty, c: base.c * qty })
+    refresh()
+  }
   function remove(uid) { store.removeFood(date, uid); refresh() }
 
   if (addMeal) return <AddPanel meal={addMeal} onAdd={addEntry} onAddDish={addDishEntry} onManual={addManual} onClose={() => setAddMeal(null)} onChange={refresh} />
@@ -104,9 +124,14 @@ export default function Nutrition({ profile }) {
                 {list.map(e => (
                   <div className="foodrow" key={e.uid}>
                     <button className="foodrow-main" onClick={() => setEditUid(e.uid)}>
-                      <span className="foodrow-name">{e.name}</span>
-                      <span className="foodrow-sub">{e.grams ? e.grams + ' г · ' : ''}Б {e.p} · Ж {e.f} · У {e.c}</span>
+                      <span className="foodrow-name">{e.name}{(e.qty || 1) > 1 ? ' ×' + e.qty : ''}</span>
+                      <span className="foodrow-sub">{e.grams ? e.grams + (e.qty > 1 ? '×' + e.qty : '') + ' г · ' : ''}Б {e.p} · Ж {e.f} · У {e.c}</span>
                     </button>
+                    <div className="qtybox">
+                      <button onClick={() => changeQty(e, -1)} aria-label="Меньше"><Icon name="minus" size={14} /></button>
+                      <span>{e.qty || 1}</span>
+                      <button onClick={() => changeQty(e, 1)} aria-label="Больше"><Icon name="plus" size={14} /></button>
+                    </div>
                     <span className="foodrow-kcal">{e.kcal}</span>
                     <button className="delbtn" onClick={() => remove(e.uid)} aria-label="Удалить"><Icon name="trash" size={16} /></button>
                   </div>
