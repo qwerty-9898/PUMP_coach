@@ -1531,3 +1531,13 @@ body {
 .seg { display: flex; gap: 3px; align-items: center; }
 .seg-i { flex: 1 1 0; height: 7px; border-radius: 2px; background: rgba(255,255,255,.07); }
 .seg-i.on { box-shadow: 0 0 5px 0 rgba(255,255,255,.1); }
+
+/* ===== Мини-кольца сеткой (восстановление / покрытие) ===== */
+.mr-rings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 4px; }
+.mring { display: flex; flex-direction: column; align-items: center; gap: 5px; background: transparent; border: none; padding: 0; color: var(--text); }
+.mring:active { opacity: .65; }
+.mring-c { position: relative; width: 54px; height: 54px; }
+.mring-c svg { width: 100%; height: 100%; display: block; }
+.mring-v { position: absolute; inset: 0; display: grid; place-items: center; font-family: 'Unbounded'; font-size: 13px; font-weight: 700; }
+.mring-l { font-size: 11px; font-weight: 600; text-align: center; line-height: 1.05; }
+.mring-sub { font-size: 9.5px; color: var(--muted); margin-top: -2px; }

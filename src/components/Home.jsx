@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Icon from './Icon.jsx'
 import CalendarStrip from './CalendarStrip.jsx'
 import MuscleSheet from './MuscleSheet.jsx'
+import MiniRing from './MiniRing.jsx'
 import { calcNutrition } from '../engine/nutrition.js'
 import { PROGRAMS, recommendProgram, activeOrRecommended } from '../data/programs.js'
 import { recoveryMap, freshFocus, recoveryDetail } from '../engine/recovery.js'
@@ -43,68 +44,15 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
   const focusReady = focus.filter(f => f.days == null || f.days >= 2)
   const detail = recoveryDetail()
   const freshCount = detail.filter(d => d.state !== 'recovering').length
-  const tiredCount = detail.filter(d => d.state === 'recovering').length
-  const readyPct = Math.round(freshCount / detail.length * 100)
+  const readyPct = trainedCount ? Math.round(detail.reduce((a, d) => a + d.pct, 0) / detail.length * 100) : 100
   const CIRC = 2 * Math.PI * 27
+  const weekday = new Date().toLocaleDateString('ru-RU', { weekday: 'long' })
 
   return (
     <div className="home">
       <div className="greet">
-        <span className="greet-k">Погнали, {userName || 'чемпион'}</span>
-        <h1 className="display lg">Время прокачаться</h1>
-      </div>
-
-      {/* Восстановление мышц — чистый минимализм */}
-      <div className="card recovery-card">
-        <div className="rc-head">
-          <span className="card-kicker"><Icon name="activity" size={15} /> Восстановление мышц</span>
-          {trainedCount > 0 && <span className="card-meta">{trainedCount}/7</span>}
-        </div>
-        {trainedCount === 0 ? (
-          <p className="recovery-hint">Проведи первую тренировку — здесь покажем, какие мышцы устали, а какие свежие и готовы к нагрузке.</p>
-        ) : (
-          <>
-          <div className="rc-summary">
-            <div className="rc-ring">
-              <svg viewBox="0 0 64 64">
-                <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="6" />
-                <circle cx="32" cy="32" r="27" fill="none" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"
-                  strokeDasharray={CIRC} strokeDashoffset={CIRC * (1 - readyPct / 100)} transform="rotate(-90 32 32)" />
-              </svg>
-              <span className="rc-ring-num">{readyPct}<small>%</small></span>
-            </div>
-            <div className="rc-sum-txt">
-              <span className="rc-sum-lbl">Готовность к тренировке</span>
-              <span className="rc-sum-sub">{freshCount} свежих · {tiredCount} устали</span>
-            </div>
-          </div>
-          <div className="mr-grid">
-            {detail.map(d => {
-              const c = GROUP_META[d.group].color
-              const tl = d.state === 'fresh' ? 'свежая' : d.state === 'ready' ? 'готова' : (d.hoursLeft >= 24 ? '~' + Math.round(d.hoursLeft / 24) + ' дн' : '~' + d.hoursLeft + ' ч')
-              const fill = Math.max(1, Math.round(d.pct * 14))
-              return (
-                <button className="mr-card" key={d.group} onClick={() => setSheetG(d.group)}>
-                  <div className="mr-head">
-                    <span className="mr-name"><span className="mr-dot" style={{ background: c, boxShadow: '0 0 7px ' + c }} />{GROUP_META[d.group].label}</span>
-                    <span className={'mr-tag ' + d.state}>{tl}</span>
-                  </div>
-                  <div className="seg">{Array.from({ length: 14 }).map((_, k) => <span key={k} className={'seg-i' + (k < fill ? ' on' : '')} style={k < fill ? { background: c } : undefined} />)}</div>
-                </button>
-              )
-            })}
-          </div>
-          </>
-        )}
-        {focusReady.length > 0 && (
-          <button className="focus-cta" onClick={() => go('workout')}>
-            <div className="focus-txt">
-              <span className="focus-lbl">Свежее всего сегодня</span>
-              <span className="focus-groups">{focusReady.map(f => GROUP_META[f.group].label).join(' · ')}</span>
-            </div>
-            <Icon name="arrow" size={18} />
-          </button>
-        )}
+        <span className="greet-k">Сегодня · {weekday}</span>
+        <h1 className="display lg">Привет, {userName || 'чемпион'}</h1>
       </div>
 
       {firstRun && (
@@ -145,6 +93,50 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
         <button className="todaybox" onClick={() => go('water')}>
           <Icon name="droplet" size={18} /><b>{(water / 1000).toFixed(1)}<small> л</small></b><span>вода</span>
         </button>
+      </div>
+
+      {/* Восстановление мышц — чистый минимализм */}
+      <div className="card recovery-card">
+        <div className="rc-head">
+          <span className="card-kicker"><Icon name="activity" size={15} /> Восстановление мышц</span>
+          {trainedCount > 0 && <span className="card-meta">{trainedCount}/7</span>}
+        </div>
+        {trainedCount === 0 ? (
+          <p className="recovery-hint">Проведи первую тренировку — здесь покажем, какие мышцы устали, а какие свежие и готовы к нагрузке.</p>
+        ) : (
+          <>
+          <div className="rc-summary">
+            <div className="rc-ring">
+              <svg viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="6" />
+                <circle cx="32" cy="32" r="27" fill="none" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"
+                  strokeDasharray={CIRC} strokeDashoffset={CIRC * (1 - readyPct / 100)} transform="rotate(-90 32 32)" />
+              </svg>
+              <span className="rc-ring-num">{readyPct}<small>%</small></span>
+            </div>
+            <div className="rc-sum-txt">
+              <span className="rc-sum-lbl">Готовность к тренировке</span>
+              <span className="rc-sum-sub">{freshCount} из {detail.length} групп готовы к нагрузке</span>
+            </div>
+          </div>
+          <div className="mr-rings">
+            {detail.map(d => {
+              const col = d.pct < 0.4 ? '#ff4d4d' : d.pct < 0.85 ? '#f5a623' : '#22c55e'
+              const tl = d.state === 'fresh' ? 'свежая' : d.state === 'ready' ? 'готова' : (d.hoursLeft >= 24 ? '~' + Math.round(d.hoursLeft / 24) + ' дн' : '~' + d.hoursLeft + ' ч')
+              return <MiniRing key={d.group} pct={d.pct} color={col} center={Math.round(d.pct * 100)} label={GROUP_META[d.group].label} sub={tl} onClick={() => setSheetG(d.group)} />
+            })}
+          </div>
+          </>
+        )}
+        {focusReady.length > 0 && (
+          <button className="focus-cta" onClick={() => go('workout')}>
+            <div className="focus-txt">
+              <span className="focus-lbl">Свежее всего сегодня</span>
+              <span className="focus-groups">{focusReady.map(f => GROUP_META[f.group].label).join(' · ')}</span>
+            </div>
+            <Icon name="arrow" size={18} />
+          </button>
+        )}
       </div>
 
       <div className="quick2">

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
 import SparkChart from './SparkChart.jsx'
+import MiniRing from './MiniRing.jsx'
 import { EXERCISES, GROUPS, GROUP_META } from '../engine/exercises.js'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store, calcStreak, calcWeekStreak } from '../storage.js'
@@ -88,19 +89,10 @@ export default function Progress({ profile }) {
                 <div><b>{GROUP_META[covTop.group].label}</b><span>чаще всего</span></div>
                 <div><b>{GROUP_META[covLag.group].label}</b><span>отстаёт</span></div>
               </div>
-              <div className="mr-grid">
+              <div className="mr-rings">
                 {(() => { const mx = Math.max.apply(null, cov.map(x => x.count).concat([1])); return cov.map(c => {
                   const color = GROUP_META[c.group].color
-                  const fill = c.count > 0 ? Math.max(1, Math.round(c.count / mx * 14)) : 0
-                  return (
-                    <div className="mr-card static" key={c.group}>
-                      <div className="mr-head">
-                        <span className="mr-name"><span className="mr-dot" style={{ background: color, boxShadow: '0 0 7px ' + color }} />{GROUP_META[c.group].label}</span>
-                        <span className={'mr-count' + (c.count > 0 ? '' : ' zero')}>{c.count > 0 ? '×' + c.count : '—'}</span>
-                      </div>
-                      <div className="seg">{Array.from({ length: 14 }).map((_, k) => <span key={k} className={'seg-i' + (k < fill ? ' on' : '')} style={k < fill ? { background: color } : undefined} />)}</div>
-                    </div>
-                  )
+                  return <MiniRing key={c.group} pct={c.count / mx} color={color} center={c.count > 0 ? '×' + c.count : '0'} label={GROUP_META[c.group].label} dim={c.count === 0} />
                 }) })()}
               </div>
               </>
