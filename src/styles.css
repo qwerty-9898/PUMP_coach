@@ -1507,3 +1507,27 @@ body {
 .pd-chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
 .pd-start { flex: 0 0 auto; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px;
   background: var(--accent); color: #fff; border: none; box-shadow: 0 4px 14px rgba(255,90,31,.4); }
+
+/* ===== Тренировки: маркер меньше + неон манекена тусклее (каталог не трогаем) ===== */
+.ex-thumb img, .guided-art { filter: brightness(.66) saturate(.62) contrast(.95); }
+.ex-thumb .m-dot, .muscle .m-dot, .guided-artwrap .m-dot {
+  width: 6px; height: 6px; box-shadow: 0 0 0 1px rgba(0,0,0,.45), 0 0 5px 1px rgba(255,46,46,.8); }
+
+/* ===== Премиум-блоки: сегментированные строки (эквалайзер) ===== */
+.mr-grid { display: flex; flex-direction: column; gap: 10px; }
+.mr-card { width: 100%; text-align: left; color: var(--text); padding: 12px 13px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.018));
+  border: 1px solid var(--line); transition: transform .12s, border-color .12s; }
+.mr-card:active:not(.static) { transform: scale(.99); border-color: rgba(255,255,255,.18); }
+.mr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+.mr-name { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 700; }
+.mr-dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+.mr-tag { font-size: 11px; font-weight: 700; padding: 3px 11px; border-radius: 20px; white-space: nowrap; }
+.mr-tag.recovering { color: #ffb088; background: rgba(255,90,31,.15); }
+.mr-tag.ready { color: #34d27b; background: rgba(34,197,94,.16); }
+.mr-tag.fresh { color: #6db9ff; background: rgba(59,130,246,.16); }
+.mr-count { font-family: 'Unbounded'; font-size: 14px; font-weight: 700; }
+.mr-count.zero { font-family: 'Rubik'; color: var(--muted); }
+.seg { display: flex; gap: 3px; align-items: center; }
+.seg-i { flex: 1 1 0; height: 7px; border-radius: 2px; background: rgba(255,255,255,.07); }
+.seg-i.on { box-shadow: 0 0 5px 0 rgba(255,255,255,.1); }

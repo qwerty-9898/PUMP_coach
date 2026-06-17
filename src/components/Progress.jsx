@@ -88,15 +88,17 @@ export default function Progress({ profile }) {
                 <div><b>{GROUP_META[covTop.group].label}</b><span>чаще всего</span></div>
                 <div><b>{GROUP_META[covLag.group].label}</b><span>отстаёт</span></div>
               </div>
-              <div className="rc-list">
+              <div className="mr-grid">
                 {(() => { const mx = Math.max.apply(null, cov.map(x => x.count).concat([1])); return cov.map(c => {
                   const color = GROUP_META[c.group].color
+                  const fill = c.count > 0 ? Math.max(1, Math.round(c.count / mx * 14)) : 0
                   return (
-                    <div className="rc-row static" key={c.group}>
-                      <span className="rc-dot" style={{ background: color }} />
-                      <span className="rc-name">{GROUP_META[c.group].label}</span>
-                      <span className="rc-bar"><i style={{ width: (c.count / mx * 100) + '%', background: color }} /></span>
-                      <span className="rc-status">{c.count > 0 ? '×' + c.count : '—'}</span>
+                    <div className="mr-card static" key={c.group}>
+                      <div className="mr-head">
+                        <span className="mr-name"><span className="mr-dot" style={{ background: color, boxShadow: '0 0 7px ' + color }} />{GROUP_META[c.group].label}</span>
+                        <span className={'mr-count' + (c.count > 0 ? '' : ' zero')}>{c.count > 0 ? '×' + c.count : '—'}</span>
+                      </div>
+                      <div className="seg">{Array.from({ length: 14 }).map((_, k) => <span key={k} className={'seg-i' + (k < fill ? ' on' : '')} style={k < fill ? { background: color } : undefined} />)}</div>
                     </div>
                   )
                 }) })()}

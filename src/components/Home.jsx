@@ -42,9 +42,9 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
   const focus = freshFocus(3)
   const focusReady = focus.filter(f => f.days == null || f.days >= 2)
   const detail = recoveryDetail()
-  const readyPct = trainedCount ? Math.round(detail.reduce((a, d) => a + d.pct, 0) / detail.length * 100) : 0
   const freshCount = detail.filter(d => d.state !== 'recovering').length
-  const tiredCount = detail.filter(d => d.state === 'recovering' && d.pct < 0.5).length
+  const tiredCount = detail.filter(d => d.state === 'recovering').length
+  const readyPct = Math.round(freshCount / detail.length * 100)
   const CIRC = 2 * Math.PI * 27
 
   return (
@@ -78,20 +78,18 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
               <span className="rc-sum-sub">{freshCount} свежих · {tiredCount} устали</span>
             </div>
           </div>
-          <div className="rcv-list">
+          <div className="mr-grid">
             {detail.map(d => {
               const c = GROUP_META[d.group].color
               const tl = d.state === 'fresh' ? 'свежая' : d.state === 'ready' ? 'готова' : (d.hoursLeft >= 24 ? '~' + Math.round(d.hoursLeft / 24) + ' дн' : '~' + d.hoursLeft + ' ч')
+              const fill = Math.max(1, Math.round(d.pct * 14))
               return (
-                <button className="rcv-row" key={d.group} onClick={() => setSheetG(d.group)}>
-                  <span className="rcv-dot" style={{ background: c }} />
-                  <div className="rcv-mid">
-                    <div className="rcv-l1">
-                      <span className="rcv-name">{GROUP_META[d.group].label}</span>
-                      <span className={'rcv-time ' + d.state}>{tl}</span>
-                    </div>
-                    <div className="rcv-bar"><i style={{ width: (d.pct * 100) + '%', background: c }} /></div>
+                <button className="mr-card" key={d.group} onClick={() => setSheetG(d.group)}>
+                  <div className="mr-head">
+                    <span className="mr-name"><span className="mr-dot" style={{ background: c, boxShadow: '0 0 7px ' + c }} />{GROUP_META[d.group].label}</span>
+                    <span className={'mr-tag ' + d.state}>{tl}</span>
                   </div>
+                  <div className="seg">{Array.from({ length: 14 }).map((_, k) => <span key={k} className={'seg-i' + (k < fill ? ' on' : '')} style={k < fill ? { background: c } : undefined} />)}</div>
                 </button>
               )
             })}
