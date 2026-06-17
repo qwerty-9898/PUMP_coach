@@ -31,6 +31,10 @@ export default function Progress({ profile }) {
   const cov = coverageMap(30)
   const covLoads = Object.fromEntries(cov.map(c => [c.group, c.load]))
   const covActive = cov.filter(c => c.count > 0)
+  const covTop = cov.reduce((a, c) => (c.count > a.count ? c : a), cov[0])
+  const covLag = cov.reduce((a, c) => (c.count < a.count ? c : a), cov[0])
+  const d30 = new Date(); d30.setDate(d30.getDate() - 30)
+  const sessions30 = store.getProgress().workouts.filter(w => new Date(w.date) >= d30).length
   const medals = achievements()
   const earned = medals.filter(m => m.earned).length
 
@@ -78,6 +82,12 @@ export default function Progress({ profile }) {
             {covActive.length === 0 ? (
               <p className="recovery-hint">Тут покажу, какие мышцы ты грузил за месяц — длиннее полоса значит чаще. Лови баланс.</p>
             ) : (
+              <>
+              <div className="cov-summary">
+                <div><b>{sessions30}</b><span>трен. за 30 дн</span></div>
+                <div><b>{GROUP_META[covTop.group].label}</b><span>чаще всего</span></div>
+                <div><b>{GROUP_META[covLag.group].label}</b><span>отстаёт</span></div>
+              </div>
               <div className="rc-list">
                 {(() => { const mx = Math.max.apply(null, cov.map(x => x.count).concat([1])); return cov.map(c => {
                   const color = GROUP_META[c.group].color
@@ -91,6 +101,7 @@ export default function Progress({ profile }) {
                   )
                 }) })()}
               </div>
+              </>
             )}
           </div>
 

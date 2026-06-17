@@ -41,6 +41,10 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
   const trainedCount = map.filter(m => m.days != null).length
   const focus = freshFocus(3)
   const focusReady = focus.filter(f => f.days == null || f.days >= 2)
+  const readyPct = trainedCount ? Math.round(map.reduce((a, m) => a + (1 - m.load), 0) / map.length * 100) : 0
+  const freshCount = map.filter(m => m.load < 0.4).length
+  const tiredCount = map.filter(m => m.load >= 0.6).length
+  const R = 27, CIRC = 2 * Math.PI * R
 
   return (
     <div className="home">
@@ -58,6 +62,21 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
         {trainedCount === 0 ? (
           <p className="recovery-hint">Проведи первую тренировку — здесь покажем, какие мышцы устали, а какие свежие и готовы к нагрузке.</p>
         ) : (
+          <>
+          <div className="rc-summary">
+            <div className="rc-ring">
+              <svg viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="6" />
+                <circle cx="32" cy="32" r="27" fill="none" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"
+                  strokeDasharray={CIRC} strokeDashoffset={CIRC * (1 - readyPct / 100)} transform="rotate(-90 32 32)" />
+              </svg>
+              <span className="rc-ring-num">{readyPct}<small>%</small></span>
+            </div>
+            <div className="rc-sum-txt">
+              <span className="rc-sum-lbl">Готовность к тренировке</span>
+              <span className="rc-sum-sub">{freshCount} свежих · {tiredCount} устали</span>
+            </div>
+          </div>
           <div className="rc-list">
             {map.map(m => {
               const c = GROUP_META[m.group].color
@@ -72,6 +91,7 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
               )
             })}
           </div>
+          </>
         )}
         {focusReady.length > 0 && (
           <button className="focus-cta" onClick={() => go('workout')}>
