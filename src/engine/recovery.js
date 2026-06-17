@@ -74,3 +74,24 @@ export function presetFreshness(groups) {
   const vals = (groups || []).map(g => map[g] == null ? 99 : map[g])
   return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0
 }
+
+// Научно-обоснованные окна полного восстановления группы (часы).
+// Крупные мышцы дольше, мелкие быстрее. Зависит от объёма/сна/питания — это ориентир.
+export const RECOVERY_HOURS = {
+  'грудь': 48, 'спина': 48, 'ноги': 72, 'плечи': 36, 'бицепс': 36, 'трицепс': 36, 'пресс': 24
+}
+
+// Детально по группам: сколько часов до полного восстановления + прогресс.
+export function recoveryDetail() {
+  const last = lastDates()
+  return GROUPS.map(g => {
+    const date = last[g]
+    const full = RECOVERY_HOURS[g] || 48
+    const days = date == null ? null : daysSince(date)
+    if (days == null) return { group: g, days: null, full, hoursLeft: 0, pct: 1, state: 'fresh' }
+    const hoursSince = days * 24
+    const hoursLeft = Math.max(0, full - hoursSince)
+    const pct = Math.max(0, Math.min(1, hoursSince / full))
+    return { group: g, days, full, hoursLeft, pct, state: hoursLeft <= 0 ? 'ready' : 'recovering' }
+  })
+}

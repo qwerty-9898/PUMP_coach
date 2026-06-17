@@ -1428,10 +1428,11 @@ body {
 .goal-note2 svg { flex: 0 0 auto; margin-top: 2px; }
 
 /* ===== Точечный мигающий маркер мышцы ===== */
-.m-dot { position: absolute; transform: translate(-50%, -50%); width: 8px; height: 8px; border-radius: 50%; pointer-events: none; z-index: 6;
-  background: #fff; box-shadow: 0 0 0 1.4px rgba(0,0,0,.4), 0 0 7px 2px rgba(120,220,255,.85);
-  animation: dotBlink 1.1s ease-in-out infinite; }
-@keyframes dotBlink { 0%, 100% { opacity: .28; transform: translate(-50%, -50%) scale(.82); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+.m-dot { position: absolute; transform: translate(-50%, -50%); width: 9px; height: 9px; border-radius: 50%; pointer-events: none; z-index: 6;
+  background: radial-gradient(circle at 50% 40%, #ff6a5a 0%, #ff2e2e 55%, #e01b10 100%);
+  box-shadow: 0 0 0 1.3px rgba(0,0,0,.45), 0 0 8px 2px rgba(255,46,46,.85);
+  animation: dotPulse 2.4s ease-in-out infinite; }
+@keyframes dotPulse { 0%, 100% { opacity: .55; transform: translate(-50%, -50%) scale(.9); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.12); } }
 
 /* Меньше неона в пикере групп (тренировки), как в каталоге */
 .mcard-img { filter: brightness(.74) saturate(.72) contrast(.96); }
@@ -1451,3 +1452,58 @@ body {
 .cov-summary div { flex: 1; text-align: center; background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 12px; padding: 9px 4px; }
 .cov-summary b { display: block; font-family: 'Unbounded'; font-size: 14px; }
 .cov-summary span { display: block; font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+/* ===== Восстановление мышц — премиум-строки с временем ===== */
+.rcv-list { display: flex; flex-direction: column; gap: 9px; }
+.rcv-row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 11px 12px;
+  background: rgba(255,255,255,.035); border: 1px solid var(--line); border-radius: 14px; color: var(--text); transition: transform .12s; }
+.rcv-row:active { transform: scale(.985); }
+.rcv-dot { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 8px 1px currentColor; }
+.rcv-mid { flex: 1 1 auto; min-width: 0; }
+.rcv-l1 { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 7px; }
+.rcv-name { font-size: 14px; font-weight: 700; }
+.rcv-time { font-size: 11.5px; font-weight: 700; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+.rcv-time.recovering { color: #ffb088; background: rgba(255,90,31,.14); }
+.rcv-time.ready { color: #34d27b; background: rgba(34,197,94,.16); }
+.rcv-time.fresh { color: #6db9ff; background: rgba(59,130,246,.16); }
+.rcv-bar { height: 7px; border-radius: 5px; background: rgba(255,255,255,.08); overflow: hidden; }
+.rcv-bar i { display: block; height: 100%; border-radius: 5px; transition: width .5s ease; opacity: .9; }
+
+/* ===== Кнопка «План на 4 недели» ===== */
+.plan-cta { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; margin-bottom: 14px;
+  background: linear-gradient(135deg, rgba(255,90,31,.16), var(--glass, var(--card)) 70%); border: 1px solid rgba(255,90,31,.3);
+  border-radius: 16px; padding: 13px 14px; color: var(--text); backdrop-filter: blur(10px); }
+.plan-cta-ic { width: 38px; height: 38px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 11px; background: var(--accent-soft); color: var(--accent); }
+.plan-cta-txt { flex: 1 1 auto; display: flex; flex-direction: column; }
+.plan-cta-txt b { font-size: 14.5px; }
+.plan-cta-txt small { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.plan-cta > svg { color: var(--muted); }
+
+/* ===== План: вкладки недель ===== */
+.wk-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.wk-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 4px; border-radius: 12px;
+  background: var(--glass, var(--card)); border: 1px solid var(--line); color: var(--muted); }
+.wk-tab.on { background: var(--accent-soft); border-color: rgba(255,90,31,.5); color: #fff; }
+.wk-n { font-family: 'Unbounded'; font-size: 12px; font-weight: 700; }
+.wk-t { font-size: 9.5px; }
+
+/* ===== План: заметка недели ===== */
+.wk-note { background: var(--glass, var(--card)); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 16px; }
+.wk-note.deload { border-color: rgba(59,130,246,.4); background: linear-gradient(135deg, rgba(59,130,246,.1), var(--glass, var(--card)) 70%); }
+.wk-note-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+.wk-note-title { font-family: 'Unbounded'; font-size: 15px; font-weight: 700; }
+.wk-note-scheme { font-size: 12.5px; font-weight: 700; color: var(--accent2); }
+.wk-note p { font-size: 13.5px; color: var(--muted); line-height: 1.45; margin: 0; }
+
+/* ===== План: дни недели ===== */
+.plan-days { display: flex; flex-direction: column; gap: 8px; }
+.plan-day { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.035); border: 1px solid var(--line); border-radius: 14px; padding: 11px 12px; }
+.plan-day.rest { opacity: .55; }
+.pd-day { flex: 0 0 auto; width: 30px; font-family: 'Unbounded'; font-size: 12px; font-weight: 700; color: var(--muted); }
+.pd-rest { font-size: 13px; color: var(--muted); }
+.pd-main { flex: 1 1 auto; min-width: 0; }
+.pd-label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+.pd-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.pd-chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.pd-start { flex: 0 0 auto; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px;
+  background: var(--accent); color: #fff; border: none; box-shadow: 0 4px 14px rgba(255,90,31,.4); }

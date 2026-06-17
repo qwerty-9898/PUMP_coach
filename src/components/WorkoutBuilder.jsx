@@ -16,14 +16,17 @@ const GOAL_NOTE = {
   'тонус': 'Тонус: многоповторка и суперсеты, + лёгкое кардио.'
 }
 
-export default function WorkoutBuilder({ program, profile, initialGroup, onChangeProgram }) {
+export default function WorkoutBuilder({ program, profile, initialGroup, initialGroups, onChangeProgram }) {
   const [picked, setPicked] = useState([])
   const [session, setSession] = useState(null)
   const [saved, setSaved] = useState(false)
   const [guided, setGuided] = useState(false)
   const [routines, setRoutines] = useState(() => store.getRoutines())
   const favorites = store.getFavEx()
-  useEffect(() => { if (initialGroup) { setPicked([initialGroup]); build([initialGroup], true) } }, [])
+  useEffect(() => {
+    if (initialGroups && initialGroups.length) { setPicked(initialGroups); build(initialGroups, true) }
+    else if (initialGroup) { setPicked([initialGroup]); build([initialGroup], true) }
+  }, [])
 
   const toggle = (g) => setPicked(p => p.includes(g) ? p.filter(x => x !== g) : [...p, g])
 

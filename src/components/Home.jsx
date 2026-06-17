@@ -4,7 +4,7 @@ import CalendarStrip from './CalendarStrip.jsx'
 import MuscleSheet from './MuscleSheet.jsx'
 import { calcNutrition } from '../engine/nutrition.js'
 import { PROGRAMS, recommendProgram, activeOrRecommended } from '../data/programs.js'
-import { recoveryMap, freshFocus } from '../engine/recovery.js'
+import { recoveryMap, freshFocus, recoveryDetail } from '../engine/recovery.js'
 import { GROUP_META } from '../engine/exercises.js'
 import { store, calcStreak, todayKey } from '../storage.js'
 
@@ -41,10 +41,11 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
   const trainedCount = map.filter(m => m.days != null).length
   const focus = freshFocus(3)
   const focusReady = focus.filter(f => f.days == null || f.days >= 2)
-  const readyPct = trainedCount ? Math.round(map.reduce((a, m) => a + (1 - m.load), 0) / map.length * 100) : 0
-  const freshCount = map.filter(m => m.load < 0.4).length
-  const tiredCount = map.filter(m => m.load >= 0.6).length
-  const R = 27, CIRC = 2 * Math.PI * R
+  const detail = recoveryDetail()
+  const readyPct = trainedCount ? Math.round(detail.reduce((a, d) => a + d.pct, 0) / detail.length * 100) : 0
+  const freshCount = detail.filter(d => d.state !== 'recovering').length
+  const tiredCount = detail.filter(d => d.state === 'recovering' && d.pct < 0.5).length
+  const CIRC = 2 * Math.PI * 27
 
   return (
     <div className="home">
@@ -77,16 +78,20 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
               <span className="rc-sum-sub">{freshCount} свежих · {tiredCount} устали</span>
             </div>
           </div>
-          <div className="rc-list">
-            {map.map(m => {
-              const c = GROUP_META[m.group].color
-              const ready = Math.round((1 - m.load) * 100)
+          <div className="rcv-list">
+            {detail.map(d => {
+              const c = GROUP_META[d.group].color
+              const tl = d.state === 'fresh' ? 'свежая' : d.state === 'ready' ? 'готова' : (d.hoursLeft >= 24 ? '~' + Math.round(d.hoursLeft / 24) + ' дн' : '~' + d.hoursLeft + ' ч')
               return (
-                <button className="rc-row" key={m.group} onClick={() => setSheetG(m.group)}>
-                  <span className="rc-dot" style={{ background: c }} />
-                  <span className="rc-name">{GROUP_META[m.group].label}</span>
-                  <span className="rc-bar"><i style={{ width: ready + '%', background: c }} /></span>
-                  <span className="rc-status">{m.status}</span>
+                <button className="rcv-row" key={d.group} onClick={() => setSheetG(d.group)}>
+                  <span className="rcv-dot" style={{ background: c }} />
+                  <div className="rcv-mid">
+                    <div className="rcv-l1">
+                      <span className="rcv-name">{GROUP_META[d.group].label}</span>
+                      <span className={'rcv-time ' + d.state}>{tl}</span>
+                    </div>
+                    <div className="rcv-bar"><i style={{ width: (d.pct * 100) + '%', background: c }} /></div>
+                  </div>
                 </button>
               )
             })}
