@@ -72,3 +72,56 @@ export function pickAlternative({ group, equip, level, excludeIds = [], favorite
 }
 
 export function shapeExercise(e, scheme) { return shape(e, scheme) }
+
+// ===== Суперсеты и статистика тренировки =====
+// ss — массив индексов i, означающих, что упражнение i связано со следующим (i+1) в суперсет.
+export function buildBlocks(exercises, ss = []) {
+  const set = new Set(ss)
+  const blocks = []
+  let i = 0
+  while (i < exercises.length) {
+    if (set.has(i) && i + 1 < exercises.length) {
+      blocks.push({ idxs: [i, i + 1], exs: [exercises[i], exercises[i + 1]], super: true })
+      i += 2
+    } else {
+      blocks.push({ idxs: [i], exs: [exercises[i]], super: false })
+      i += 1
+    }
+  }
+  return blocks
+}
+
+// Последовательность «слотов» (подходов) внутри блока: для суперсета чередуем A,B по раундам.
+export function blockSlots(block) {
+  const maxSets = Math.max(...block.exs.map(e => e.sets || 0))
+  const slots = []
+  for (let r = 0; r < maxSets; r++) {
+    block.exs.forEach((e, k) => {
+      if (r < (e.sets || 0)) slots.push({ sub: k, exIdx: block.idxs[k], ex: e, round: r })
+    })
+  }
+  return slots
+}
+
+export function restSeconds(rest) {
+  const num = parseInt((rest || '').replace(/[^0-9].*$/, ''), 10) || 60
+  return /мин/.test(rest) ? num * 60 : num
+}
+
+// Оценка длительности и объёма тренировки.
+export function sessionStats(session) {
+  const rs = restSeconds(session.scheme && session.scheme.rest)
+  const ssSet = new Set(session.ss || [])
+  let totalSets = 0, sec = 0
+  session.exercises.forEach((ex, i) => {
+    totalSets += ex.sets
+    const isSecondOfSuper = ssSet.has(i - 1)
+    // в суперсете второй экземпляр не добавляет отдельный отдых (отдых после пары)
+    const restPer = isSecondOfSuper ? 0 : rs
+    sec += ex.sets * (45 + restPer)
+  })
+  sec += 5 * 60 // разминка
+  if (session.cardio) sec += 18 * 60
+  const mins = Math.max(10, Math.round(sec / 60 / 5) * 5)
+  return { sets: totalSets, mins, exs: session.exercises.length }
+}

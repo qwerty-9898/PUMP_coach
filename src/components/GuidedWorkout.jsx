@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import Icon from './Icon.jsx'
 import { GROUP_META } from '../engine/exercises.js'
 import { MUSCLE_ART } from './muscleArt.js'
+import { Hl } from './MuscleThumb.jsx'
+import { buildBlocks, blockSlots, restSeconds } from '../engine/sessionGenerator.js'
 import { estimateLoad } from '../engine/loads.js'
 import { suggestNext, lastSummary, isPR } from '../engine/progress.js'
 import { store, todayKey, calcStreak } from '../storage.js'
@@ -13,17 +15,16 @@ const WARMUP = [
   'Динамическая растяжка рабочих мышц',
   '1–2 разминочных подхода первого упражнения с лёгким весом'
 ]
-function restSeconds(rest) {
-  const num = parseInt((rest || '').replace(/[^0-9].*$/, ''), 10) || 60
-  return /мин/.test(rest) ? num * 60 : num
-}
 function parseLoad(str) { const m = (str || '').match(/(\d+(\.\d+)?)/); return m ? Number(m[1]) : '' }
 
 export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
-  const total = session.exercises.length
+  const blocks = buildBlocks(session.exercises, session.ss || [])
   const rest = restSeconds(session.scheme.rest)
+  const totalSlots = blocks.reduce((a, b) => a + blockSlots(b).length, 0)
+
   const [phase, setPhase] = useState('warmup')
-  const [idx, setIdx] = useState(0)
+  const [bi, setBi] = useState(0)
+  const [slotPos, setSlotPos] = useState(0)
   const [logs, setLogs] = useState({})
   const [resting, setResting] = useState(false)
   const [left, setLeft] = useState(rest)
@@ -31,15 +32,27 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
   const [curR, setCurR] = useState('')
   const [prFlash, setPrFlash] = useState(false)
   const [milestones, setMilestones] = useState([])
+  const inputsRef = useRef({})
   const ref = useRef(null)
-  const ex = session.exercises[idx]
-  const working = (logs[idx] || []).filter(s => !s.warm)
-  const doneSets = working.length
-  const warmSets = (logs[idx] || []).filter(s => s.warm).length
 
-  // подстановка веса/повторов при входе в упражнение
+  const block = blocks[bi]
+  const slots = block ? blockSlots(block) : []
+  const blockDone = slotPos >= slots.length
+  const slot = slots[Math.min(slotPos, slots.length - 1)]
+  const ex = slot ? slot.ex : null
+  const exIdx = slot ? slot.exIdx : 0
+  const working = (logs[exIdx] || []).filter(s => !s.warm)
+  const doneSets = working.length
+  const warmSets = (logs[exIdx] || []).filter(s => s.warm).length
+  const slotsBefore = blocks.slice(0, bi).reduce((a, b) => a + blockSlots(b).length, 0)
+  const completed = slotsBefore + Math.min(slotPos, slots.length)
+  const otherEx = block && block.super && slot ? block.exs[1 - slot.sub] : null
+
+  // подстановка веса/повторов при входе в упражнение (своё значение на каждое упражнение)
   useEffect(() => {
-    if (phase !== 'work') return
+    if (phase !== 'work' || !ex) return
+    const saved = inputsRef.current[exIdx]
+    if (saved) { setCurW(saved.w); setCurR(saved.r); return }
     const sug = suggestNext(ex.id, ex.reps)
     if (sug) { setCurW(String(sug.weight)); setCurR(String(sug.reps)) }
     else {
@@ -47,7 +60,7 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
       setCurW(w === '' ? '' : String(w))
       setCurR(String((ex.reps || '').split(/[–-]/)[0] || 10))
     }
-  }, [idx, phase])
+  }, [exIdx, bi, phase])
 
   useEffect(() => {
     if (resting) {
@@ -60,18 +73,27 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
   }, [resting, rest])
 
   function recordSet(warm) {
+    if (!ex) return
     const w = Number(curW) || 0, r = Number(curR) || 0
     if (r <= 0) return
     haptic('light')
     if (!warm && w > 0 && isPR(ex.id, w, r) && doneSets === 0) { setPrFlash(true); setTimeout(() => setPrFlash(false), 2000) }
-    const next = { ...logs, [idx]: [...(logs[idx] || []), { w, r, warm: !!warm }] }
+    inputsRef.current[exIdx] = { w: curW, r: curR }
+    const next = { ...logs, [exIdx]: [...(logs[exIdx] || []), { w, r, warm: !!warm }] }
     setLogs(next)
-    const workCount = next[idx].filter(s => !s.warm).length
-    if (!warm && workCount < ex.sets) { setLeft(rest); setResting(true) }
+    if (warm) return
+    // переход к следующему слоту блока
+    const np = slotPos + 1
+    setSlotPos(np)
+    if (np < slots.length) {
+      const nextSlot = slots[np]
+      // в суперсете не отдыхаем при переходе A→B (sub===1), отдыхаем перед новым раундом (sub===0)
+      if (!block.super || nextSlot.sub === 0) { setLeft(rest); setResting(true) }
+    }
   }
-  function nextEx() {
-    if (idx + 1 >= total) { finishAll(); return }
-    setIdx(idx + 1); setResting(false); setLeft(rest); window.scrollTo(0, 0)
+  function nextBlock() {
+    if (bi + 1 >= blocks.length) { finishAll(); return }
+    setBi(bi + 1); setSlotPos(0); setResting(false); setLeft(rest); window.scrollTo(0, 0)
   }
   function finishAll() {
     const date = todayKey()
@@ -129,7 +151,6 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
     )
   }
 
-  const exDone = doneSets >= ex.sets
   const last = lastSummary(ex.id)
   const sug = suggestNext(ex.id, ex.reps)
   const mm = String(Math.floor(left / 60)), ss = String(left % 60).padStart(2, '0')
@@ -139,13 +160,23 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
       <div className="guided-top">
         <button className="iconbtn" onClick={onExit}><Icon name="x" size={20} /></button>
         <div className="guided-prog">
-          <div className="gp-track"><div className="gp-fill" style={{ width: ((idx + (exDone ? 1 : 0)) / total) * 100 + '%' }} /></div>
-          <span>{idx + 1} / {total}</span>
+          <div className="gp-track"><div className="gp-fill" style={{ width: (completed / totalSlots) * 100 + '%' }} /></div>
+          <span>{Math.min(completed + 1, totalSlots)} / {totalSlots}</span>
         </div>
       </div>
 
+      {block.super && (
+        <div className="super-banner">
+          <Icon name="bolt" size={14} /> Суперсет {slot.sub === 0 ? 'A' : 'B'}
+          {otherEx && <span className="super-next"> · дальше без отдыха: {otherEx.name}</span>}
+        </div>
+      )}
+
       <div className={'guided-card' + (prFlash ? ' pr' : '')}>
-        <img className="guided-art" src={MUSCLE_ART[ex.group]} alt="" />
+        <span className="guided-artwrap">
+          <img className="guided-art" src={MUSCLE_ART[ex.group]} alt="" />
+          <Hl group={ex.group} />
+        </span>
         <span className="tag" style={tagStyle(ex.group)}>{GROUP_META[ex.group].label}</span>
         <h2 className="display md">{ex.name}</h2>
         <div className="guided-meta">
@@ -170,9 +201,9 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
           <span className="rest-time">{mm}:{ss}</span>
           <button className="cta sm ghost-cta" onClick={skipRest}>Пропустить отдых</button>
         </div>
-      ) : exDone ? (
-        <button className="cta" onClick={nextEx}>
-          {idx + 1 >= total ? <><Icon name="flag" size={18} /> Завершить тренировку</> : <><Icon name="arrow" size={18} /> Следующее упражнение</>}
+      ) : blockDone ? (
+        <button className="cta" onClick={nextBlock}>
+          {bi + 1 >= blocks.length ? <><Icon name="flag" size={18} /> Завершить тренировку</> : <><Icon name="arrow" size={18} /> Следующее упражнение</>}
         </button>
       ) : (
         <div className="setlogger">

@@ -891,10 +891,12 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 
 /* Красная неон-подсветка целевой мышцы в каталоге */
 .m-hl { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; z-index: 5;
-  background: radial-gradient(closest-side, #ff3b30, #e01b10 52%, rgba(220,0,0,.35) 72%, transparent 82%);
-  box-shadow: 0 0 0 1.2px rgba(255,255,255,.4), 0 0 13px 3px rgba(255,40,25,.7);
-  filter: saturate(1.4); animation: hlPulse 1.6s ease-in-out infinite; }
-@keyframes hlPulse { 0%, 100% { opacity: .9; } 50% { opacity: 1; } }
+  background: transparent; border: 2px solid rgba(255,70,55,.95);
+  box-shadow: 0 0 10px rgba(255,55,35,.75), inset 0 0 9px rgba(255,55,35,.35);
+  animation: hlPulse 1.8s ease-in-out infinite; }
+.m-hl::after { content: ''; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; border-radius: 50%;
+  background: #ff3b30; transform: translate(-50%, -50%); box-shadow: 0 0 6px 1px rgba(255,55,35,.9); }
+@keyframes hlPulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .85; } 50% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; } }
 .musclecard-scrim, .muscle-banner-scrim { z-index: 2; }
 .musclecard-info, .muscle-banner-info { z-index: 6; }
 
@@ -962,9 +964,9 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .iconbtn.sm { width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; }
 
 /* Шит-редактор порции */
-.sheet { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 0 14px; backdrop-filter: blur(3px); animation: fadeIn .2s; }
+.sheet { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.6); display: flex; align-items: flex-start; justify-content: center; padding: 11vh 14px 0; backdrop-filter: blur(3px); animation: fadeIn .2s; overflow-y: auto; }
 .sheet-card { width: 100%; max-width: 460px; background: var(--bg2); border: 1px solid var(--line); border-radius: 22px;
-  padding: 20px 18px; margin-bottom: 12vh; box-shadow: 0 20px 60px rgba(0,0,0,.5); animation: sheetUp .24s cubic-bezier(.2,.8,.3,1.05); }
+  padding: 20px 18px; margin: 0 auto; box-shadow: 0 20px 60px rgba(0,0,0,.5); animation: sheetUp .24s cubic-bezier(.2,.8,.3,1.05); }
 .sheet-card .addhead-t { display: block; margin-bottom: 14px; }
 @keyframes sheetUp { from { transform: translateY(22px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -1211,7 +1213,7 @@ body {
 .photo img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; border: 1px solid var(--glassbd); cursor: pointer; }
 .photo-del { position: absolute; top: 5px; right: 5px; width: 22px; height: 22px; border-radius: 50%; background: rgba(0,0,0,.6); color: #fff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .photo-date { position: absolute; left: 6px; bottom: 6px; font-size: 10px; background: rgba(0,0,0,.55); padding: 2px 6px; border-radius: 6px; color: #fff; }
-.sheet-center { align-items: center !important; justify-content: center; }
+.sheet-center { align-items: center !important; padding-top: 0 !important; justify-content: center; }
 .photo-full { max-width: 92%; max-height: 80vh; border-radius: 16px; display: block; }
 
 /* недельная серия + прогноз онбординга */
@@ -1223,3 +1225,78 @@ body {
 .qtybox button { width: 26px; height: 26px; border-radius: 8px; background: var(--glass); border: 1px solid var(--glassbd); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .qtybox button:active { transform: scale(.9); }
 .qtybox span { min-width: 18px; text-align: center; font-weight: 700; font-size: 13px; }
+
+/* ===== Миниатюра мышцы с маркером ===== */
+.mthumb { position: relative; flex: 0 0 auto; width: 54px; height: 54px; border-radius: 14px; overflow: hidden;
+  background: #0a0c10; border: 1px solid var(--line); display: block; }
+.mthumb img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.92) brightness(1.02); }
+
+/* ===== Тренировки: миниатюра+номер в карточке упражнения ===== */
+.ex-thumb { position: relative; flex: 0 0 auto; width: 50px; height: 50px; border-radius: 13px; overflow: hidden;
+  background: #0a0c10; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
+.ex-thumb img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.92); }
+.ex-thumb .ex-num { position: absolute; left: 4px; top: 3px; font-family: 'Unbounded'; font-size: 11px; font-weight: 700;
+  color: #fff; line-height: 1; padding: 2px 5px; border-radius: 8px; background: rgba(0,0,0,.62); backdrop-filter: blur(2px); }
+.ex-thumb.cardio { color: var(--accent); }
+
+/* ===== Каталог: строка упражнения с миниатюрой ===== */
+.exrow { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  background: var(--glass, var(--card)); border: 1px solid var(--line); border-radius: 16px; padding: 9px 11px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: transform .12s, border-color .12s; }
+.exrow:active { transform: scale(.985); border-color: rgba(255,90,31,.4); }
+.exrow-thumb { width: 50px; height: 50px; border-radius: 12px; }
+.exrow-main { flex: 1 1 auto; min-width: 0; }
+.exrow-name { display: block; font-weight: 600; font-size: 15px; color: var(--text); }
+.exrow-sub { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.exrow-arr { color: var(--muted); flex: 0 0 auto; }
+.exlist { display: flex; flex-direction: column; gap: 8px; }
+
+.exgroup-lbl { font-family: 'Unbounded'; font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--muted); margin: 16px 2px 8px; }
+
+/* ===== Каталог: поиск ===== */
+.catsearch { position: relative; display: flex; align-items: center; margin-bottom: 14px; }
+.catsearch-ico { position: absolute; left: 13px; color: var(--muted); pointer-events: none; }
+.catsearch input { width: 100%; height: 46px; padding: 0 40px 0 40px; border-radius: 14px;
+  background: var(--glass, var(--card)); border: 1px solid var(--line); color: var(--text); font-size: 15px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); outline: none; }
+.catsearch input:focus { border-color: rgba(255,90,31,.5); }
+.catsearch input::placeholder { color: var(--muted); }
+.catsearch-x { position: absolute; right: 8px; width: 30px; height: 30px; display: grid; place-items: center;
+  background: rgba(255,255,255,.06); border: none; border-radius: 9px; color: var(--text); }
+
+/* ===== Каталог: фильтр по инвентарю ===== */
+.catfilter { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 4px; margin-bottom: 6px; -ms-overflow-style: none; scrollbar-width: none; }
+.catfilter::-webkit-scrollbar { display: none; }
+.catchip { flex: 0 0 auto; padding: 8px 14px; border-radius: 11px; font-size: 13px; font-weight: 600;
+  background: var(--glass, var(--card)); border: 1px solid var(--line); color: var(--muted);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.catchip.on { background: var(--accent-soft); border-color: rgba(255,90,31,.55); color: #fff; }
+
+.empty-mini { text-align: center; color: var(--muted); font-size: 13.5px; padding: 24px 16px; }
+
+/* ===== Статистика собранной тренировки ===== */
+.sess-stats { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0 4px; }
+.sess-stats span { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.sess-stats span svg { color: var(--accent); }
+
+/* ===== Суперсеты в плане ===== */
+.ex-super { border-color: rgba(255,90,31,.45); box-shadow: 0 0 0 1px rgba(255,90,31,.16) inset; }
+.tag.ss-tag { background: var(--accent-soft); border: 1px solid rgba(255,90,31,.5); color: #ffb088; display: inline-flex; align-items: center; gap: 3px; }
+.ss-link { display: flex; justify-content: center; margin: -2px 0 8px; }
+.ss-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--muted);
+  background: transparent; border: 1px dashed var(--line); border-radius: 10px; padding: 6px 12px; }
+.ss-btn.on { color: #ffb088; border-style: solid; border-color: rgba(255,90,31,.5); background: var(--accent-soft); }
+
+/* ===== Гид: баннер суперсета ===== */
+.super-banner { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center;
+  background: var(--accent-soft); border: 1px solid rgba(255,90,31,.4); color: #ffb088;
+  font-family: 'Unbounded'; font-size: 12.5px; font-weight: 700; padding: 9px 14px; border-radius: 13px; margin-bottom: 12px; }
+.super-next { font-family: 'Rubik'; font-weight: 500; color: var(--muted); font-size: 12px; }
+
+/* ===== Гид: обёртка картинки с маркером ===== */
+.guided-artwrap { position: relative; display: block; }
+
+/* ===== Видео техники ===== */
+.cta.video-cta { background: rgba(255,255,255,.05); border: 1px solid var(--line); color: var(--text); margin-bottom: 6px; }
+.cta.video-cta svg { color: var(--accent); }

@@ -38,6 +38,11 @@ export function tgUserName() {
 
 const BOT_URL = 'https://t.me/pump_coach_bot' // замени на адрес своего бота
 
+export function openLink(url) {
+  try { if (wa && wa.openLink) { wa.openLink(url, { try_instant_view: false }); return } } catch (e) {}
+  try { window.open(url, '_blank') } catch (e) {}
+}
+
 export function shareText(text) {
   const url = 'https://t.me/share/url?url=' + encodeURIComponent(BOT_URL) + '&text=' + encodeURIComponent(text)
   try { if (wa && wa.openTelegramLink) { wa.openTelegramLink(url); return } } catch (e) {}
