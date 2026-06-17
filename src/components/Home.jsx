@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import Icon from './Icon.jsx'
 import CalendarStrip from './CalendarStrip.jsx'
-import BodyHeatmap from './BodyHeatmap.jsx'
 import MuscleSheet from './MuscleSheet.jsx'
 import { calcNutrition } from '../engine/nutrition.js'
 import { PROGRAMS, recommendProgram, activeOrRecommended } from '../data/programs.js'
@@ -50,33 +49,34 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
         <h1 className="display lg">Время прокачаться</h1>
       </div>
 
-      {/* Карта тела — фон-сцена, элементы поверх */}
-      <div className="bodystage">
-        <div className="bs-head">
-          <span className="card-kicker"><Icon name="activity" size={15} /> Карта восстановления</span>
-          {trainedCount > 0 && <span className="card-meta">{trainedCount} / 7</span>}
+      {/* Восстановление мышц — чистый минимализм */}
+      <div className="card recovery-card">
+        <div className="rc-head">
+          <span className="card-kicker"><Icon name="activity" size={15} /> Восстановление мышц</span>
+          {trainedCount > 0 && <span className="card-meta">{trainedCount}/7</span>}
         </div>
-
-        <BodyHeatmap onPick={setSheetG} />
-
         {trainedCount === 0 ? (
-          <p className="recovery-hint">Здесь оживёт карта твоего тела — мышцы загорятся по нагрузке, а тусклые подскажут, что качать дальше.</p>
+          <p className="recovery-hint">Проведи первую тренировку — здесь покажем, какие мышцы устали, а какие свежие и готовы к нагрузке.</p>
         ) : (
-          <div className="bs-chips">
-            {map.map(m => (
-              <button className="bs-chip" key={m.group} onClick={() => onMuscle(m.group)}>
-                <span className="bs-dot" style={{ background: GROUP_META[m.group].color, opacity: 0.4 + m.load * 0.6 }} />
-                <span className="bs-cn">{GROUP_META[m.group].label}</span>
-                <span className="bs-cs">{m.status}</span>
-              </button>
-            ))}
+          <div className="rc-list">
+            {map.map(m => {
+              const c = GROUP_META[m.group].color
+              const ready = Math.round((1 - m.load) * 100)
+              return (
+                <button className="rc-row" key={m.group} onClick={() => setSheetG(m.group)}>
+                  <span className="rc-dot" style={{ background: c }} />
+                  <span className="rc-name">{GROUP_META[m.group].label}</span>
+                  <span className="rc-bar"><i style={{ width: ready + '%', background: c }} /></span>
+                  <span className="rc-status">{m.status}</span>
+                </button>
+              )
+            })}
           </div>
         )}
-
         {focusReady.length > 0 && (
           <button className="focus-cta" onClick={() => go('workout')}>
             <div className="focus-txt">
-              <span className="focus-lbl">Сегодня свежее всего</span>
+              <span className="focus-lbl">Свежее всего сегодня</span>
               <span className="focus-groups">{focusReady.map(f => GROUP_META[f.group].label).join(' · ')}</span>
             </div>
             <Icon name="arrow" size={18} />

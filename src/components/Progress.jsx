@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
 import SparkChart from './SparkChart.jsx'
-import BodyHeatmap from './BodyHeatmap.jsx'
 import { EXERCISES, GROUPS, GROUP_META } from '../engine/exercises.js'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store, calcStreak, calcWeekStreak } from '../storage.js'
@@ -76,18 +75,21 @@ export default function Progress({ profile }) {
               <span className="card-kicker"><Icon name="activity" size={15} /> Прокачано за 30 дней</span>
               {covActive.length > 0 && <span className="card-meta">{covActive.length} групп</span>}
             </div>
-            <BodyHeatmap loads={covLoads} />
             {covActive.length === 0 ? (
-              <p className="recovery-hint">Тут покажу, какие мышцы ты грузил за месяц — ярче значит чаще. Лови баланс.</p>
+              <p className="recovery-hint">Тут покажу, какие мышцы ты грузил за месяц — длиннее полоса значит чаще. Лови баланс.</p>
             ) : (
-              <div className="rg-grid">
-                {cov.map(c => (
-                  <div className="rg" key={c.group}>
-                    <span className="rg-dot" style={{ background: GROUP_META[c.group].color, opacity: 0.3 + c.load * 0.7 }} />
-                    <span className="rg-name">{GROUP_META[c.group].label}</span>
-                    <span className="rg-st">{c.count > 0 ? '×' + c.count : '—'}</span>
-                  </div>
-                ))}
+              <div className="rc-list">
+                {(() => { const mx = Math.max.apply(null, cov.map(x => x.count).concat([1])); return cov.map(c => {
+                  const color = GROUP_META[c.group].color
+                  return (
+                    <div className="rc-row static" key={c.group}>
+                      <span className="rc-dot" style={{ background: color }} />
+                      <span className="rc-name">{GROUP_META[c.group].label}</span>
+                      <span className="rc-bar"><i style={{ width: (c.count / mx * 100) + '%', background: color }} /></span>
+                      <span className="rc-status">{c.count > 0 ? '×' + c.count : '—'}</span>
+                    </div>
+                  )
+                }) })()}
               </div>
             )}
           </div>

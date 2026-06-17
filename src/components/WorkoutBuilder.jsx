@@ -9,6 +9,13 @@ import { presetFreshness } from '../engine/recovery.js'
 import { estimateLoad } from '../engine/loads.js'
 import { store, todayKey } from '../storage.js'
 
+const GOAL_NOTE = {
+  'сила': 'Силовая схема: упор на базу, тяжёлый вес, низкие повторы, длинный отдых.',
+  'набор массы': 'Гипертрофия: умеренный вес и объём, отдых 60–90 сек.',
+  'похудение': 'Жиросжигание: суперсеты по кругу, минимум отдыха, + кардио в конце.',
+  'тонус': 'Тонус: многоповторка и суперсеты, + лёгкое кардио.'
+}
+
 export default function WorkoutBuilder({ program, profile, initialGroup, onChangeProgram }) {
   const [picked, setPicked] = useState([])
   const [session, setSession] = useState(null)
@@ -22,7 +29,8 @@ export default function WorkoutBuilder({ program, profile, initialGroup, onChang
 
   function build(groups, varied) {
     if (!groups.length) return
-    setSession({ ...generateSession({ groups, goal: profile.goal, level: profile.level, equip: profile.equip, favorites, varied }), ss: [] })
+    const g = generateSession({ groups, goal: profile.goal, level: profile.level, equip: profile.equip, favorites, varied })
+    setSession({ ...g, ss: g.ss || [] })
     setSaved(false)
     setTimeout(() => document.getElementById('session')?.scrollIntoView({ behavior: 'smooth' }), 60)
   }
@@ -145,6 +153,7 @@ function Session({ session, profile, saved, onSave, onGuide, onRegen, onSwap, on
           <span><Icon name="grid" size={14} /> {stats.exs} упр</span>
           <span><Icon name="bolt" size={14} /> {stats.sets} подходов</span>
         </div>
+        {GOAL_NOTE[profile.goal] && <p className="goal-note2"><Icon name="bolt" size={13} /> {GOAL_NOTE[profile.goal]}</p>}
         <div className="scheme">
           <div><span>Подходы</span><b>{session.scheme.sets}</b></div>
           <div><span>Повторы</span><b>{session.scheme.reps}</b></div>

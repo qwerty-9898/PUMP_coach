@@ -1,18 +1,14 @@
-import { MUSCLE_ART, MUSCLE_HL } from './muscleArt.js'
+import { MUSCLE_ART } from './muscleArt.js'
 
-// Маркер целевой мышцы (кольцо-прицел). Координаты в % из MUSCLE_HL.
-export function Hl({ group }) {
-  return (MUSCLE_HL[group] || []).map((h, i) => (
-    <span key={i} className="m-hl" style={{ left: h[0] + '%', top: h[1] + '%', width: h[2] + '%', height: h[3] + '%' }} />
-  ))
-}
+// Маркеры мышц отключены по просьбе пользователя — оставлена заглушка,
+// чтобы существующие импорты Hl продолжали работать без правок.
+export function Hl() { return null }
 
-// Маленькая миниатюра группы мышц с маркером — для строк и карточек.
+// Миниатюра группы мышц (без маркера).
 export function MuscleThumb({ group, className = '' }) {
   return (
     <span className={'mthumb ' + className}>
       <img src={MUSCLE_ART[group]} alt="" />
-      <Hl group={group} />
     </span>
   )
 }

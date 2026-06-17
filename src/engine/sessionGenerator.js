@@ -57,7 +57,22 @@ export function generateSession({ groups, goal, level, equip, favorites = [], va
   picked = picked.filter(e => (seen.has(e.id) ? false : seen.add(e.id)))
   picked.sort((a, b) => (a.compound === b.compound ? 0 : a.compound ? -1 : 1))
 
-  return { exercises: picked.map(e => shape(e, scheme)), scheme, groups: uniq, cardio: scheme.cardio }
+  // Подгонка под цель:
+  if (goal === 'сила') {
+    // упор на базу: оставляем все базовые + максимум одно изолирующее
+    const comp = picked.filter(e => e.compound)
+    if (comp.length >= 1) picked = comp.concat(picked.filter(e => !e.compound).slice(0, 1))
+  }
+
+  const exercises = picked.map(e => shape(e, scheme))
+
+  // Суперсеты-круговая под жиросжигание/тонус (плотность тренировки выше)
+  let ss = []
+  if ((goal === 'похудение' || goal === 'тонус') && exercises.length >= 4) {
+    for (let i = 0; i + 1 < exercises.length; i += 2) ss.push(i)
+  }
+
+  return { exercises, scheme, groups: uniq, cardio: scheme.cardio, ss }
 }
 
 // Подбор замены упражнения на ту же группу (не из уже использованных)

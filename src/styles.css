@@ -1405,3 +1405,24 @@ body {
 .meas-trend b { font-family: 'Unbounded'; font-size: 18px; color: var(--text); }
 .meas-trend b.up { color: #22c55e; }
 .meas-trend b.down { color: #ff6b5a; }
+
+
+/* ===== Меньше неона на манекенах каталога ===== */
+.musclecard-img, .muscle-banner-img, .muscle-hero-img { filter: brightness(.74) saturate(.72) contrast(.96); }
+.mthumb img, .exrow-thumb img { filter: brightness(.78) saturate(.7); }
+
+/* ===== Чистые списки восстановления / покрытия (минимализм) ===== */
+.recovery-card { margin-bottom: 4px; }
+.rc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.rc-list { display: flex; flex-direction: column; gap: 11px; }
+.rc-row { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: transparent; border: none; padding: 0; color: var(--text); }
+.rc-row:active:not(.static) { opacity: .7; }
+.rc-dot { flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%; }
+.rc-name { flex: 0 0 60px; font-size: 13.5px; font-weight: 600; }
+.rc-bar { flex: 1 1 auto; height: 7px; border-radius: 5px; background: rgba(255,255,255,.08); overflow: hidden; }
+.rc-bar i { display: block; height: 100%; border-radius: 5px; transition: width .4s ease; }
+.rc-status { flex: 0 0 auto; font-size: 11px; color: var(--muted); white-space: nowrap; min-width: 56px; text-align: right; }
+
+/* Пояснение схемы под цель */
+.goal-note2 { display: flex; align-items: flex-start; gap: 6px; font-size: 12.5px; color: var(--accent2); margin: 8px 0 2px; line-height: 1.35; }
+.goal-note2 svg { flex: 0 0 auto; margin-top: 2px; }

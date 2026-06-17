@@ -87,11 +87,20 @@ export function programsForEquip(equip) {
   return PROGRAMS.filter(p => p.equip.includes(equip))
 }
 
-export function recommendProgram({ level, daysPerWeek, equip }) {
+export function recommendProgram({ level, daysPerWeek, equip, goal }) {
   let id
-  if (level === 'новичок') id = 'fullbody'
-  else if (level === 'средний') id = daysPerWeek <= 3 ? 'split_synergist' : daysPerWeek === 4 ? 'upper_lower' : 'ppl'
-  else id = daysPerWeek <= 3 ? 'split_synergist' : daysPerWeek === 4 ? 'upper_lower' : daysPerWeek === 5 ? 'ppl' : 'bro_split'
+  if (goal === 'похудение' || goal === 'тонус') {
+    // частота и общий расход важнее изоляции → фуллбади, при 5+ днях верх/низ
+    id = daysPerWeek >= 5 ? 'upper_lower' : 'fullbody'
+  } else if (goal === 'сила') {
+    // база, низкие повторы, реже на группу → фуллбади / верх-низ
+    id = level === 'новичок' ? 'fullbody' : (daysPerWeek >= 4 ? 'upper_lower' : 'fullbody')
+  } else {
+    // набор массы / по умолчанию — объём и сплиты под уровень
+    if (level === 'новичок') id = 'fullbody'
+    else if (level === 'средний') id = daysPerWeek <= 3 ? 'split_synergist' : daysPerWeek === 4 ? 'upper_lower' : 'ppl'
+    else id = daysPerWeek <= 3 ? 'split_synergist' : daysPerWeek === 4 ? 'upper_lower' : daysPerWeek === 5 ? 'ppl' : 'bro_split'
+  }
   const allowed = PROGRAMS.filter(p => p.equip.includes(equip)).map(p => p.id)
   if (allowed.includes(id)) return id
   if (daysPerWeek >= 4 && allowed.includes('upper_lower')) return 'upper_lower'
