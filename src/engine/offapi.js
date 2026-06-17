@@ -1,5 +1,4 @@
 // Open Food Facts — бесплатный публичный API (CORS разрешён). Поиск еды и продукт по штрихкоду.
-// Работает из браузера/Telegram; в песочнице сеть к OFF может быть закрыта — это нормально.
 const BASE = 'https://world.openfoodfacts.org'
 
 function num(n) { const x = Number(n); return isFinite(x) ? x : 0 }
@@ -7,21 +6,29 @@ function num(n) { const x = Number(n); return isFinite(x) ? x : 0 }
 function mapProduct(p, code) {
   if (!p) return null
   const nu = p.nutriments || {}
-  let kcal = num(nu['energy-kcal_100g'])
-  if (!kcal && nu['energy_100g']) kcal = Math.round(num(nu['energy_100g']) / 4.184)
+  // калории: пробуем 100г, потом порцию, потом перевод из кДж
+  let kcal = num(nu['energy-kcal_100g']) || num(nu['energy-kcal_serving']) || num(nu['energy-kcal_value'])
+  if (!kcal) {
+    const kj = num(nu['energy_100g']) || num(nu['energy-kj_100g']) || num(nu['energy_value'])
+    if (kj) kcal = Math.round(kj / 4.184)
+  }
+  const prot = num(nu.proteins_100g) || num(nu.proteins_serving)
+  const fat = num(nu.fat_100g) || num(nu.fat_serving)
+  const carb = num(nu.carbohydrates_100g) || num(nu.carbohydrates_serving)
   let name = (p.product_name_ru || p.product_name || p.generic_name || '').trim()
-  if (!name) return null
   const brand = p.brands ? String(p.brands).split(',')[0].trim() : ''
-  if (brand && !name.toLowerCase().includes(brand.toLowerCase())) name = name + ' · ' + brand
+  if (!name) name = brand || ('Товар ' + (code || ''))
+  else if (brand && !name.toLowerCase().includes(brand.toLowerCase())) name = name + ' · ' + brand
   return {
     id: 'off_' + (code || p.code || name),
     name,
     kcal: Math.round(kcal),
-    p: Math.round(num(nu.proteins_100g)),
-    f: Math.round(num(nu.fat_100g)),
-    c: Math.round(num(nu.carbohydrates_100g)),
+    p: Math.round(prot),
+    f: Math.round(fat),
+    c: Math.round(carb),
     portion: 100,
-    off: true
+    off: true,
+    hasMacros: kcal > 0
   }
 }
 
@@ -52,12 +59,12 @@ export async function searchOFF(query) {
   return out.slice(0, 30)
 }
 
-// Продукт по штрихкоду (EAN/UPC) → один продукт или null.
+// Продукт по штрихкоду (EAN/UPC) → продукт (даже без КБЖУ) или null, если не найден.
 export async function productByBarcode(code) {
   const c = String(code || '').replace(/\D/g, '')
   if (c.length < 6) return null
   const url = BASE + '/api/v2/product/' + c + '.json?fields=code,product_name,product_name_ru,generic_name,brands,nutriments'
   const j = await getJSON(url)
-  if (!j || j.status !== 1) return null
+  if (!j || j.status !== 1 || !j.product) return null
   return mapProduct(j.product, c)
 }

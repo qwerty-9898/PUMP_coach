@@ -891,7 +891,7 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 
 /* Маркер целевой мышцы: уголки-фокус (рамка прицела) */
 .m-hl { position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 5; border-radius: 5px;
-  --hc: #ff7a3d; --ht: 2.5px; --hl: 32%;
+  --hc: #19e3ff; --ht: 2.6px; --hl: 32%;
   background-image:
     linear-gradient(var(--hc), var(--hc)), linear-gradient(var(--hc), var(--hc)),
     linear-gradient(var(--hc), var(--hc)), linear-gradient(var(--hc), var(--hc)),
@@ -906,7 +906,7 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
   background-position:
     left top, left top, right top, right top,
     left bottom, left bottom, right bottom, right bottom;
-  filter: drop-shadow(0 0 5px rgba(255,110,40,.9));
+  filter: drop-shadow(0 0 1.5px rgba(0,0,0,.95)) drop-shadow(0 0 6px rgba(25,227,255,.9));
   animation: hlPulse 2s ease-in-out infinite; }
 @keyframes hlPulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .92; } 50% { transform: translate(-50%, -50%) scale(1.06); opacity: 1; } }
 .musclecard-scrim, .muscle-banner-scrim { z-index: 2; }

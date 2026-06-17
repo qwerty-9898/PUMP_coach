@@ -202,7 +202,7 @@ export default function Nutrition({ profile }) {
         setEditUid(null); refresh()
       }} onClose={() => setEditUid(null)} />}
 
-      {scanOpen && <BarcodeSheet onClose={() => setScanOpen(false)} onAdd={(food, grams, meal) => { addEntry(food, grams, meal); setScanOpen(false); toast('Добавлено: ' + food.name) }} />}
+      {scanOpen && <BarcodeSheet onClose={() => setScanOpen(false)} onAdd={(food, grams, meal) => { addEntry(food, grams, meal); setScanOpen(false); toast('Добавлено: ' + food.name) }} onAddManual={(n, k, pr, meal) => { addManual(n, k, pr, meal); setScanOpen(false); toast('Добавлено: ' + n) }} />}
       {scoreOpen && score && <ScoreSheet score={score} onClose={() => setScoreOpen(false)} />}
       {photoOpen && <PhotoSheet onClose={() => setPhotoOpen(false)} onAddItems={addPhotoItems} />}
     </div>
@@ -299,7 +299,7 @@ function ScoreSheet({ score, onClose }) {
   )
 }
 
-function BarcodeSheet({ onClose, onAdd }) {
+function BarcodeSheet({ onClose, onAdd, onAddManual }) {
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [prod, setProd] = useState(null)
@@ -307,6 +307,8 @@ function BarcodeSheet({ onClose, onAdd }) {
   const [grams, setGrams] = useState(100)
   const [meal, setMeal] = useState('Перекус')
   const [scanning, setScanning] = useState(false)
+  const [mk, setMk] = useState('')
+  const [mp, setMp] = useState('')
   async function lookup(c) {
     const q = c || code
     if (!q) return
@@ -332,7 +334,7 @@ function BarcodeSheet({ onClose, onAdd }) {
           <button className="cta sm" onClick={() => lookup()} disabled={loading}>{loading ? '...' : 'Найти'}</button>
         </div>
         {err && <p className="sub" style={{ color: '#f97316', marginTop: 8 }}>{err}</p>}
-        {prod && m && (
+        {prod && prod.hasMacros && m && (
           <div className="bc-prod">
             <span className="bc-name">{prod.name}</span>
             <div className="portion-quick" style={{ marginTop: 8 }}>
@@ -348,6 +350,20 @@ function BarcodeSheet({ onClose, onAdd }) {
               {MEALS.map(mm => <button key={mm.key} className={'qchip' + (meal === mm.key ? ' on' : '')} onClick={() => setMeal(mm.key)}>{mm.key}</button>)}
             </div>
             <button className="cta" onClick={() => onAdd(prod, grams, meal)}><Icon name="plus" size={18} /> Добавить в «{meal}»</button>
+          </div>
+        )}
+        {prod && !prod.hasMacros && (
+          <div className="bc-prod">
+            <span className="bc-name">{prod.name}</span>
+            <p className="sub" style={{ margin: '6px 0 8px' }}>В базе нет КБЖУ для этого товара. Впиши вручную (на свою порцию):</p>
+            <div className="row2">
+              <label className="field"><span className="flabel">Ккал</span><input type="number" inputMode="numeric" value={mk} onChange={e => setMk(e.target.value)} placeholder="0" /></label>
+              <label className="field"><span className="flabel">Белки, г</span><input type="number" inputMode="numeric" value={mp} onChange={e => setMp(e.target.value)} placeholder="0" /></label>
+            </div>
+            <div className="bc-meals">
+              {MEALS.map(mm => <button key={mm.key} className={'qchip' + (meal === mm.key ? ' on' : '')} onClick={() => setMeal(mm.key)}>{mm.key}</button>)}
+            </div>
+            <button className={'cta' + (mk ? '' : ' disabled')} disabled={!mk} onClick={() => onAddManual(prod.name, mk, mp, meal)}><Icon name="plus" size={18} /> Добавить в «{meal}»</button>
           </div>
         )}
       </div>
