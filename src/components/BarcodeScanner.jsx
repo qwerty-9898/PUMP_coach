@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import Icon from './Icon.jsx'
 
-// Live-сканер EAN/штрихкодов через камеру (ZXing). Динамический импорт, чтобы не раздувать бандл.
+// Live-сканер EAN/штрихкодов через камеру (ZXing).
+// Грузим библиотеку с CDN в рантайме (esm.sh) — чтобы не добавлять npm-зависимость и не ломать сборку.
+const ZXING_URL = 'https://esm.sh/@zxing/browser@0.1.5'
+
 export default function BarcodeScanner({ onDetected, onClose }) {
   const videoRef = useRef(null)
   const controlsRef = useRef(null)
@@ -11,7 +14,7 @@ export default function BarcodeScanner({ onDetected, onClose }) {
     let stopped = false
     ;(async () => {
       try {
-        const mod = await import('@zxing/browser')
+        const mod = await import(/* @vite-ignore */ ZXING_URL)
         const Reader = mod.BrowserMultiFormatReader
         const reader = new Reader()
         controlsRef.current = await reader.decodeFromVideoDevice(undefined, videoRef.current, (result, e, controls) => {

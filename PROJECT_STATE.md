@@ -50,6 +50,7 @@
 - **GitHub** `qwerty-9898/PUMP_coach` → **Vercel** → BotFather Mini App. Git-репозиторий лежит в копии **Вайб-кодинг/fit-coach**.
 - `vercel.json`: no-cache заголовки для `/`,`/index.html`,`/manifest.json` + immutable для `/assets/*` + rewrite на `/`.
 - ⚠️ **Telegram агрессивно кэширует** Mini App. Чтобы увидеть изменения: `git add -A && git commit && git push` из Вайб-кодинг → дождаться деплоя Vercel → закрыть/открыть Mini App (или сбросить кэш Telegram).
+- ⚠️ **Не добавлять npm-зависимости** без пересоздания `package-lock.json` — Vercel падает на `npm ci` (рассинхрон lock) и **продолжает отдавать старую версию** (выглядит как «ничего не поменялось»). Внешние библиотеки грузим **рантайм-импортом с CDN** (esm.sh) с `/* @vite-ignore */`, как ZXing в `BarcodeScanner.jsx`.
 - ⚠️ `BOT_URL` в `tg.js` = заглушка `https://t.me/pump_coach_bot` — вписать реальный бот перед релизом.
 
 ---
