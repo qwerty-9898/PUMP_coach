@@ -32,6 +32,13 @@ export default function Catalog({ initialGroup }) {
   const [q, setQ] = useState('')
   const [filt, setFilt] = useState('all')
 
+  // Поиск по всем упражнениям (хук всегда вызывается — до ранних return)
+  const results = useMemo(() => {
+    const n = norm(q.trim())
+    if (n.length < 2) return []
+    return EXERCISES.filter(e => norm(e.name).includes(n) || norm(e.muscles).includes(n) || norm(GROUP_META[e.group].label).includes(n)).slice(0, 40)
+  }, [q])
+
   // ===== Детальная карточка упражнения =====
   if (exId) {
     const ex = EXERCISES.find(e => e.id === exId)
@@ -116,12 +123,6 @@ export default function Catalog({ initialGroup }) {
   }
 
   // ===== Главная каталога: поиск + сетка групп =====
-  const results = useMemo(() => {
-    const n = norm(q.trim())
-    if (n.length < 2) return []
-    return EXERCISES.filter(e => norm(e.name).includes(n) || norm(e.muscles).includes(n) || norm(GROUP_META[e.group].label).includes(n)).slice(0, 40)
-  }, [q])
-
   return (
     <div className="screen">
       <div className="catsearch">

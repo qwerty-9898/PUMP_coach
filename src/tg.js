@@ -38,6 +38,30 @@ export function tgUserName() {
 
 const BOT_URL = 'https://t.me/pump_coach_bot' // замени на адрес своего бота
 
+// Скан штрихкода/QR камерой Telegram. cb(code) при успехе. Возвращает false, если недоступно.
+export function scanBarcode(cb) {
+  try {
+    if (wa && wa.showScanQrPopup) {
+      const handler = (data) => {
+        const text = (data && data.data) ? data.data : data
+        if (text) {
+          try { wa.closeScanQrPopup() } catch (e) {}
+          try { if (wa.offEvent) wa.offEvent('qrTextReceived', handler) } catch (e) {}
+          cb(String(text))
+        }
+      }
+      try { if (wa.onEvent) wa.onEvent('qrTextReceived', handler) } catch (e) {}
+      wa.showScanQrPopup({ text: 'Наведи на штрихкод продукта' })
+      return true
+    }
+  } catch (e) {}
+  return false
+}
+
+export function canScan() {
+  try { return !!(wa && wa.showScanQrPopup) } catch (e) { return false }
+}
+
 export function openLink(url) {
   try { if (wa && wa.openLink) { wa.openLink(url, { try_instant_view: false }); return } } catch (e) {}
   try { window.open(url, '_blank') } catch (e) {}

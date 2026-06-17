@@ -1300,3 +1300,71 @@ body {
 /* ===== Видео техники ===== */
 .cta.video-cta { background: rgba(255,255,255,.05); border: 1px solid var(--line); color: var(--text); margin-bottom: 6px; }
 .cta.video-cta svg { color: var(--accent); }
+
+/* ===== Калории 4.0 ===== */
+.nh-actions { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.scorechip { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+  width: 50px; height: 46px; border-radius: 13px; border: 1.5px solid var(--sc, var(--line));
+  background: color-mix(in srgb, var(--sc, #888) 16%, transparent); color: var(--text); }
+.scorechip b { font-family: 'Unbounded'; font-size: 18px; line-height: 1; color: var(--sc, var(--text)); }
+.scorechip span { font-size: 9px; color: var(--muted); margin-top: 2px; }
+.scorechip.empty { border-style: dashed; }
+.goal-edit { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--muted);
+  background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 11px; padding: 8px 11px; }
+
+/* Белок — приоритетная карточка */
+.protein-card { background: var(--glass, var(--card)); border: 1px solid var(--line); border-radius: 16px; padding: 13px 14px; margin-bottom: 10px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.pc-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.pc-lbl { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
+.pc-lbl svg { color: #3b82f6; }
+.pc-val { font-size: 13px; color: var(--muted); }
+.pc-val b { font-family: 'Unbounded'; font-size: 17px; color: #3b82f6; }
+.pc-bar { height: 9px; border-radius: 6px; background: rgba(255,255,255,.07); overflow: hidden; }
+.pc-bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.pc-sub { display: block; font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+
+/* Быстрые действия */
+.nut-quick { display: flex; gap: 10px; margin-bottom: 14px; }
+.nut-quick button { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  height: 44px; border-radius: 13px; font-size: 13.5px; font-weight: 600; color: var(--text);
+  background: var(--glass, var(--card)); border: 1px solid var(--line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.nut-quick button svg { color: var(--accent); }
+.nut-quick button:active { transform: scale(.97); border-color: rgba(255,90,31,.45); }
+
+/* Приём: кнопки */
+.mb-acts { display: flex; align-items: center; gap: 6px; }
+.mb-rep { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px;
+  background: rgba(255,255,255,.05); border: 1px solid var(--line); color: var(--muted); }
+
+/* Неделя */
+.week-stats { display: flex; gap: 8px; margin-top: 12px; }
+.week-stats div { flex: 1; text-align: center; background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 12px; padding: 9px 4px; }
+.week-stats span { display: block; font-size: 10.5px; color: var(--muted); }
+.week-stats b { font-family: 'Unbounded'; font-size: 16px; margin-top: 2px; display: block; }
+
+/* Score-шит */
+.score-big { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 6px 0 4px; }
+.score-grade { font-family: 'Unbounded'; font-weight: 800; font-size: 54px; line-height: 1; color: var(--sc, var(--accent)); }
+.score-num { font-size: 15px; color: var(--muted); }
+.score-num small { font-size: 12px; }
+.score-tips { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.score-tip { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; color: var(--text);
+  background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.score-tip svg { color: var(--accent); flex: 0 0 auto; margin-top: 2px; }
+
+/* Штрихкод-шит */
+.bc-prod { margin-top: 14px; }
+.bc-name { display: block; font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+.bc-meals { display: flex; gap: 7px; flex-wrap: wrap; margin: 12px 0; }
+
+/* Онлайн-поиск */
+.online-btn { margin-top: 10px; }
+.online-lbl { font-size: 12px; color: var(--muted); margin: 14px 2px 8px; font-weight: 600; }
+
+/* Тост */
+.nut-toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 60;
+  background: rgba(20,24,32,.95); border: 1px solid var(--line); color: var(--text); font-size: 13.5px; font-weight: 600;
+  padding: 11px 18px; border-radius: 13px; box-shadow: 0 10px 30px rgba(0,0,0,.5); backdrop-filter: blur(8px);
+  animation: toastIn .25s ease; max-width: 86%; text-align: center; }
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }

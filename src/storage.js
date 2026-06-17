@@ -72,6 +72,34 @@ export const store = {
     }
     return out
   },
+  // Полная недельная сводка (ккал + БЖУ по дням)
+  foodWeekFull: (days = 7) => {
+    const all = read(K.food, {}); const out = []
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i); const key = todayKey(d)
+      const list = all[key] || []
+      out.push({
+        date: key,
+        kcal: list.reduce((a, e) => a + (e.kcal || 0), 0),
+        p: list.reduce((a, e) => a + (e.p || 0), 0),
+        f: list.reduce((a, e) => a + (e.f || 0), 0),
+        c: list.reduce((a, e) => a + (e.c || 0), 0)
+      })
+    }
+    return out
+  },
+  copyFood: (fromDate, toDate, meal = null) => {
+    const all = read(K.food, {})
+    const src = (all[fromDate] || []).filter(e => !meal || e.meal === meal)
+    if (!src.length) return 0
+    all[toDate] = all[toDate] || []
+    src.forEach(e => {
+      const rest = Object.assign({}, e); delete rest.uid
+      all[toDate].push(Object.assign({}, rest, { uid: Date.now() + '' + Math.floor(Math.random() * 100000) }))
+    })
+    write(K.food, all)
+    return src.length
+  },
   getDishes: () => read(K.dishes, []),
   addDish: (dish) => { const a = read(K.dishes, []); a.push({ ...dish, id: 'd' + Date.now() }); write(K.dishes, a); return a },
   removeDish: (id) => { const a = read(K.dishes, []).filter(d => d.id !== id); write(K.dishes, a); return a },

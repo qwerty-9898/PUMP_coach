@@ -3,7 +3,10 @@ import Icon from './Icon.jsx'
 import SparkChart from './SparkChart.jsx'
 import { calcNutrition } from '../engine/nutrition.js'
 import { FOODS, searchFoods, macrosFor } from '../data/foods.js'
+import { dayScore } from '../engine/foodscore.js'
+import { searchOFF, productByBarcode } from '../engine/offapi.js'
 import { store, todayKey } from '../storage.js'
+import { scanBarcode, canScan } from '../tg.js'
 
 const MEALS = [
   { key: 'Завтрак', ratio: 0.30 },
@@ -13,6 +16,7 @@ const MEALS = [
 ]
 const byId = Object.fromEntries(FOODS.map(f => [f.id, f]))
 const FAST_WINDOWS = [16, 18, 14]
+function yesterdayKey() { const d = new Date(); d.setDate(d.getDate() - 1); return todayKey(d) }
 
 export default function Nutrition({ profile }) {
   const auto = calcNutrition(profile)
@@ -21,8 +25,12 @@ export default function Nutrition({ profile }) {
   const [addMeal, setAddMeal] = useState(null)
   const [editUid, setEditUid] = useState(null)
   const [editGoal, setEditGoal] = useState(false)
+  const [scanOpen, setScanOpen] = useState(false)
+  const [scoreOpen, setScoreOpen] = useState(false)
+  const [flash, setFlash] = useState('')
   const refresh = () => setTick(t => t + 1)
   useEffect(() => { const id = setInterval(() => setTick(t => t + 1), 30000); return () => clearInterval(id) }, [])
+  function toast(msg) { setFlash(msg); setTimeout(() => setFlash(''), 2200) }
 
   const override = store.getKcalGoal()
   const goalKcal = override || auto.kcal
@@ -32,12 +40,11 @@ export default function Nutrition({ profile }) {
   const entries = store.getFoodDay(date)
   const eaten = entries.reduce((a, e) => ({ kcal: a.kcal + e.kcal, p: a.p + e.p, f: a.f + e.f, c: a.c + e.c }), { kcal: 0, p: 0, f: 0, c: 0 })
 
-  // Сожжено на тренировке сегодня (оценка)
   const todWorkouts = store.getProgress().workouts.filter(w => w.date === date).length
   const burned = Math.round(todWorkouts * profile.weight * 4.5)
   const remaining = goalKcal - eaten.kcal + burned
-  const pct = Math.min(100, Math.round((eaten.kcal / goalKcal) * 100))
-  const week = store.foodWeek(7)
+  const week = store.foodWeekFull(7)
+  const score = dayScore(eaten, { kcal: goalKcal, protein })
 
   function addEntry(food, grams, meal) {
     const base = macrosFor(food, grams)
@@ -63,6 +70,11 @@ export default function Nutrition({ profile }) {
     refresh()
   }
   function remove(uid) { store.removeFood(date, uid); refresh() }
+  function repeatDay(meal) {
+    const n = store.copyFood(yesterdayKey(), date, meal || null)
+    if (n) { toast(meal ? 'Перенёс «' + meal + '» из вчера' : 'Перенёс вчерашний день: ' + n + ' поз.'); refresh() }
+    else toast(meal ? 'Вчера в «' + meal + '» пусто' : 'Вчера записей нет')
+  }
 
   if (addMeal) return <AddPanel meal={addMeal} onAdd={addEntry} onAddDish={addDishEntry} onManual={addManual} onClose={() => setAddMeal(null)} onChange={refresh} />
 
@@ -70,7 +82,7 @@ export default function Nutrition({ profile }) {
 
   return (
     <div className="screen">
-      {/* Кольцо + баланс */}
+      {/* Кольцо + баланс + score */}
       <div className="card nuthero">
         <NutritionRing eaten={eaten.kcal} goal={goalKcal} p={[eaten.p, protein]} c={[eaten.c, carbs]} f={[eaten.f, fat]} />
         <div className="nh-side">
@@ -80,7 +92,12 @@ export default function Nutrition({ profile }) {
             <div><span>Съедено</span><b>{eaten.kcal}</b></div>
             <div><span>Сожжено</span><b className="accent">+{burned}</b></div>
           </div>
-          <button className="goal-edit" onClick={() => setEditGoal(v => !v)}><Icon name="edit" size={13} /> Цель</button>
+          <div className="nh-actions">
+            {score
+              ? <button className="scorechip" onClick={() => setScoreOpen(true)} style={{ '--sc': score.color }}><b>{score.grade}</b><span>качество</span></button>
+              : <span className="scorechip empty"><b>—</b><span>качество</span></span>}
+            <button className="goal-edit" onClick={() => setEditGoal(v => !v)}><Icon name="edit" size={13} /> Цель</button>
+          </div>
         </div>
       </div>
 
@@ -97,13 +114,28 @@ export default function Nutrition({ profile }) {
         </div>
       )}
 
+      {/* Белок — главный приоритет */}
+      <div className="protein-card">
+        <div className="pc-head">
+          <span className="pc-lbl"><Icon name="bolt" size={14} /> Белок</span>
+          <span className="pc-val"><b>{eaten.p}</b> / {protein} г</span>
+        </div>
+        <div className="pc-bar"><i style={{ width: Math.min(100, protein ? (eaten.p / protein) * 100 : 0) + '%' }} /></div>
+        <span className="pc-sub">цель {(protein / profile.weight).toFixed(1)} г/кг · осталось {Math.max(0, protein - eaten.p)} г</span>
+      </div>
+
       <div className="macrolegend">
-        <Leg label="Белки" v={eaten.p} g={protein} color="#3b82f6" />
         <Leg label="Углеводы" v={eaten.c} g={carbs} color="#f59e0b" />
         <Leg label="Жиры" v={eaten.f} g={fat} color="#ec4899" />
       </div>
 
-      {/* Приёмы пищи с целью */}
+      {/* Быстрые действия */}
+      <div className="nut-quick">
+        <button onClick={() => repeatDay(null)}><Icon name="refresh" size={16} /> Повторить вчера</button>
+        <button onClick={() => setScanOpen(true)}><Icon name="barcode" size={16} /> Штрихкод</button>
+      </div>
+
+      {/* Приёмы пищи */}
       {MEALS.map(meal => {
         const list = entries.filter(e => e.meal === meal.key)
         const sum = list.reduce((a, e) => a + e.kcal, 0)
@@ -116,7 +148,10 @@ export default function Nutrition({ profile }) {
                 <span className="mealblock-name">{meal.key}</span>
                 <span className="mb-target">{sum} / {target} ккал</span>
               </div>
-              <button className="addbtn" onClick={() => setAddMeal(meal.key)} aria-label="Добавить"><Icon name="plus" size={18} /></button>
+              <div className="mb-acts">
+                <button className="mb-rep" onClick={() => repeatDay(meal.key)} aria-label="Повторить вчерашний приём"><Icon name="refresh" size={15} /></button>
+                <button className="addbtn" onClick={() => setAddMeal(meal.key)} aria-label="Добавить"><Icon name="plus" size={18} /></button>
+              </div>
             </div>
             <div className="mb-bar"><i style={{ width: mp + '%' }} /></div>
             {list.length > 0 && (
@@ -147,26 +182,18 @@ export default function Nutrition({ profile }) {
         <FastingCard onChange={refresh} />
       </div>
 
-      {week.some(d => d.kcal > 0) && (
-        <div className="card">
-          <span className="card-kicker" style={{ marginBottom: 10, display: 'inline-flex' }}><Icon name="activity" size={15} /> Калории за 7 дней</span>
-          <SparkChart data={week.map(d => d.kcal)} unit="" />
-        </div>
-      )}
+      <WeekCard week={week} goalKcal={goalKcal} protein={protein} />
 
-      <div className="tipcard soon">
-        <span className="tip-ic"><Icon name="apple" size={18} /></span>
-        <div>
-          <span className="tip-h">Скоро: счётчик по фото</span>
-          <p>Сфоткал тарелку — приложение само посчитает калории и КБЖУ. В разработке.</p>
-        </div>
-      </div>
+      {flash && <div className="nut-toast">{flash}</div>}
 
       {editEntry && <PortionEdit entry={editEntry} onSave={(grams) => {
         const food = byId[editEntry.foodId]
         if (food) store.updateFood(date, editEntry.uid, { grams, ...macrosFor(food, grams) })
         setEditUid(null); refresh()
       }} onClose={() => setEditUid(null)} />}
+
+      {scanOpen && <BarcodeSheet onClose={() => setScanOpen(false)} onAdd={(food, grams, meal) => { addEntry(food, grams, meal); setScanOpen(false); toast('Добавлено: ' + food.name) }} />}
+      {scoreOpen && score && <ScoreSheet score={score} onClose={() => setScoreOpen(false)} />}
     </div>
   )
 }
@@ -212,6 +239,104 @@ function Leg({ label, v, g, color }) {
       <span className="leg-dot" style={{ background: color }} />
       <span className="leg-l">{label}</span>
       <span className="leg-v">{v} / {g} г</span>
+    </div>
+  )
+}
+
+function WeekCard({ week, goalKcal, protein }) {
+  const withFood = week.filter(d => d.kcal > 0)
+  if (!withFood.length) {
+    return (
+      <div className="card weekcard">
+        <span className="card-kicker"><Icon name="activity" size={15} /> Эта неделя</span>
+        <p className="sub" style={{ margin: '8px 0 0' }}>Веди дневник — здесь появятся тренды калорий, белка и дней в цели.</p>
+      </div>
+    )
+  }
+  const avgKcal = Math.round(withFood.reduce((a, d) => a + d.kcal, 0) / withFood.length)
+  const avgProt = Math.round(withFood.reduce((a, d) => a + d.p, 0) / withFood.length)
+  const onTarget = withFood.filter(d => Math.abs(d.kcal - goalKcal) <= goalKcal * 0.12).length
+  return (
+    <div className="card weekcard">
+      <span className="card-kicker" style={{ marginBottom: 10, display: 'inline-flex' }}><Icon name="activity" size={15} /> Эта неделя</span>
+      <SparkChart data={week.map(d => d.kcal)} unit="" />
+      <div className="week-stats">
+        <div><span>Средн. ккал</span><b>{avgKcal}</b></div>
+        <div><span>Средн. белок</span><b>{avgProt} г</b></div>
+        <div><span>Дней в цели</span><b className="accent">{onTarget}/{withFood.length}</b></div>
+      </div>
+    </div>
+  )
+}
+
+function ScoreSheet({ score, onClose }) {
+  return (
+    <div className="sheet" onClick={onClose}>
+      <div className="sheet-card" onClick={e => e.stopPropagation()}>
+        <div className="score-big" style={{ '--sc': score.color }}>
+          <span className="score-grade">{score.grade}</span>
+          <span className="score-num">{score.score}<small>/100</small></span>
+        </div>
+        <span className="addhead-t" style={{ textAlign: 'center', display: 'block', marginTop: 6 }}>Качество питания сегодня</span>
+        <div className="score-tips">
+          {score.tips.map((t, i) => <div className="score-tip" key={i}><Icon name="info" size={14} /> {t}</div>)}
+        </div>
+        <p className="sub" style={{ fontSize: 12, marginTop: 10 }}>Оценка по добору белка, попаданию в калории и доле жиров.</p>
+        <button className="cta" onClick={onClose}>Понятно</button>
+      </div>
+    </div>
+  )
+}
+
+function BarcodeSheet({ onClose, onAdd }) {
+  const [code, setCode] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [prod, setProd] = useState(null)
+  const [err, setErr] = useState('')
+  const [grams, setGrams] = useState(100)
+  const [meal, setMeal] = useState('Перекус')
+  async function lookup(c) {
+    const q = c || code
+    if (!q) return
+    setLoading(true); setErr(''); setProd(null)
+    const p = await productByBarcode(q)
+    setLoading(false)
+    if (p) { setProd(p); setGrams(100) } else setErr('Не нашли продукт. Проверь номер или добавь вручную через приём пищи.')
+  }
+  function scan() {
+    const ok = scanBarcode((t) => { setCode(t); lookup(t) })
+    if (!ok) setErr('Скан камерой доступен только в приложении Telegram. Введи штрихкод вручную.')
+  }
+  const m = prod ? macrosFor(prod, grams) : null
+  return (
+    <div className="sheet" onClick={onClose}>
+      <div className="sheet-card" onClick={e => e.stopPropagation()}>
+        <span className="addhead-t"><Icon name="barcode" size={18} /> Поиск по штрихкоду</span>
+        {canScan() && <button className="cta ghost-cta" style={{ marginTop: 12 }} onClick={scan}><Icon name="scan" size={18} /> Сканировать камерой</button>}
+        <div className="goal-row" style={{ marginTop: 10 }}>
+          <input type="number" inputMode="numeric" placeholder="Штрихкод с упаковки" value={code} onChange={e => setCode(e.target.value)} />
+          <button className="cta sm" onClick={() => lookup()} disabled={loading}>{loading ? '...' : 'Найти'}</button>
+        </div>
+        {err && <p className="sub" style={{ color: '#f97316', marginTop: 8 }}>{err}</p>}
+        {prod && m && (
+          <div className="bc-prod">
+            <span className="bc-name">{prod.name}</span>
+            <div className="portion-quick" style={{ marginTop: 8 }}>
+              {[50, 100, 150, 200, 300].map(g => <button key={g} className={'qchip' + (grams === g ? ' on' : '')} onClick={() => setGrams(g)}>{g} г</button>)}
+            </div>
+            <div className="portion-macros" style={{ marginTop: 10 }}>
+              <div><span>Ккал</span><b className="accent">{m.kcal}</b></div>
+              <div><span>Белки</span><b>{m.p} г</b></div>
+              <div><span>Углев</span><b>{m.c} г</b></div>
+              <div><span>Жиры</span><b>{m.f} г</b></div>
+            </div>
+            <div className="bc-meals">
+              {MEALS.map(mm => <button key={mm.key} className={'qchip' + (meal === mm.key ? ' on' : '')} onClick={() => setMeal(mm.key)}>{mm.key}</button>)}
+            </div>
+            <button className="cta" onClick={() => onAdd(prod, grams, meal)}><Icon name="plus" size={18} /> Добавить в «{meal}»</button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -302,11 +427,14 @@ function AddPanel({ meal, onAdd, onAddDish, onManual, onClose, onChange }) {
   const [sel, setSel] = useState(null)
   const [grams, setGrams] = useState(100)
   const [building, setBuilding] = useState(false)
+  const [online, setOnline] = useState(null)
+  const [onLoading, setOnLoading] = useState(false)
   const [mName, setMName] = useState(''); const [mKcal, setMKcal] = useState(''); const [mProt, setMProt] = useState('')
   const [, force] = useState(0)
   const fav = store.getFavorites()
   function pick(food) { setSel(food); setGrams(food.portion || 100) }
   function toggleFav(e, id) { e.stopPropagation(); store.toggleFavorite(id); force(x => x + 1); onChange && onChange() }
+  async function findOnline() { setOnLoading(true); setOnline(null); const r = await searchOFF(q); setOnLoading(false); setOnline(r) }
 
   if (building) return <DishBuilder onClose={() => setBuilding(false)} onSaved={() => { setBuilding(false); setTab('dishes') }} />
 
@@ -319,7 +447,7 @@ function AddPanel({ meal, onAdd, onAddDish, onManual, onClose, onChange }) {
           <span className="addhead-t">{sel.name}</span>
         </div>
         <div className="portioncard">
-          <span className="flabel">Порция, грамм</span>
+          <span className="flabel">Порция, грамм{sel.off ? ' · из интернета' : ''}</span>
           <div className="portion-row">
             <button className="iconbtn big" onClick={() => setGrams(g => Math.max(5, g - 10))}><Icon name="minus" size={20} /></button>
             <input type="number" inputMode="numeric" value={grams} onChange={e => setGrams(Math.max(1, Number(e.target.value) || 0))} />
@@ -343,6 +471,7 @@ function AddPanel({ meal, onAdd, onAddDish, onManual, onClose, onChange }) {
   const recent = store.frequentFoods(16).map(id => byId[id]).filter(Boolean)
   const favList = fav.map(id => byId[id]).filter(Boolean)
   const dishes = store.getDishes()
+  const localRes = searchFoods(q).slice(0, 60)
 
   return (
     <div className="screen">
@@ -357,9 +486,21 @@ function AddPanel({ meal, onAdd, onAddDish, onManual, onClose, onChange }) {
         <>
           <div className="searchbar">
             <Icon name="search" size={18} className="searchbar-ic" />
-            <input className="searchinput" placeholder="Найди еду: гречка, банан, шаурма…" value={q} onChange={e => setQ(e.target.value)} />
+            <input className="searchinput" placeholder="Найди еду: гречка, банан, шаурма…" value={q} onChange={e => { setQ(e.target.value); setOnline(null) }} />
           </div>
-          <FoodList foods={searchFoods(q).slice(0, 60)} fav={fav} onPick={pick} onFav={toggleFav} />
+          <FoodList foods={localRes} fav={fav} onPick={pick} onFav={toggleFav} />
+          {q.trim().length >= 2 && (
+            <>
+              {online === null
+                ? <button className="cta ghost-cta online-btn" onClick={findOnline} disabled={onLoading}>
+                    <Icon name="search" size={16} /> {onLoading ? 'Ищу в интернете…' : 'Искать ещё в интернете'}
+                  </button>
+                : <>
+                    <div className="online-lbl">{online.length ? 'Из интернета (Open Food Facts):' : 'В интернете тоже ничего не нашлось'}</div>
+                    <FoodList foods={online} fav={fav} onPick={pick} onFav={toggleFav} />
+                  </>}
+            </>
+          )}
         </>
       )}
       {tab === 'recent' && (recent.length ? <FoodList foods={recent} fav={fav} onPick={pick} onFav={toggleFav} />
@@ -413,7 +554,9 @@ function FoodList({ foods, fav, onPick, onFav }) {
             <span className="exrow-name">{f.name}</span>
             <span className="exrow-sub">{f.kcal} ккал · 100 г · Б {f.p} Ж {f.f} У {f.c}</span>
           </div>
-          <span className={'favstar' + (fav.includes(f.id) ? ' on' : '')} onClick={e => onFav(e, f.id)}><Icon name="star" size={18} /></span>
+          {fav && onFav
+            ? <span className={'favstar' + (fav.includes(f.id) ? ' on' : '')} onClick={e => onFav(e, f.id)}><Icon name="star" size={18} /></span>
+            : <Icon name="plus" size={18} className="exrow-arr" />}
         </button>
       ))}
     </div>
