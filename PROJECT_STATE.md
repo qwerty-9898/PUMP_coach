@@ -1,8 +1,8 @@
 # PUMP — паспорт проекта (единая выжимка)
 
 > **Единственный источник правды. Работаем дальше только по этому файлу.**
-> Обновляется после каждой задачи. Версия в коде: **v1.9**.
-> Последнее: калории 4.0 (Open Food Facts онлайн-поиск + штрихкод, score качества, цель белка, повтор дня/приёма, недельная аналитика) + фикс бага каталога.
+> Обновляется после каждой задачи. Версия в коде: **v2.0**.
+> Последнее: маркер→уголки-фокус, реальный EAN-сканер камеры (ZXing), калории по фото (Vercel+ИИ), бэкап/восстановление, графики тела по замерам.
 
 ---
 
@@ -65,7 +65,9 @@
 - `engine/recovery.js` — карта восстановления: `recoveryMap()`, `coverageMap(days,target)`, `freshFocus(limit)`, `statusOf`, `presetFreshness(groups)`.
 - `engine/achievements.js` — 9 медалей (Регулярность/Объём/Сила), `achievementsSummary()`.
 - `engine/offapi.js` — Open Food Facts: `searchOFF(query)` (онлайн-поиск еды), `productByBarcode(code)` (продукт по штрихкоду). Fetch с таймаутом, защита от ошибок. CORS-публичный, работает в задеплоенном приложении (в песочнице сеть закрыта).
-- `engine/foodscore.js` — `dayScore(eaten,{kcal,protein})` → `{score 0-100, grade A-E, color, tips[]}` (добор белка/попадание в ккал/доля жиров).
+- `engine/foodscore.js` — `dayScore(eaten,{kcal,protein})` → `{score 0-100, grade A-E, color, tips[]}`.
+- `api/photo-calories.js` — **Vercel serverless**: фото→ИИ-распознавание еды (OpenAI gpt-4o-mini vision)→`{items:[{name,grams,kcal,p,f,c}]}`. Ключ в env `OPENAI_API_KEY` (Vercel → Settings → Environment Variables). Без ключа отдаёт 503.
+- `components/BarcodeScanner.jsx` — live-сканер EAN через камеру (`@zxing/browser`, динамический импорт). Зависимости в `package.json`: `@zxing/browser`, `@zxing/library`.
 
 ### Данные
 - `data/programs.js` — `PROGRAMS`(6), `programsForEquip`, `recommendProgram`, `buildWeek`, `activeOrRecommended`.
@@ -131,4 +133,5 @@ profile `pump_profile_v3`, progress, water, measures, food, fav, favex, rating, 
 - **v1.5** — чистая прозрачность тела (без «клетки»), метки каталога, MuscleSheet, Калории 3.0.
 - **v1.7** — свои тренировки, умный автоподбор, история по упражнению, разминочные+вехи, прогресс-фото, недельная серия, прогноз веса.
 - **v1.8** — маркер-прицел, шиты выше, маркеры мышц в тренировках, ребренд каталога (поиск/фильтр/Базовые-Изолирующие/видео), суперсеты в гиде, время+объём тренировки, общий `MuscleThumb`, `tg.openLink`.
+- **v2.0** — маркер→**уголки-фокус** (`.m-hl`, во всём приложении); **реальный EAN-сканер** камеры (ZXing, `BarcodeScanner.jsx`) вместо QR-скана Telegram; **калории по фото** (serverless `api/photo-calories.js` + экран `PhotoSheet`, нужен `OPENAI_API_KEY` на Vercel); **бэкап/восстановление** (`store.exportAll/importAll`, раздел «Данные» в Профиле — скачать/загрузить JSON); **графики тела** по замерам (блок «Динамика»). Версия в футере → v2.0.
 - **v1.9** — калории 4.0: онлайн-поиск еды и штрихкод через Open Food Facts (`offapi.js`, `tg.scanBarcode`), score качества дня (`foodscore.js`, бейдж+шит), приоритетная карточка белка (г/кг), быстрые действия «Повторить вчера»/«Штрихкод», повтор приёма из вчера, недельная аналитика (ккал+белок+дней в цели, `storage.foodWeekFull/copyFood`), тосты. Фикс: `useMemo` в `Catalog.jsx` поднят выше ранних return (пустой экран при тапе на группу).

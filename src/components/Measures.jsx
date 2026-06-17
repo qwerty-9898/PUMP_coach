@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
+import SparkChart from './SparkChart.jsx'
 import { store, todayKey } from '../storage.js'
 
 const FIELDS = [
@@ -15,6 +16,7 @@ export default function Measures() {
   const [f, setF] = useState({})
   const [photos, setPhotos] = useState(() => store.getPhotos())
   const [view, setView] = useState(null)
+  const [chartField, setChartField] = useState('weight')
 
   function save() {
     const entry = { date: todayKey() }
@@ -48,6 +50,10 @@ export default function Measures() {
   const last = list[list.length - 1]
   const prev = list[list.length - 2]
   const oldest = photos[photos.length - 1], newest = photos[0]
+  const measFields = FIELDS.filter(fl => list.filter(e => e[fl.k] != null).length >= 2)
+  const activeField = measFields.some(fl => fl.k === chartField) ? chartField : (measFields[0] && measFields[0].k)
+  const series = activeField ? list.filter(e => e[activeField] != null).map(e => e[activeField]) : []
+  const trend = series.length >= 2 ? (series[series.length - 1] - series[0]) : 0
 
   return (
     <div className="screen">
@@ -80,6 +86,24 @@ export default function Measures() {
               )
             })}
             <span className="meas-date">{fmt(last.date)}</span>
+          </div>
+        </>
+      )}
+
+      {measFields.length > 0 && (
+        <>
+          <div className="block-head" style={{ marginTop: 24 }}><h2 className="display sm">Динамика</h2></div>
+          <div className="catfilter">
+            {measFields.map(fl => (
+              <button key={fl.k} className={'catchip' + (activeField === fl.k ? ' on' : '')} onClick={() => setChartField(fl.k)}>{fl.label.split(',')[0]}</button>
+            ))}
+          </div>
+          <div className="card">
+            <SparkChart data={series} unit="" />
+            <div className="meas-trend">
+              <span>{fmt(list.filter(e => e[activeField] != null)[0].date)} → сейчас</span>
+              <b className={trend === 0 ? '' : (trend > 0 ? 'up' : 'down')}>{trend > 0 ? '+' : ''}{Number(trend.toFixed(1))}</b>
+            </div>
           </div>
         </>
       )}

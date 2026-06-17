@@ -35,6 +35,30 @@ export default function More({ go, profile, userName }) {
     }
   }
 
+  function backupData() {
+    try {
+      const blob = new Blob([JSON.stringify({ app: 'PUMP', v: 1, ts: Date.now(), data: store.exportAll() })], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = 'pump-backup-' + new Date().toISOString().slice(0, 10) + '.json'
+      document.body.appendChild(a); a.click(); a.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 1500)
+    } catch (e) { window.alert('Не удалось создать бэкап.') }
+  }
+  function restoreData(e) {
+    const file = e.target.files && e.target.files[0]; if (!file) return
+    const rd = new FileReader()
+    rd.onload = () => {
+      try {
+        const j = JSON.parse(rd.result)
+        const data = j && j.data ? j.data : j
+        if (store.importAll(data) && window.confirm('Данные восстановлены. Перезагрузить приложение?')) window.location.reload()
+        else if (!data) window.alert('Файл не похож на бэкап PUMP.')
+      } catch (_) { window.alert('Файл повреждён или неверный формат.') }
+    }
+    rd.readAsText(file)
+  }
+
   return (
     <div className="screen">
       {/* Профиль-герой */}
@@ -79,6 +103,27 @@ export default function More({ go, profile, userName }) {
       ))}
 
       <div className="more-sect">
+        <span className="more-lbl">Данные</span>
+        <div className="more-list">
+          <button className="more-row" onClick={backupData}>
+            <span className="mr-ic" style={{ color: '#22c55e', background: 'rgba(34,197,94,.15)' }}><Icon name="share" size={22} /></span>
+            <span className="mr-txt">
+              <span className="mr-title">Сохранить бэкап</span>
+              <span className="mr-sub">Скачать все данные одним файлом</span>
+            </span>
+          </button>
+          <label className="more-row">
+            <span className="mr-ic" style={{ color: '#3b82f6', background: 'rgba(59,130,246,.15)' }}><Icon name="refresh" size={22} /></span>
+            <span className="mr-txt">
+              <span className="mr-title">Восстановить из файла</span>
+              <span className="mr-sub">Загрузить бэкап на новом устройстве</span>
+            </span>
+            <input type="file" accept="application/json,.json" hidden onChange={restoreData} />
+          </label>
+        </div>
+      </div>
+
+      <div className="more-sect">
         <span className="more-lbl">Система</span>
         <div className="more-list">
           <button className="more-row" onClick={reloadApp}>
@@ -98,7 +143,7 @@ export default function More({ go, profile, userName }) {
         </div>
       </div>
 
-      <p className="more-foot">PUMP · v1.4 · Telegram Mini App</p>
+      <p className="more-foot">PUMP · v2.0 · Telegram Mini App</p>
     </div>
   )
 }

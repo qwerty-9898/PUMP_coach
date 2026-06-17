@@ -6,7 +6,7 @@ import { FOODS, searchFoods, macrosFor } from '../data/foods.js'
 import { dayScore } from '../engine/foodscore.js'
 import { searchOFF, productByBarcode } from '../engine/offapi.js'
 import { store, todayKey } from '../storage.js'
-import { scanBarcode, canScan } from '../tg.js'
+import BarcodeScanner from './BarcodeScanner.jsx'
 
 const MEALS = [
   { key: 'Завтрак', ratio: 0.30 },
@@ -27,6 +27,7 @@ export default function Nutrition({ profile }) {
   const [editGoal, setEditGoal] = useState(false)
   const [scanOpen, setScanOpen] = useState(false)
   const [scoreOpen, setScoreOpen] = useState(false)
+  const [photoOpen, setPhotoOpen] = useState(false)
   const [flash, setFlash] = useState('')
   const refresh = () => setTick(t => t + 1)
   useEffect(() => { const id = setInterval(() => setTick(t => t + 1), 30000); return () => clearInterval(id) }, [])
@@ -74,6 +75,14 @@ export default function Nutrition({ profile }) {
     const n = store.copyFood(yesterdayKey(), date, meal || null)
     if (n) { toast(meal ? 'Перенёс «' + meal + '» из вчера' : 'Перенёс вчерашний день: ' + n + ' поз.'); refresh() }
     else toast(meal ? 'Вчера в «' + meal + '» пусто' : 'Вчера записей нет')
+  }
+
+  function addPhotoItems(items, meal) {
+    items.forEach(it => {
+      const base = { kcal: it.kcal, p: it.p, f: it.f, c: it.c }
+      store.addFood(date, { foodId: null, name: it.name, grams: it.grams || 0, meal, qty: 1, base, ...base })
+    })
+    setPhotoOpen(false); toast('Добавлено по фото: ' + items.length + ' поз.'); refresh()
   }
 
   if (addMeal) return <AddPanel meal={addMeal} onAdd={addEntry} onAddDish={addDishEntry} onManual={addManual} onClose={() => setAddMeal(null)} onChange={refresh} />
@@ -131,8 +140,9 @@ export default function Nutrition({ profile }) {
 
       {/* Быстрые действия */}
       <div className="nut-quick">
-        <button onClick={() => repeatDay(null)}><Icon name="refresh" size={16} /> Повторить вчера</button>
+        <button onClick={() => repeatDay(null)}><Icon name="refresh" size={16} /> Вчера</button>
         <button onClick={() => setScanOpen(true)}><Icon name="barcode" size={16} /> Штрихкод</button>
+        <button onClick={() => setPhotoOpen(true)}><Icon name="apple" size={16} /> Фото</button>
       </div>
 
       {/* Приёмы пищи */}
@@ -194,6 +204,7 @@ export default function Nutrition({ profile }) {
 
       {scanOpen && <BarcodeSheet onClose={() => setScanOpen(false)} onAdd={(food, grams, meal) => { addEntry(food, grams, meal); setScanOpen(false); toast('Добавлено: ' + food.name) }} />}
       {scoreOpen && score && <ScoreSheet score={score} onClose={() => setScoreOpen(false)} />}
+      {photoOpen && <PhotoSheet onClose={() => setPhotoOpen(false)} onAddItems={addPhotoItems} />}
     </div>
   )
 }
@@ -295,6 +306,7 @@ function BarcodeSheet({ onClose, onAdd }) {
   const [err, setErr] = useState('')
   const [grams, setGrams] = useState(100)
   const [meal, setMeal] = useState('Перекус')
+  const [scanning, setScanning] = useState(false)
   async function lookup(c) {
     const q = c || code
     if (!q) return
@@ -303,16 +315,18 @@ function BarcodeSheet({ onClose, onAdd }) {
     setLoading(false)
     if (p) { setProd(p); setGrams(100) } else setErr('Не нашли продукт. Проверь номер или добавь вручную через приём пищи.')
   }
-  function scan() {
-    const ok = scanBarcode((t) => { setCode(t); lookup(t) })
-    if (!ok) setErr('Скан камерой доступен только в приложении Telegram. Введи штрихкод вручную.')
+  function onScan(text) {
+    setScanning(false)
+    const c = String(text || '').replace(/\D/g, '')
+    if (c) { setCode(c); lookup(c) } else setErr('Не распознал код. Попробуй ещё раз или введи вручную.')
   }
   const m = prod ? macrosFor(prod, grams) : null
   return (
     <div className="sheet" onClick={onClose}>
       <div className="sheet-card" onClick={e => e.stopPropagation()}>
         <span className="addhead-t"><Icon name="barcode" size={18} /> Поиск по штрихкоду</span>
-        {canScan() && <button className="cta ghost-cta" style={{ marginTop: 12 }} onClick={scan}><Icon name="scan" size={18} /> Сканировать камерой</button>}
+        {scanning && <BarcodeScanner onDetected={onScan} onClose={() => setScanning(false)} />}
+        <button className="cta ghost-cta" style={{ marginTop: 12 }} onClick={() => setScanning(true)}><Icon name="scan" size={18} /> Сканировать камерой</button>
         <div className="goal-row" style={{ marginTop: 10 }}>
           <input type="number" inputMode="numeric" placeholder="Штрихкод с упаковки" value={code} onChange={e => setCode(e.target.value)} />
           <button className="cta sm" onClick={() => lookup()} disabled={loading}>{loading ? '...' : 'Найти'}</button>
@@ -335,6 +349,84 @@ function BarcodeSheet({ onClose, onAdd }) {
             </div>
             <button className="cta" onClick={() => onAdd(prod, grams, meal)}><Icon name="plus" size={18} /> Добавить в «{meal}»</button>
           </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function resizeImage(file, max) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      const scale = Math.min(1, max / Math.max(img.width, img.height))
+      const w = Math.round(img.width * scale), h = Math.round(img.height * scale)
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h
+      cv.getContext('2d').drawImage(img, 0, 0, w, h)
+      URL.revokeObjectURL(url)
+      resolve(cv.toDataURL('image/jpeg', 0.8))
+    }
+    img.onerror = reject
+    img.src = url
+  })
+}
+
+function PhotoSheet({ onClose, onAddItems }) {
+  const [loading, setLoading] = useState(false)
+  const [err, setErr] = useState('')
+  const [items, setItems] = useState(null)
+  const [meal, setMeal] = useState('Обед')
+  async function onFile(e) {
+    const file = e.target.files && e.target.files[0]; if (!file) return
+    setErr(''); setItems(null); setLoading(true)
+    try {
+      const dataUrl = await resizeImage(file, 512)
+      const r = await fetch('/api/photo-calories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: dataUrl }) })
+      const j = await r.json().catch(() => ({}))
+      if (!r.ok) { setErr(j.message || 'Сервис недоступен. Возможно, не настроен ИИ-ключ на Vercel.'); setLoading(false); return }
+      if (!j.items || !j.items.length) { setErr('Не нашёл еду на фото. Сними ближе и при свете.'); setLoading(false); return }
+      setItems(j.items)
+    } catch (e) { setErr('Не получилось распознать. Проверь интернет или добавь вручную.') }
+    setLoading(false)
+  }
+  const total = (items || []).reduce((a, it) => ({ kcal: a.kcal + it.kcal, p: a.p + it.p, f: a.f + it.f, c: a.c + it.c }), { kcal: 0, p: 0, f: 0, c: 0 })
+  function removeItem(i) { setItems(arr => arr.filter((_, j) => j !== i)) }
+  return (
+    <div className="sheet" onClick={onClose}>
+      <div className="sheet-card" onClick={e => e.stopPropagation()}>
+        <span className="addhead-t"><Icon name="apple" size={18} /> Калории по фото</span>
+        {!items && (
+          <>
+            <p className="sub" style={{ marginTop: 6 }}>Сфоткай тарелку — ИИ оценит блюда и КБЖУ. Лучше сверху и при хорошем свете.</p>
+            <label className={'cta' + (loading ? ' disabled' : '')} style={{ marginTop: 12 }}>
+              <Icon name="apple" size={18} /> {loading ? 'Распознаю…' : 'Сделать фото / выбрать'}
+              <input type="file" accept="image/*" capture="environment" hidden onChange={onFile} disabled={loading} />
+            </label>
+          </>
+        )}
+        {err && <p className="sub" style={{ color: '#f97316', marginTop: 8 }}>{err}</p>}
+        {items && items.length > 0 && (
+          <>
+            <div className="bc-meals" style={{ marginTop: 12 }}>
+              {MEALS.map(mm => <button key={mm.key} className={'qchip' + (meal === mm.key ? ' on' : '')} onClick={() => setMeal(mm.key)}>{mm.key}</button>)}
+            </div>
+            <div className="photo-items">
+              {items.map((it, i) => (
+                <div className="foodrow" key={i}>
+                  <div className="foodrow-main" style={{ cursor: 'default' }}>
+                    <span className="foodrow-name">{it.name}</span>
+                    <span className="foodrow-sub">{it.grams ? it.grams + ' г · ' : ''}Б {it.p} · Ж {it.f} · У {it.c}</span>
+                  </div>
+                  <span className="foodrow-kcal">{it.kcal}</span>
+                  <button className="delbtn" onClick={() => removeItem(i)}><Icon name="trash" size={16} /></button>
+                </div>
+              ))}
+            </div>
+            <div className="dish-total">Итого: <b>{total.kcal} ккал</b> · Б {total.p} · Ж {total.f} · У {total.c}</div>
+            <p className="sub" style={{ fontSize: 11.5, margin: '6px 0 10px' }}>Оценка примерная — поправь, удалив лишнее.</p>
+            <button className="cta" onClick={() => onAddItems(items, meal)}><Icon name="plus" size={18} /> Добавить в «{meal}»</button>
+          </>
         )}
       </div>
     </div>

@@ -889,14 +889,26 @@ input[type=number]:focus, .searchinput:focus { transition: box-shadow .2s ease, 
 .muscle-hero-info h2 { margin: 0; }
 .muscle-tagline { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--mc); }
 
-/* Красная неон-подсветка целевой мышцы в каталоге */
-.m-hl { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; z-index: 5;
-  background: transparent; border: 2px solid rgba(255,70,55,.95);
-  box-shadow: 0 0 10px rgba(255,55,35,.75), inset 0 0 9px rgba(255,55,35,.35);
-  animation: hlPulse 1.8s ease-in-out infinite; }
-.m-hl::after { content: ''; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; border-radius: 50%;
-  background: #ff3b30; transform: translate(-50%, -50%); box-shadow: 0 0 6px 1px rgba(255,55,35,.9); }
-@keyframes hlPulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .85; } 50% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; } }
+/* Маркер целевой мышцы: уголки-фокус (рамка прицела) */
+.m-hl { position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 5; border-radius: 5px;
+  --hc: #ff7a3d; --ht: 2.5px; --hl: 32%;
+  background-image:
+    linear-gradient(var(--hc), var(--hc)), linear-gradient(var(--hc), var(--hc)),
+    linear-gradient(var(--hc), var(--hc)), linear-gradient(var(--hc), var(--hc)),
+    linear-gradient(var(--hc), var(--hc)), linear-gradient(var(--hc), var(--hc)),
+    linear-gradient(var(--hc), var(--hc)), linear-gradient(var(--hc), var(--hc));
+  background-repeat: no-repeat;
+  background-size:
+    var(--hl) var(--ht), var(--ht) var(--hl),
+    var(--hl) var(--ht), var(--ht) var(--hl),
+    var(--hl) var(--ht), var(--ht) var(--hl),
+    var(--hl) var(--ht), var(--ht) var(--hl);
+  background-position:
+    left top, left top, right top, right top,
+    left bottom, left bottom, right bottom, right bottom;
+  filter: drop-shadow(0 0 5px rgba(255,110,40,.9));
+  animation: hlPulse 2s ease-in-out infinite; }
+@keyframes hlPulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .92; } 50% { transform: translate(-50%, -50%) scale(1.06); opacity: 1; } }
 .musclecard-scrim, .muscle-banner-scrim { z-index: 2; }
 .musclecard-info, .muscle-banner-info { z-index: 6; }
 
@@ -1368,3 +1380,28 @@ body {
   padding: 11px 18px; border-radius: 13px; box-shadow: 0 10px 30px rgba(0,0,0,.5); backdrop-filter: blur(8px);
   animation: toastIn .25s ease; max-width: 86%; text-align: center; }
 @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+/* ===== Live-сканер штрихкода ===== */
+.scanner { position: fixed; inset: 0; z-index: 80; background: #000; display: flex; align-items: center; justify-content: center; }
+.scanner-video { width: 100%; height: 100%; object-fit: cover; }
+.scanner-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; pointer-events: none; }
+.scanner-frame { width: 74%; max-width: 320px; height: 150px; border-radius: 18px;
+  box-shadow: 0 0 0 100vmax rgba(0,0,0,.45); border: 2px solid rgba(255,255,255,.9); }
+.scanner-frame::after { content: ''; position: absolute; left: 13%; right: 13%; top: 50%; height: 2px; background: var(--accent);
+  box-shadow: 0 0 12px 2px rgba(255,90,31,.9); animation: scanLine 1.8s ease-in-out infinite; }
+@keyframes scanLine { 0%,100% { transform: translateY(-66px); } 50% { transform: translateY(66px); } }
+.scanner-hint { color: #fff; font-size: 14px; font-weight: 600; text-shadow: 0 1px 6px rgba(0,0,0,.8); position: relative; z-index: 2; }
+.scanner-close { position: absolute; top: 16px; right: 16px; z-index: 3; width: 42px; height: 42px; border-radius: 50%;
+  display: grid; place-items: center; background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.25); color: #fff; }
+.scanner-err { position: absolute; bottom: 60px; left: 16px; right: 16px; text-align: center; color: #fff;
+  background: rgba(220,40,30,.85); padding: 10px 14px; border-radius: 12px; font-size: 13.5px; }
+
+/* ===== Фото-калории ===== */
+.photo-items { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.nut-quick button { padding: 0 6px; font-size: 13px; }
+
+/* ===== Динамика замеров ===== */
+.meas-trend { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 13px; color: var(--muted); }
+.meas-trend b { font-family: 'Unbounded'; font-size: 18px; color: var(--text); }
+.meas-trend b.up { color: #22c55e; }
+.meas-trend b.down { color: #ff6b5a; }

@@ -31,6 +31,8 @@ export const store = {
   setProfile: (p) => write(K.profile, p),
   clearProfile: () => { try { localStorage.removeItem(K.profile) } catch (e) {} },
   clearAll: () => { try { Object.keys(localStorage).filter(k => k.startsWith('pump_')).forEach(k => localStorage.removeItem(k)) } catch (e) {} },
+  exportAll: () => { const o = {}; try { Object.keys(localStorage).filter(k => k.startsWith('pump_')).forEach(k => { o[k] = localStorage.getItem(k) }) } catch (e) {} return o },
+  importAll: (obj) => { try { if (!obj || typeof obj !== 'object') return false; Object.keys(obj).forEach(k => { if (k.indexOf('pump_') === 0) localStorage.setItem(k, typeof obj[k] === 'string' ? obj[k] : JSON.stringify(obj[k])) }); return true } catch (e) { return false } },
 
   getProgress: () => read(K.progress, { workouts: [] }),
   setProgress: (p) => write(K.progress, p),
