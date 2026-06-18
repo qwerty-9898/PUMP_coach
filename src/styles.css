@@ -1619,25 +1619,25 @@ body {
    сдержанный оранжевый акцент, воздух, чистая типографика.
    ============================================================ */
 :root {
-  --bg: #0a0b0d;
-  --bg2: #0e1013;
-  --card: #131519;
-  --card2: #181b20;
-  --line: #23262d;
+  --bg: #101217;
+  --bg2: #15181e;
+  --card: #1a1d24;
+  --card2: #22262f;
+  --line: #2c313c;
   --text: #f4f6f8;
-  --muted: #8b919c;
-  --glass: #131519;
-  --glass2: #181b20;
-  --glassbd: #23262d;
+  --muted: #9aa1ad;
+  --glass: #1a1d24;
+  --glass2: #22262f;
+  --glassbd: #2c313c;
   --glow: none;
 }
 
 body {
-  background: #0a0b0d !important;
+  background: #101217 !important;
   background-attachment: fixed;
 }
 /* фон-манекен почти убран — никакого цветного тумана */
-.app-bg { opacity: .04 !important; filter: grayscale(1) brightness(.4) blur(60px) !important; }
+.app-bg { opacity: .05 !important; filter: grayscale(1) brightness(.5) blur(60px) !important; }
 
 /* Плоские поверхности без блюра и теней */
 .card, .glass, .recovery-card, .insights-card, .ideas-card, .weekcard {
@@ -1648,7 +1648,7 @@ body {
   border-radius: 18px;
 }
 .topbar { background: var(--bg) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-.tabbar { background: rgba(10,11,13,.97) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+.tabbar { background: rgba(16,18,23,.98) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
   border-top: 1px solid var(--line) !important; box-shadow: none !important; }
 
 /* Герои и акцентные блоки → тихие тёмные карточки */
@@ -1680,3 +1680,39 @@ body {
 /* Чуть больше воздуха между блоками */
 .home > *, .screen > * { }
 .card { padding: 16px; }
+
+/* ===== 6 вкладок — компактнее ===== */
+.tabbar .tab { padding-left: 2px; padding-right: 2px; }
+.tabbar .tab span { font-size: 9.5px; letter-spacing: -.01em; }
+
+/* ===== Маршрут дня ===== */
+.route-card { margin-bottom: 14px; }
+.route-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.route-cnt { font-family: 'Unbounded'; font-size: 13px; font-weight: 700; color: var(--accent); }
+.route-row { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; padding: 9px 2px; background: none; border: none; color: var(--text); }
+.route-row + .route-row { border-top: 1px solid var(--line); }
+.route-ic { width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 9px; background: var(--accent-soft); color: var(--accent); }
+.route-l { flex: 1 1 auto; font-size: 14px; font-weight: 600; }
+.route-arr { color: var(--muted); }
+.route-row.done .route-l { color: var(--muted); text-decoration: line-through; }
+.route-row.done .route-ic { background: rgba(52,211,153,.15); color: #34d399; }
+
+/* ===== Быстрая кнопка (FAB) ===== */
+.fab { position: fixed; right: 16px; bottom: calc(74px + env(safe-area-inset-bottom)); z-index: 45; width: 56px; height: 56px; border-radius: 50%;
+  background: var(--accent); color: #0a0b0d; border: none; display: grid; place-items: center; box-shadow: 0 8px 24px rgba(255,90,31,.4);
+  transition: transform .2s; }
+.fab.open { transform: rotate(90deg); background: var(--card2); color: var(--text); }
+.fab:active { transform: scale(.92); }
+.fab-backdrop { position: fixed; inset: 0; z-index: 44; background: rgba(0,0,0,.5); animation: fadeIn .2s; }
+.fab-menu { position: fixed; right: 16px; bottom: calc(140px + env(safe-area-inset-bottom)); z-index: 46; display: flex; flex-direction: column; gap: 8px; animation: fabUp .2s ease; }
+@keyframes fabUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.fab-menu button { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 14px; font-size: 14px; font-weight: 600;
+  background: var(--card2); border: 1px solid var(--line); color: var(--text); box-shadow: 0 6px 20px rgba(0,0,0,.4); }
+.fab-menu button svg { color: var(--accent); }
+
+/* ===== Свернуть/показать инструменты ===== */
+.more-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin: 6px 0 12px;
+  padding: 12px; border-radius: 14px; font-size: 13.5px; font-weight: 600; color: var(--muted);
+  background: var(--card); border: 1px solid var(--line); }
+.more-toggle svg:last-child { margin-left: auto; }
+.more-toggle svg:first-child { color: var(--accent); }

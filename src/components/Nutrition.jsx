@@ -31,6 +31,7 @@ export default function Nutrition({ profile }) {
   const [scoreOpen, setScoreOpen] = useState(false)
   const [photoOpen, setPhotoOpen] = useState(false)
   const [recipesOpen, setRecipesOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const [flash, setFlash] = useState('')
   const refresh = () => setTick(t => t + 1)
   useEffect(() => { const id = setInterval(() => setTick(t => t + 1), 30000); return () => clearInterval(id) }, [])
@@ -234,30 +235,37 @@ export default function Nutrition({ profile }) {
         )
       })}
 
-      {recipeIdeas.length > 0 && (
-        <div className="card ideas-card">
-          <div className="ideas-head">
-            <span className="card-kicker"><Icon name="apple" size={15} /> Идеи под остаток</span>
-            <button className="ideas-all" onClick={() => setRecipesOpen(true)}>Все идеи</button>
-          </div>
-          <div className="ideas-row">
-            {recipeIdeas.slice(0, 3).map(r => (
-              <button className="idea" key={r.id} onClick={() => addRecipe(r, 'Перекус')}>
-                <span className="idea-k">{r.kcal}<small> ккал</small></span>
-                <span className="idea-n">{r.name}</span>
-                <span className="idea-p">Б {r.p} г</span>
-              </button>
-            ))}
-          </div>
+      <button className="more-toggle" onClick={() => setMoreOpen(v => !v)}>
+        <Icon name="grid" size={15} /> {moreOpen ? 'Скрыть инструменты' : 'Вода, голодание, неделя и идеи'}
+        <Icon name={moreOpen ? 'chevron' : 'chevronR'} size={16} />
+      </button>
+
+      {moreOpen && (<>
+        <div className="nut-2col">
+          <WaterMini profile={profile} date={date} onChange={refresh} />
+          <FastingCard onChange={refresh} />
         </div>
-      )}
 
-      <div className="nut-2col">
-        <WaterMini profile={profile} date={date} onChange={refresh} />
-        <FastingCard onChange={refresh} />
-      </div>
+        {recipeIdeas.length > 0 && (
+          <div className="card ideas-card">
+            <div className="ideas-head">
+              <span className="card-kicker"><Icon name="apple" size={15} /> Идеи под остаток</span>
+              <button className="ideas-all" onClick={() => setRecipesOpen(true)}>Все идеи</button>
+            </div>
+            <div className="ideas-row">
+              {recipeIdeas.slice(0, 3).map(r => (
+                <button className="idea" key={r.id} onClick={() => addRecipe(r, 'Перекус')}>
+                  <span className="idea-k">{r.kcal}<small> ккал</small></span>
+                  <span className="idea-n">{r.name}</span>
+                  <span className="idea-p">Б {r.p} г</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
-      <WeekCard week={week} goalKcal={goalKcal} protein={protein} />
+        <WeekCard week={week} goalKcal={goalKcal} protein={protein} />
+      </>)}
 
       {flash && <div className="nut-toast">{flash}</div>}
 

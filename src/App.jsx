@@ -22,15 +22,16 @@ import { initTelegram, tgBackButton, haptic, tgUserName } from './tg.js'
 const TABS = [
   { key: 'home', label: 'Сегодня', icon: 'home' },
   { key: 'workout', label: 'Тренировки', icon: 'dumbbell' },
+  { key: 'catalog', label: 'Каталог', icon: 'catalog' },
   { key: 'nutrition', label: 'Питание', icon: 'nutrition' },
   { key: 'progress', label: 'Прогресс', icon: 'activity' },
   { key: 'more', label: 'Профиль', icon: 'grid' }
 ]
 const SECONDARY = {
-  profile: 'Профиль', catalog: 'Каталог упражнений', water: 'Дневник воды',
+  profile: 'Профиль', water: 'Дневник воды',
   measures: 'Замеры тела', timer: 'Таймер отдыха', calculators: 'Калькуляторы'
 }
-const TAB_TITLE = { workout: 'Тренировки', nutrition: 'Питание', progress: 'Прогресс', more: 'Профиль' }
+const TAB_TITLE = { workout: 'Тренировки', catalog: 'Каталог упражнений', nutrition: 'Питание', progress: 'Прогресс', more: 'Профиль' }
 
 export default function App() {
   const [profile, setProfile] = useState(null)
@@ -40,6 +41,7 @@ export default function App() {
   const [workoutGroup, setWorkoutGroup] = useState(null)
   const [introSeen, setIntroSeen] = useState(() => store.getIntroSeen())
   const [planOpen, setPlanOpen] = useState(false)
+  const [fabOpen, setFabOpen] = useState(false)
 
   useEffect(() => { initTelegram(); setProfile(store.getProfile()) }, [])
 
@@ -52,7 +54,7 @@ export default function App() {
   function submit(p) { store.setProfile(p); setProfile(p); setRoute('home'); setLoading(true); setTimeout(() => setLoading(false), 2600); window.scrollTo(0, 0) }
   function saveProfile(p) { store.setProfile(p); setProfile(p) }
   function restart() { store.clearProfile(); setProfile(null); setRoute('home') }
-  function go(r) { haptic('light'); if (r === 'catalog') setCatGroup(null); if (r === 'workout') setWorkoutGroup(null); setPlanOpen(false); setRoute(r); window.scrollTo(0, 0) }
+  function go(r) { haptic('light'); if (r === 'catalog') setCatGroup(null); if (r === 'workout') setWorkoutGroup(null); setPlanOpen(false); setFabOpen(false); setRoute(r); window.scrollTo(0, 0) }
   function openMuscle(g) { haptic('light'); setCatGroup(g); setRoute('catalog'); window.scrollTo(0, 0) }
   function startGroup(g) { haptic('light'); setWorkoutGroup(g); setPlanOpen(false); setRoute('workout'); window.scrollTo(0, 0) }
   function openPlan() { haptic('light'); setWorkoutGroup(null); setPlanOpen(true); setRoute('workout'); window.scrollTo(0, 0) }
@@ -114,6 +116,20 @@ export default function App() {
           </button>
         ))}
       </nav>
+
+      {!isSecondary && (<>
+        {fabOpen && <div className="fab-backdrop" onClick={() => setFabOpen(false)} />}
+        {fabOpen && (
+          <div className="fab-menu">
+            <button onClick={() => go('workout')}><Icon name="dumbbell" size={18} /> Начать тренировку</button>
+            <button onClick={() => go('nutrition')}><Icon name="apple" size={18} /> Добавить еду</button>
+            <button onClick={() => go('catalog')}><Icon name="book" size={18} /> Каталог</button>
+          </div>
+        )}
+        <button className={'fab' + (fabOpen ? ' open' : '')} onClick={() => setFabOpen(v => !v)} aria-label="Быстрые действия">
+          <Icon name={fabOpen ? 'x' : 'plus'} size={24} />
+        </button>
+      </>)}
     </div>
   )
 }

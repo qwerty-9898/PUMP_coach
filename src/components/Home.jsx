@@ -36,6 +36,14 @@ export default function Home({ profile, go, onMuscle, onTrain, onPlan, userName 
   const eaten = store.getFoodDay(date).reduce((a, e) => a + e.kcal, 0)
   const water = store.getWater()[date] || 0
   const did = store.getProgress().workouts.some(w => w.date === date)
+  const eatenP = store.getFoodDay(date).reduce((a, e) => a + (e.p || 0), 0)
+  const waterGoal = Math.round(profile.weight * 30)
+  const route = [
+    { icon: 'dumbbell', done: did, label: did ? 'Тренировка сделана' : 'Сделай тренировку', go: 'workout' },
+    { icon: 'apple', done: eatenP >= Math.round(n.protein * 0.8), label: eatenP >= Math.round(n.protein * 0.8) ? 'Белок набран' : 'Добери белок · ' + eatenP + '/' + n.protein + ' г', go: 'nutrition' },
+    { icon: 'droplet', done: water >= waterGoal, label: water >= waterGoal ? 'Вода в норме' : 'Попей воды · ' + (water / 1000).toFixed(1) + '/' + (waterGoal / 1000).toFixed(1) + ' л', go: 'water' }
+  ]
+  const routeDone = route.filter(r => r.done).length
 
   const firstRun = store.getProgress().workouts.length === 0
   const map = recoveryMap()
@@ -53,6 +61,20 @@ export default function Home({ profile, go, onMuscle, onTrain, onPlan, userName 
       <div className="greet">
         <span className="greet-k">Сегодня · {weekday}</span>
         <h1 className="display lg">Привет, {userName || 'чемпион'}</h1>
+      </div>
+
+      <div className="card route-card">
+        <div className="route-head">
+          <span className="card-kicker"><Icon name="flag" size={15} /> Маршрут на сегодня</span>
+          <span className="route-cnt">{routeDone}/3</span>
+        </div>
+        {route.map((r, i) => (
+          <button className={'route-row' + (r.done ? ' done' : '')} key={i} onClick={() => go(r.go)}>
+            <span className="route-ic"><Icon name={r.done ? 'check' : r.icon} size={15} /></span>
+            <span className="route-l">{r.label}</span>
+            {!r.done && <Icon name="chevronR" size={16} className="route-arr" />}
+          </button>
+        ))}
       </div>
 
       {firstRun && (
