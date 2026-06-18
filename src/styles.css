@@ -1612,3 +1612,71 @@ body {
 .plan-chip-ic { width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 9px; background: var(--accent-soft); color: var(--accent); }
 .plan-chip-txt { flex: 1 1 auto; font-size: 14px; font-weight: 600; }
 .plan-chip > svg { color: var(--muted); }
+
+/* ============================================================
+   DARK MINIMAL v3 — финальная тема (перекрывает предыдущие слои)
+   Стиль Whoop/Oura: почти-чёрный плоский фон, тихие карточки,
+   сдержанный оранжевый акцент, воздух, чистая типографика.
+   ============================================================ */
+:root {
+  --bg: #0a0b0d;
+  --bg2: #0e1013;
+  --card: #131519;
+  --card2: #181b20;
+  --line: #23262d;
+  --text: #f4f6f8;
+  --muted: #8b919c;
+  --glass: #131519;
+  --glass2: #181b20;
+  --glassbd: #23262d;
+  --glow: none;
+}
+
+body {
+  background: #0a0b0d !important;
+  background-attachment: fixed;
+}
+/* фон-манекен почти убран — никакого цветного тумана */
+.app-bg { opacity: .04 !important; filter: grayscale(1) brightness(.4) blur(60px) !important; }
+
+/* Плоские поверхности без блюра и теней */
+.card, .glass, .recovery-card, .insights-card, .ideas-card, .weekcard {
+  background: var(--card) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  border-radius: 18px;
+}
+.topbar { background: var(--bg) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.tabbar { background: rgba(10,11,13,.97) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  border-top: 1px solid var(--line) !important; box-shadow: none !important; }
+
+/* Герои и акцентные блоки → тихие тёмные карточки */
+.herocard, .dash-hero, .prog-hero {
+  background: var(--card2) !important; border: 1px solid var(--line) !important; box-shadow: none !important; color: var(--text) !important;
+}
+.welcome, .profilecard, .tip2, .plan-cta, .plan-chip, .goalbox, .protein-card {
+  background: var(--card2) !important; border: 1px solid var(--line) !important; box-shadow: none !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+.hero-glow, .dash-glow { display: none !important; }
+
+/* Акцент сдержанно: действие — оранжевая кнопка, всё остальное тихое */
+.cta { box-shadow: none !important; }
+.hero-cta { background: var(--accent) !important; color: #0a0b0d !important; }
+.dash-m { background: rgba(255,255,255,.05) !important; }
+.auto-btn, .guide-btn { box-shadow: none !important; }
+.pd-start { box-shadow: none !important; }
+
+/* Чипы/кольца — мягче неон */
+.m-dot { box-shadow: 0 0 0 1.2px rgba(0,0,0,.5), 0 0 5px 1px rgba(255,46,46,.6) !important; }
+.mr-rings .mring-c svg circle { filter: none; }
+
+/* Типографика: крупные заголовки нормальным регистром, чище кернинг */
+.display { text-transform: none !important; letter-spacing: -.02em !important; }
+.logo, .topbar-title, .hero-name, .muscle-banner-info .display { text-transform: none !important; letter-spacing: -.01em !important; }
+.greet .display { font-weight: 700; }
+
+/* Чуть больше воздуха между блоками */
+.home > *, .screen > * { }
+.card { padding: 16px; }
