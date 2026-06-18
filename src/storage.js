@@ -79,7 +79,15 @@ export const store = {
     return out
   },
   // Полная недельная сводка (ккал + БЖУ по дням)
-  foodWeekFull: (days = 7) => {
+  foodStreak: () => {
+    const all = read(K.food, {})
+    let streak = 0
+    const d = new Date()
+    if (!(all[todayKey(d)] && all[todayKey(d)].length)) d.setDate(d.getDate() - 1)
+    while (all[todayKey(d)] && all[todayKey(d)].length) { streak++; d.setDate(d.getDate() - 1) }
+    return streak
+  },
+    foodWeekFull: (days = 7) => {
     const all = read(K.food, {}); const out = []
     for (let i = days - 1; i >= 0; i--) {
       const d = new Date(); d.setDate(d.getDate() - i); const key = todayKey(d)

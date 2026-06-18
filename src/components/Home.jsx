@@ -38,10 +38,12 @@ export default function Home({ profile, go, onMuscle, onTrain, onPlan, userName 
   const water = store.getWater()[date] || 0
   const did = store.getProgress().workouts.some(w => w.date === date)
   const eatenP = store.getFoodDay(date).reduce((a, e) => a + (e.p || 0), 0)
+  const mg = store.getMacroGoal()
+  const proteinGoal = (mg && mg.p) || n.protein
   const waterGoal = Math.round(profile.weight * 30)
   const route = [
     { icon: 'dumbbell', done: did, label: did ? 'Тренировка сделана' : 'Сделай тренировку', go: 'workout' },
-    { icon: 'apple', done: eatenP >= Math.round(n.protein * 0.8), label: eatenP >= Math.round(n.protein * 0.8) ? 'Белок набран' : 'Добери белок · ' + eatenP + '/' + n.protein + ' г', go: 'nutrition' },
+    { icon: 'apple', done: eatenP >= Math.round(proteinGoal * 0.8), label: eatenP >= Math.round(proteinGoal * 0.8) ? 'Белок набран' : 'Добери белок · ' + eatenP + '/' + proteinGoal + ' г', go: 'nutrition' },
     { icon: 'droplet', done: water >= waterGoal, label: water >= waterGoal ? 'Вода в норме' : 'Попей воды · ' + (water / 1000).toFixed(1) + '/' + (waterGoal / 1000).toFixed(1) + ' л', go: 'water' }
   ]
   const routeDone = route.filter(r => r.done).length

@@ -1773,3 +1773,11 @@ body {
 .empty > svg { background: var(--accent-soft); }
 .empty svg { color: var(--accent); opacity: .85; }
 .empty p { color: var(--muted); }
+
+/* ===== Питание: навигатор дней + стрик ===== */
+.daynav { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.daynav-arr { width: 36px; height: 36px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 11px; background: var(--card); border: 1px solid var(--line); color: var(--text); }
+.daynav-arr:disabled { opacity: .3; }
+.daynav-lbl { flex: 1 1 auto; text-align: center; font-weight: 700; font-size: 14px; text-transform: capitalize; }
+.daynav-streak { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 6px 11px; border-radius: 20px; }
+.daynav-today { flex: 0 0 auto; font-size: 12.5px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border: 1px solid rgba(255,90,31,.4); border-radius: 10px; padding: 7px 11px; }

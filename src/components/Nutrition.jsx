@@ -18,11 +18,14 @@ const MEALS = [
 ]
 const byId = Object.fromEntries(FOODS.map(f => [f.id, f]))
 const FAST_WINDOWS = [16, 18, 14]
-function yesterdayKey() { const d = new Date(); d.setDate(d.getDate() - 1); return todayKey(d) }
+function shiftKey(dateStr, delta) { const d = new Date(dateStr); d.setDate(d.getDate() + delta); return todayKey(d) }
+function fmtDay(dateStr) { return new Date(dateStr).toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' }) }
 
 export default function Nutrition({ profile }) {
   const auto = calcNutrition(profile)
-  const date = todayKey()
+  const today = todayKey()
+  const [date, setDate] = useState(today)
+  const fstreak = store.foodStreak()
   const [tick, setTick] = useState(0)
   const [addMeal, setAddMeal] = useState(null)
   const [editUid, setEditUid] = useState(null)
@@ -80,9 +83,9 @@ export default function Nutrition({ profile }) {
   }
   function remove(uid) { store.removeFood(date, uid); refresh() }
   function repeatDay(meal) {
-    const n = store.copyFood(yesterdayKey(), date, meal || null)
-    if (n) { toast(meal ? 'Перенёс «' + meal + '» из вчера' : 'Перенёс вчерашний день: ' + n + ' поз.'); refresh() }
-    else toast(meal ? 'Вчера в «' + meal + '» пусто' : 'Вчера записей нет')
+    const n = store.copyFood(shiftKey(date, -1), date, meal || null)
+    if (n) { toast(meal ? 'Перенёс «' + meal + '» из пред. дня' : 'Перенёс предыдущий день: ' + n + ' поз.'); refresh() }
+    else toast(meal ? 'В пред. дне «' + meal + '» пусто' : 'В предыдущем дне записей нет')
   }
 
   function addRecipe(r, meal) {
@@ -119,6 +122,14 @@ export default function Nutrition({ profile }) {
 
   return (
     <div className="screen">
+      <div className="daynav">
+        <button className="daynav-arr" onClick={() => setDate(shiftKey(date, -1))} aria-label="Назад"><Icon name="back" size={18} /></button>
+        <span className="daynav-lbl">{date === today ? 'Сегодня' : fmtDay(date)}</span>
+        <button className="daynav-arr" onClick={() => setDate(shiftKey(date, 1))} disabled={date >= today} aria-label="Вперёд"><Icon name="chevronR" size={18} /></button>
+        {fstreak > 0 && <span className="daynav-streak"><Icon name="flame" size={13} /> {fstreak}</span>}
+        {date !== today && <button className="daynav-today" onClick={() => setDate(today)}>Сегодня</button>}
+      </div>
+
       {/* Кольцо + баланс + score */}
       <div className="card nuthero">
         <NutritionRing eaten={eaten.kcal} goal={goalKcal} p={[eaten.p, protein]} c={[eaten.c, carbs]} f={[eaten.f, fat]} />
