@@ -26,6 +26,7 @@ export default function Home({ profile, go, onMuscle, onTrain, onPlan, userName 
   const date = todayKey()
   const [tipIdx, setTipIdx] = useState(() => new Date().getMinutes() % TIPS.length)
   const [sheetG, setSheetG] = useState(null)
+  const [moreH, setMoreH] = useState(false)
   useEffect(() => {
     const id = setInterval(() => setTipIdx(i => (i + 1) % TIPS.length), 120000)
     return () => clearInterval(id)
@@ -167,22 +168,29 @@ export default function Home({ profile, go, onMuscle, onTrain, onPlan, userName 
         )}
       </div>
 
-      <div className="quick2">
-        <button className="quickcard" onClick={() => go('catalog')}>
-          <Icon name="book" size={22} /><span>Каталог<br /><small>техника упражнений</small></span>
-        </button>
-        <button className="quickcard" onClick={() => go('more')}>
-          <Icon name="grid" size={22} /><span>Инструменты<br /><small>вода, замеры, таймер</small></span>
-        </button>
-      </div>
+      <button className="more-toggle" onClick={() => setMoreH(v => !v)}>
+        <Icon name="grid" size={15} /> {moreH ? 'Скрыть' : 'Инструменты и совет дня'}
+        <Icon name={moreH ? 'chevron' : 'chevronR'} size={16} />
+      </button>
 
-      <div className="tip2">
-        <div className="tip2-head">
-          <span className="tip2-ic"><Icon name="bolt" size={16} /></span>
-          <span className="tip2-kicker">Совет дня</span>
+      {moreH && (<>
+        <div className="quick2">
+          <button className="quickcard" onClick={() => go('catalog')}>
+            <Icon name="book" size={22} /><span>Каталог<br /><small>техника упражнений</small></span>
+          </button>
+          <button className="quickcard" onClick={() => go('more')}>
+            <Icon name="grid" size={22} /><span>Инструменты<br /><small>вода, замеры, таймер</small></span>
+          </button>
         </div>
-        <p key={tipIdx} className="tip2-text tip-anim">{TIPS[tipIdx]}</p>
-      </div>
+
+        <div className="tip2">
+          <div className="tip2-head">
+            <span className="tip2-ic"><Icon name="bolt" size={16} /></span>
+            <span className="tip2-kicker">Совет дня</span>
+          </div>
+          <p key={tipIdx} className="tip2-text tip-anim">{TIPS[tipIdx]}</p>
+        </div>
+      </>)}
 
       {sheetG && (() => {
         const m = map.find(x => x.group === sheetG)
