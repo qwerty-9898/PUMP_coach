@@ -1749,3 +1749,27 @@ body {
 .ps-row > div { text-align: center; background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 13px; padding: 11px 6px; }
 .ps-row b { font-family: 'Unbounded'; font-size: 18px; display: block; }
 .ps-row span { font-size: 10.5px; color: var(--muted); }
+
+/* ===== Цель по весу (Профиль) ===== */
+.goalw-card { border: 1px solid rgba(255,90,31,.30) !important; box-shadow: 0 0 0 1px rgba(255,90,31,.05), 0 6px 26px rgba(255,90,31,.10) !important; background: linear-gradient(180deg, rgba(255,90,31,.055), var(--card2)) !important; }
+.goalw-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.goalw-set { font-size: 12.5px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border: 1px solid rgba(255,90,31,.4); border-radius: 10px; padding: 6px 12px; }
+.goalw-nums { display: flex; align-items: center; justify-content: center; gap: 22px; }
+.goalw-nums > div { text-align: center; }
+.goalw-nums b { font-family: 'Unbounded'; font-size: 30px; line-height: 1; display: block; }
+.goalw-nums span { font-size: 11px; color: var(--muted); }
+.goalw-arrow { color: var(--muted); }
+.goalw-rem { display: block; text-align: center; margin-top: 12px; font-size: 13.5px; font-weight: 700; color: var(--accent2); }
+
+/* ===== Полировка: анкета онбординга под минимал+акцент ===== */
+.wizard .pill.on, .wizard .optcard.on { color: #fff !important; box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(255,90,31,.20); }
+.wizard .optcard.on { background: linear-gradient(180deg, rgba(255,90,31,.10), var(--card2)) !important; }
+.wdot.done { background: var(--accent) !important; box-shadow: 0 0 6px rgba(255,90,31,.55); }
+.wiz-q .display { letter-spacing: -.02em; }
+.seg-btn.on { color: #0a0b0d !important; }
+
+/* ===== Полировка: пустые состояния под минимал ===== */
+.empty { background: linear-gradient(180deg, rgba(255,90,31,.04), var(--card)) !important; border: 1px solid var(--line) !important; padding: 34px 22px; }
+.empty > svg { background: var(--accent-soft); }
+.empty svg { color: var(--accent); opacity: .85; }
+.empty p { color: var(--muted); }

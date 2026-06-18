@@ -18,7 +18,8 @@ const K = {
   photos: 'pump_photos_v1',
   macros: 'pump_macros_v1',
   mealtpl: 'pump_mealtpl_v1',
-  intro: 'pump_intro_v1'
+  intro: 'pump_intro_v1',
+  goalweight: 'pump_goalweight_v1'
 }
 
 function read(key, fallback) {
@@ -111,6 +112,8 @@ export const store = {
   getKcalGoal: () => read(K.kcalgoal, null),
   setKcalGoal: (n) => write(K.kcalgoal, n),
   getIntroSeen: () => read(K.intro, false),
+  getGoalWeight: () => read(K.goalweight, null),
+  setGoalWeight: (n) => write(K.goalweight, n),
   setIntroSeen: (v) => write(K.intro, !!v),
   getMacroGoal: () => read(K.macros, null),
   setMacroGoal: (m) => write(K.macros, m),
