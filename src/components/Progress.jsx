@@ -6,7 +6,7 @@ import { EXERCISES, GROUPS, GROUP_META } from '../engine/exercises.js'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store, calcStreak, calcWeekStreak } from '../storage.js'
 import { shareText } from '../tg.js'
-import { allRecords, exSeries, weeklyVolume } from '../engine/progress.js'
+import { allRecords, exSeries, weeklyVolume, volumeByGroup, bodyBalance } from '../engine/progress.js'
 import { coverageMap } from '../engine/recovery.js'
 import { achievements } from '../engine/achievements.js'
 
@@ -38,6 +38,12 @@ export default function Progress({ profile }) {
   const sessions30 = store.getProgress().workouts.filter(w => new Date(w.date) >= d30).length
   const medals = achievements()
   const earned = medals.filter(m => m.earned).length
+  const volG = volumeByGroup(30)
+  const volMax = Math.max(1, ...GROUPS.map(g => volG[g] || 0))
+  const balance = bodyBalance(30)
+  const weightSeries = store.getMeasures().filter(m => m.weight != null).map(m => m.weight)
+  const kcalWeek = store.foodWeekFull(7)
+  const vt = (x) => x >= 1000 ? (x / 1000).toFixed(1) + 'т' : Math.round(x)
 
   const recId = store.getActiveProgram() || recommendProgram(profile)
   const program = PROGRAMS.find(p => p.id === recId)
@@ -156,6 +162,46 @@ export default function Progress({ profile }) {
               <div className="card">
                 <span className="card-kicker" style={{ marginBottom: 12, display: 'inline-flex' }}><Icon name="bolt" size={15} /> Тоннаж по неделям (кг)</span>
                 <SparkChart data={wv.map(w => w.vol)} color="#3b82f6" />
+              </div>
+            )}
+            {Object.keys(volG).length > 0 && (
+              <div className="card">
+                <span className="card-kicker" style={{ marginBottom: 12, display: 'inline-flex' }}><Icon name="bolt" size={15} /> Объём по группам (30 дней)</span>
+                <div className="mr-rings">
+                  {GROUPS.map(g => (
+                    <MiniRing key={g} pct={(volG[g] || 0) / volMax} color={GROUP_META[g].color} center={vt(volG[g] || 0)} label={GROUP_META[g].label} dim={!volG[g]} />
+                  ))}
+                </div>
+              </div>
+            )}
+            {balance.total > 0 && (
+              <div className="card">
+                <span className="card-kicker" style={{ marginBottom: 12, display: 'inline-flex' }}><Icon name="activity" size={15} /> Баланс тела (30 дней)</span>
+                <div className="bal-list">
+                  {[['Толкающие', 'push', '#ff5a1f'], ['Тянущие', 'pull', '#3b82f6'], ['Ноги', 'legs', '#22c55e']].map(([lbl, key, c]) => {
+                    const pct = Math.round(balance[key] / balance.total * 100)
+                    return (
+                      <div className="bal-row" key={key}>
+                        <span className="bal-l">{lbl}</span>
+                        <span className="bal-bar"><i style={{ width: pct + '%', background: c }} /></span>
+                        <span className="bal-v">{pct}%</span>
+                      </div>
+                    )
+                  })}
+                </div>
+                <p className="bal-hint">Держи толкающие и тянущие примерно вровень, а ноги — не меньше трети объёма.</p>
+              </div>
+            )}
+            {weightSeries.length >= 2 && (
+              <div className="card">
+                <span className="card-kicker" style={{ marginBottom: 12, display: 'inline-flex' }}><Icon name="activity" size={15} /> Тренд веса тела (кг)</span>
+                <SparkChart data={weightSeries} unit=" кг" color="#a855f7" />
+              </div>
+            )}
+            {kcalWeek.some(d => d.kcal > 0) && (
+              <div className="card">
+                <span className="card-kicker" style={{ marginBottom: 12, display: 'inline-flex' }}><Icon name="flame" size={15} /> Калории за 7 дней</span>
+                <SparkChart data={kcalWeek.map(d => d.kcal)} color="#ff5a1f" />
               </div>
             )}
           </>

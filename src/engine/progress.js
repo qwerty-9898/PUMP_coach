@@ -63,3 +63,24 @@ export function isPR(exId, w, r) {
   const pr = personalRecord(exId)
   return !pr || e1rm(w, r) > pr.e1rm
 }
+
+// Тоннаж (кг) по группам за N дней — для аналитики объёма.
+export function volumeByGroup(days = 30) {
+  const since = Date.now() - days * 86400000
+  const v = {}
+  for (const l of store.getLogs()) {
+    if (new Date(l.date).getTime() < since) continue
+    const t = l.sets.reduce((s, x) => s + (x.w || 0) * (x.r || 0), 0)
+    if (l.group) v[l.group] = (v[l.group] || 0) + t
+  }
+  return v
+}
+
+// Баланс тела: толкающие / тянущие / ноги (по тоннажу за N дней).
+export function bodyBalance(days = 30) {
+  const v = volumeByGroup(days)
+  const push = (v['грудь'] || 0) + (v['плечи'] || 0) + (v['трицепс'] || 0)
+  const pull = (v['спина'] || 0) + (v['бицепс'] || 0)
+  const legs = v['ноги'] || 0
+  return { push, pull, legs, total: push + pull + legs }
+}

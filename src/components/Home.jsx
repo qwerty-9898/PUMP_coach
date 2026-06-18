@@ -21,7 +21,7 @@ const TIPS = [
 ]
 const PLACE = { gym: 'в зале', dumbbell: 'дома с гантелями', none: 'без инвентаря' }
 
-export default function Home({ profile, go, onMuscle, onTrain, userName }) {
+export default function Home({ profile, go, onMuscle, onTrain, onPlan, userName }) {
   const n = calcNutrition(profile)
   const date = todayKey()
   const [tipIdx, setTipIdx] = useState(() => new Date().getMinutes() % TIPS.length)
@@ -79,6 +79,12 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
           <span>{did ? 'Добить ещё раз' : 'Начать тренировку'}</span>
           <Icon name="arrow" size={20} />
         </div>
+      </button>
+
+      <button className="plan-chip" onClick={() => (onPlan ? onPlan() : go('workout'))}>
+        <span className="plan-chip-ic"><Icon name="flag" size={15} /></span>
+        <span className="plan-chip-txt">План на 4 недели</span>
+        <Icon name="chevronR" size={16} />
       </button>
 
       <CalendarStrip profile={profile} go={go} />

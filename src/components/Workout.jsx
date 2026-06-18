@@ -7,10 +7,10 @@ import Icon from './Icon.jsx'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store } from '../storage.js'
 
-export default function Workout({ profile, initialGroup }) {
+export default function Workout({ profile, initialGroup, initialPlan }) {
   const recommended = recommendProgram(profile)
   const [programId, setProgramId] = useState(() => store.getActiveProgram() || null)
-  const [showPlan, setShowPlan] = useState(false)
+  const [showPlan, setShowPlan] = useState(!!initialPlan)
   const [dayGroups, setDayGroups] = useState(null)
   const program = PROGRAMS.find(p => p.id === programId)
   function select(id) { store.setActiveProgram(id); setProgramId(id) }

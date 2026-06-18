@@ -17,7 +17,8 @@ const K = {
   routines: 'pump_routines_v1',
   photos: 'pump_photos_v1',
   macros: 'pump_macros_v1',
-  mealtpl: 'pump_mealtpl_v1'
+  mealtpl: 'pump_mealtpl_v1',
+  intro: 'pump_intro_v1'
 }
 
 function read(key, fallback) {
@@ -109,6 +110,8 @@ export const store = {
   removeDish: (id) => { const a = read(K.dishes, []).filter(d => d.id !== id); write(K.dishes, a); return a },
   getKcalGoal: () => read(K.kcalgoal, null),
   setKcalGoal: (n) => write(K.kcalgoal, n),
+  getIntroSeen: () => read(K.intro, false),
+  setIntroSeen: (v) => write(K.intro, !!v),
   getMacroGoal: () => read(K.macros, null),
   setMacroGoal: (m) => write(K.macros, m),
   getMealTemplates: () => read(K.mealtpl, []),

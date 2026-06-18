@@ -1581,3 +1581,34 @@ body {
 .rcp-macro { flex: 0 0 auto; text-align: right; }
 .rcp-macro b { font-family: 'Unbounded'; font-size: 15px; color: var(--accent2); display: block; }
 .rcp-macro span { font-size: 11px; color: var(--muted); }
+
+/* ===== Баланс тела ===== */
+.bal-list { display: flex; flex-direction: column; gap: 11px; }
+.bal-row { display: flex; align-items: center; gap: 10px; }
+.bal-l { flex: 0 0 80px; font-size: 13px; font-weight: 600; }
+.bal-bar { flex: 1 1 auto; height: 9px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden; }
+.bal-bar i { display: block; height: 100%; border-radius: 6px; transition: width .5s ease; }
+.bal-v { flex: 0 0 auto; font-family: 'Unbounded'; font-size: 13px; font-weight: 700; min-width: 38px; text-align: right; }
+.bal-hint { font-size: 12px; color: var(--muted); margin: 12px 0 0; line-height: 1.4; }
+
+/* ===== Онбординг-слайды ===== */
+.intro { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+  padding: 40px 26px calc(40px + env(safe-area-inset-bottom)); position: relative; }
+.intro-skip { position: absolute; top: 18px; right: 18px; font-size: 13px; color: var(--muted); background: none; border: none; }
+.intro-body { flex: 0 1 auto; display: flex; flex-direction: column; align-items: center; max-width: 360px; }
+.intro-ic { width: 84px; height: 84px; border-radius: 26px; display: grid; place-items: center; color: var(--accent);
+  background: var(--accent-soft); border: 1px solid rgba(255,90,31,.35); box-shadow: 0 10px 40px rgba(255,90,31,.25); }
+.intro-text { font-size: 15.5px; color: var(--muted); line-height: 1.5; margin-top: 12px; }
+.intro-dots { display: flex; gap: 8px; margin: 30px 0 22px; }
+.intro-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.18); transition: all .25s; }
+.intro-dot.on { width: 22px; border-radius: 5px; background: var(--accent); }
+.intro .cta { max-width: 360px; }
+
+/* ===== Главная: чип плана на 4 недели ===== */
+.plan-chip { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; margin: 10px 0 2px;
+  background: var(--glass, var(--card)); border: 1px solid var(--line); border-radius: 14px; padding: 11px 13px; color: var(--text);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.plan-chip:active { transform: scale(.99); }
+.plan-chip-ic { width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 9px; background: var(--accent-soft); color: var(--accent); }
+.plan-chip-txt { flex: 1 1 auto; font-size: 14px; font-weight: 600; }
+.plan-chip > svg { color: var(--muted); }

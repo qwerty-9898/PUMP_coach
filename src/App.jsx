@@ -12,6 +12,7 @@ import Measures from './components/Measures.jsx'
 import Timer from './components/Timer.jsx'
 import Calculators from './components/Calculators.jsx'
 import Loader from './components/Loader.jsx'
+import WelcomeSlides from './components/WelcomeSlides.jsx'
 import Icon from './components/Icon.jsx'
 import NavIcon from './components/NavIcon.jsx'
 import bgBody from './assets/skeleton/muscle_front.png'
@@ -37,6 +38,8 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [catGroup, setCatGroup] = useState(null)
   const [workoutGroup, setWorkoutGroup] = useState(null)
+  const [introSeen, setIntroSeen] = useState(() => store.getIntroSeen())
+  const [planOpen, setPlanOpen] = useState(false)
 
   useEffect(() => { initTelegram(); setProfile(store.getProfile()) }, [])
 
@@ -49,9 +52,10 @@ export default function App() {
   function submit(p) { store.setProfile(p); setProfile(p); setRoute('home'); setLoading(true); setTimeout(() => setLoading(false), 2600); window.scrollTo(0, 0) }
   function saveProfile(p) { store.setProfile(p); setProfile(p) }
   function restart() { store.clearProfile(); setProfile(null); setRoute('home') }
-  function go(r) { haptic('light'); if (r === 'catalog') setCatGroup(null); if (r === 'workout') setWorkoutGroup(null); setRoute(r); window.scrollTo(0, 0) }
+  function go(r) { haptic('light'); if (r === 'catalog') setCatGroup(null); if (r === 'workout') setWorkoutGroup(null); setPlanOpen(false); setRoute(r); window.scrollTo(0, 0) }
   function openMuscle(g) { haptic('light'); setCatGroup(g); setRoute('catalog'); window.scrollTo(0, 0) }
-  function startGroup(g) { haptic('light'); setWorkoutGroup(g); setRoute('workout'); window.scrollTo(0, 0) }
+  function startGroup(g) { haptic('light'); setWorkoutGroup(g); setPlanOpen(false); setRoute('workout'); window.scrollTo(0, 0) }
+  function openPlan() { haptic('light'); setWorkoutGroup(null); setPlanOpen(true); setRoute('workout'); window.scrollTo(0, 0) }
 
   if (loading) return <div className="app"><Loader /></div>
 
@@ -64,9 +68,13 @@ export default function App() {
     )
   }
 
+  if (!introSeen) {
+    return <div className="app"><WelcomeSlides onDone={() => { store.setIntroSeen(true); setIntroSeen(true); window.scrollTo(0, 0) }} /></div>
+  }
+
   const screens = {
-    home: <Home profile={profile} go={go} onMuscle={openMuscle} onTrain={startGroup} userName={tgUserName()} />,
-    workout: <Workout key={workoutGroup || 'w'} profile={profile} initialGroup={workoutGroup} />,
+    home: <Home profile={profile} go={go} onMuscle={openMuscle} onTrain={startGroup} onPlan={openPlan} userName={tgUserName()} />,
+    workout: <Workout key={(workoutGroup || 'w') + (planOpen ? '|plan' : '')} profile={profile} initialGroup={workoutGroup} initialPlan={planOpen} />,
     catalog: <Catalog key={catGroup || 'all'} initialGroup={catGroup} />,
     progress: <Progress profile={profile} />,
     more: <More go={go} profile={profile} userName={tgUserName()} />,
