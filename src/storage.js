@@ -15,7 +15,9 @@ const K = {
   active: 'pump_active_v1',
   fast: 'pump_fast_v1',
   routines: 'pump_routines_v1',
-  photos: 'pump_photos_v1'
+  photos: 'pump_photos_v1',
+  macros: 'pump_macros_v1',
+  mealtpl: 'pump_mealtpl_v1'
 }
 
 function read(key, fallback) {
@@ -107,6 +109,11 @@ export const store = {
   removeDish: (id) => { const a = read(K.dishes, []).filter(d => d.id !== id); write(K.dishes, a); return a },
   getKcalGoal: () => read(K.kcalgoal, null),
   setKcalGoal: (n) => write(K.kcalgoal, n),
+  getMacroGoal: () => read(K.macros, null),
+  setMacroGoal: (m) => write(K.macros, m),
+  getMealTemplates: () => read(K.mealtpl, []),
+  addMealTemplate: (tpl) => { const a = read(K.mealtpl, []); a.unshift({ ...tpl, id: 't' + Date.now() }); write(K.mealtpl, a.slice(0, 30)); return a.slice(0, 30) },
+  removeMealTemplate: (id) => { const a = read(K.mealtpl, []).filter(x => x.id !== id); write(K.mealtpl, a); return a },
   getActiveProgram: () => read(K.active, null),
   setActiveProgram: (id) => write(K.active, id),
   getFast: () => read(K.fast, null),

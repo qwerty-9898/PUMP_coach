@@ -1541,3 +1541,43 @@ body {
 .mring-v { position: absolute; inset: 0; display: grid; place-items: center; font-family: 'Unbounded'; font-size: 13px; font-weight: 700; }
 .mring-l { font-size: 11px; font-weight: 600; text-align: center; line-height: 1.05; }
 .mring-sub { font-size: 9.5px; color: var(--muted); margin-top: -2px; }
+
+/* ===== Цели БЖУ (свои) ===== */
+.goal-grid { display: flex; gap: 8px; margin: 4px 0 8px; }
+.goal-grid .gg { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.goal-grid .gg span { font-size: 11px; color: var(--muted); }
+.goal-grid .gg input { width: 100%; height: 42px; text-align: center; border-radius: 12px; background: var(--card2, #1d222c);
+  border: 1px solid var(--line); color: var(--text); font-size: 16px; font-family: 'Unbounded'; }
+.goal-hint { display: block; font-size: 11.5px; color: var(--muted); margin-bottom: 10px; }
+
+/* ===== Инсайты дня ===== */
+.insights-card { margin-bottom: 4px; }
+.insight { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; line-height: 1.4; padding: 9px 11px; border-radius: 12px; margin-top: 8px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+.insight svg { flex: 0 0 auto; margin-top: 2px; }
+.insight.good { color: #cfe7d6; } .insight.good svg { color: #34d27b; }
+.insight.warn { color: #ffd9c2; } .insight.warn svg { color: #ff8a3d; }
+.insight.info { color: var(--text); } .insight.info svg { color: #6db9ff; }
+
+/* ===== Идеи под остаток ===== */
+.ideas-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.ideas-all { font-size: 12.5px; font-weight: 600; color: var(--accent); background: none; border: none; }
+.ideas-row { display: flex; gap: 8px; }
+.idea { flex: 1; display: flex; flex-direction: column; gap: 3px; text-align: left; padding: 11px 10px; border-radius: 13px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--line); color: var(--text); }
+.idea:active { transform: scale(.98); }
+.idea-k { font-family: 'Unbounded'; font-size: 16px; font-weight: 700; color: var(--accent2); }
+.idea-k small { font-size: 9.5px; color: var(--muted); font-family: 'Rubik'; }
+.idea-n { font-size: 12px; font-weight: 600; line-height: 1.15; }
+.idea-p { font-size: 10.5px; color: var(--muted); }
+
+/* ===== Рецепты-шит ===== */
+.rcp-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; max-height: 52vh; overflow-y: auto; }
+.rcp-row { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 11px 12px; border-radius: 13px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--line); color: var(--text); }
+.rcp-main { flex: 1 1 auto; min-width: 0; }
+.rcp-name { display: block; font-size: 14px; font-weight: 700; }
+.rcp-ingr { display: block; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.rcp-macro { flex: 0 0 auto; text-align: right; }
+.rcp-macro b { font-family: 'Unbounded'; font-size: 15px; color: var(--accent2); display: block; }
+.rcp-macro span { font-size: 11px; color: var(--muted); }

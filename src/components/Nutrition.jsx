@@ -4,6 +4,8 @@ import SparkChart from './SparkChart.jsx'
 import { calcNutrition } from '../engine/nutrition.js'
 import { FOODS, searchFoods, macrosFor } from '../data/foods.js'
 import { dayScore } from '../engine/foodscore.js'
+import { dayInsights } from '../engine/insights.js'
+import { suggestRecipes } from '../data/recipes.js'
 import { searchOFF, productByBarcode } from '../engine/offapi.js'
 import { store, todayKey } from '../storage.js'
 import BarcodeScanner from './BarcodeScanner.jsx'
@@ -28,14 +30,17 @@ export default function Nutrition({ profile }) {
   const [scanOpen, setScanOpen] = useState(false)
   const [scoreOpen, setScoreOpen] = useState(false)
   const [photoOpen, setPhotoOpen] = useState(false)
+  const [recipesOpen, setRecipesOpen] = useState(false)
   const [flash, setFlash] = useState('')
   const refresh = () => setTick(t => t + 1)
   useEffect(() => { const id = setInterval(() => setTick(t => t + 1), 30000); return () => clearInterval(id) }, [])
   function toast(msg) { setFlash(msg); setTimeout(() => setFlash(''), 2200) }
 
   const override = store.getKcalGoal()
+  const mg = store.getMacroGoal()
   const goalKcal = override || auto.kcal
-  const protein = auto.protein, fat = auto.fat
+  const protein = (mg && mg.p) || auto.protein
+  const fat = (mg && mg.f) || auto.fat
   const carbs = Math.max(0, Math.round((goalKcal - protein * 4 - fat * 9) / 4))
 
   const entries = store.getFoodDay(date)
@@ -46,6 +51,8 @@ export default function Nutrition({ profile }) {
   const remaining = goalKcal - eaten.kcal + burned
   const week = store.foodWeekFull(7)
   const score = dayScore(eaten, { kcal: goalKcal, protein })
+  const insights = dayInsights(eaten, { kcal: goalKcal, protein, fat, carbs })
+  const recipeIdeas = suggestRecipes(remaining, protein - eaten.p, profile.goal, 6)
 
   function addEntry(food, grams, meal) {
     const base = macrosFor(food, grams)
@@ -77,6 +84,26 @@ export default function Nutrition({ profile }) {
     else toast(meal ? 'Вчера в «' + meal + '» пусто' : 'Вчера записей нет')
   }
 
+  function addRecipe(r, meal) {
+    const base = { kcal: r.kcal, p: r.p, f: r.f, c: r.c }
+    store.addFood(date, { foodId: null, name: r.name, grams: 0, meal, qty: 1, base, ...base })
+    setRecipesOpen(false); toast('Добавлено: ' + r.name); refresh()
+  }
+  function saveMealTemplate(mealKey) {
+    const list = store.getFoodDay(date).filter(e => e.meal === mealKey)
+    if (!list.length) { toast('В «' + mealKey + '» пусто'); return }
+    const name = window.prompt('Название шаблона:', mealKey)
+    if (!name) return
+    store.addMealTemplate({ name, items: list.map(e => ({ name: e.name, grams: e.grams, kcal: e.kcal, p: e.p, f: e.f, c: e.c, foodId: e.foodId, qty: e.qty })) })
+    toast('Шаблон сохранён')
+  }
+  function addTemplate(tpl, meal) {
+    tpl.items.forEach(it => {
+      const base = { kcal: it.kcal, p: it.p, f: it.f, c: it.c }
+      store.addFood(date, { foodId: it.foodId || null, name: it.name, grams: it.grams || 0, meal, qty: it.qty || 1, base, ...base })
+    })
+    setAddMeal(null); toast('Добавлен шаблон: ' + tpl.name); refresh()
+  }
   function addPhotoItems(items, meal) {
     items.forEach(it => {
       const base = { kcal: it.kcal, p: it.p, f: it.f, c: it.c }
@@ -85,7 +112,7 @@ export default function Nutrition({ profile }) {
     setPhotoOpen(false); toast('Добавлено по фото: ' + items.length + ' поз.'); refresh()
   }
 
-  if (addMeal) return <AddPanel meal={addMeal} onAdd={addEntry} onAddDish={addDishEntry} onManual={addManual} onClose={() => setAddMeal(null)} onChange={refresh} />
+  if (addMeal) return <AddPanel meal={addMeal} onAdd={addEntry} onAddDish={addDishEntry} onManual={addManual} onAddTemplate={addTemplate} onClose={() => setAddMeal(null)} onChange={refresh} />
 
   const editEntry = editUid ? entries.find(e => e.uid === editUid) : null
 
@@ -112,13 +139,23 @@ export default function Nutrition({ profile }) {
 
       {editGoal && (
         <div className="goalbox">
-          <span className="flabel">Цель калорий в день</span>
-          <div className="goal-row">
-            <input type="number" inputMode="numeric" defaultValue={goalKcal} id="goalInput" />
-            <button className="cta sm" onClick={() => { const v = Number(document.getElementById('goalInput').value); store.setKcalGoal(v > 0 ? v : null); setEditGoal(false); refresh() }}>ОК</button>
+          <span className="flabel">Свои цели на день</span>
+          <div className="goal-grid">
+            <label className="gg"><span>Ккал</span><input type="number" inputMode="numeric" defaultValue={goalKcal} id="gKcal" /></label>
+            <label className="gg"><span>Белки, г</span><input type="number" inputMode="numeric" defaultValue={protein} id="gP" /></label>
+            <label className="gg"><span>Жиры, г</span><input type="number" inputMode="numeric" defaultValue={fat} id="gF" /></label>
           </div>
-          <button className="textlink" onClick={() => { store.setKcalGoal(null); setEditGoal(false); refresh() }}>
-            <Icon name="refresh" size={13} /> Авто ({auto.kcal} ккал под цель «{profile.goal}»)
+          <span className="goal-hint">Углеводы посчитаются автоматически из калорий и БЖУ.</span>
+          <button className="cta sm" onClick={() => {
+            const k = Number(document.getElementById('gKcal').value)
+            const pp = Number(document.getElementById('gP').value)
+            const ff = Number(document.getElementById('gF').value)
+            store.setKcalGoal(k > 0 ? k : null)
+            store.setMacroGoal((pp > 0 || ff > 0) ? { p: pp || auto.protein, f: ff || auto.fat } : null)
+            setEditGoal(false); refresh()
+          }}>Сохранить цели</button>
+          <button className="textlink" onClick={() => { store.setKcalGoal(null); store.setMacroGoal(null); setEditGoal(false); refresh() }}>
+            <Icon name="refresh" size={13} /> Авто под цель «{profile.goal}» ({auto.kcal} ккал)
           </button>
         </div>
       )}
@@ -137,6 +174,15 @@ export default function Nutrition({ profile }) {
         <Leg label="Углеводы" v={eaten.c} g={carbs} color="#f59e0b" />
         <Leg label="Жиры" v={eaten.f} g={fat} color="#ec4899" />
       </div>
+
+      {insights.length > 0 && (
+        <div className="card insights-card">
+          <span className="card-kicker" style={{ marginBottom: 10, display: 'inline-flex' }}><Icon name="bolt" size={15} /> Инсайты дня</span>
+          {insights.map((it, i) => (
+            <div className={'insight ' + it.tone} key={i}><Icon name={it.tone === 'good' ? 'check' : 'info'} size={14} /> {it.text}</div>
+          ))}
+        </div>
+      )}
 
       {/* Быстрые действия */}
       <div className="nut-quick">
@@ -159,6 +205,7 @@ export default function Nutrition({ profile }) {
                 <span className="mb-target">{sum} / {target} ккал</span>
               </div>
               <div className="mb-acts">
+                {list.length > 0 && <button className="mb-rep" onClick={() => saveMealTemplate(meal.key)} aria-label="Сохранить как шаблон"><Icon name="star" size={15} /></button>}
                 <button className="mb-rep" onClick={() => repeatDay(meal.key)} aria-label="Повторить вчерашний приём"><Icon name="refresh" size={15} /></button>
                 <button className="addbtn" onClick={() => setAddMeal(meal.key)} aria-label="Добавить"><Icon name="plus" size={18} /></button>
               </div>
@@ -187,6 +234,24 @@ export default function Nutrition({ profile }) {
         )
       })}
 
+      {recipeIdeas.length > 0 && (
+        <div className="card ideas-card">
+          <div className="ideas-head">
+            <span className="card-kicker"><Icon name="apple" size={15} /> Идеи под остаток</span>
+            <button className="ideas-all" onClick={() => setRecipesOpen(true)}>Все идеи</button>
+          </div>
+          <div className="ideas-row">
+            {recipeIdeas.slice(0, 3).map(r => (
+              <button className="idea" key={r.id} onClick={() => addRecipe(r, 'Перекус')}>
+                <span className="idea-k">{r.kcal}<small> ккал</small></span>
+                <span className="idea-n">{r.name}</span>
+                <span className="idea-p">Б {r.p} г</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="nut-2col">
         <WaterMini profile={profile} date={date} onChange={refresh} />
         <FastingCard onChange={refresh} />
@@ -205,6 +270,7 @@ export default function Nutrition({ profile }) {
       {scanOpen && <BarcodeSheet onClose={() => setScanOpen(false)} onAdd={(food, grams, meal) => { addEntry(food, grams, meal); setScanOpen(false); toast('Добавлено: ' + food.name) }} onAddManual={(n, k, pr, meal) => { addManual(n, k, pr, meal); setScanOpen(false); toast('Добавлено: ' + n) }} />}
       {scoreOpen && score && <ScoreSheet score={score} onClose={() => setScoreOpen(false)} />}
       {photoOpen && <PhotoSheet onClose={() => setPhotoOpen(false)} onAddItems={addPhotoItems} />}
+      {recipesOpen && <RecipesSheet ideas={recipeIdeas} onAdd={addRecipe} onClose={() => setRecipesOpen(false)} />}
     </div>
   )
 }
@@ -449,6 +515,31 @@ function PhotoSheet({ onClose, onAddItems }) {
   )
 }
 
+function RecipesSheet({ ideas, onAdd, onClose }) {
+  const [meal, setMeal] = useState('Обед')
+  return (
+    <div className="sheet" onClick={onClose}>
+      <div className="sheet-card" onClick={e => e.stopPropagation()}>
+        <span className="addhead-t"><Icon name="apple" size={18} /> Идеи под остаток калорий</span>
+        <div className="bc-meals" style={{ marginTop: 12 }}>
+          {MEALS.map(mm => <button key={mm.key} className={'qchip' + (meal === mm.key ? ' on' : '')} onClick={() => setMeal(mm.key)}>{mm.key}</button>)}
+        </div>
+        <div className="rcp-list">
+          {ideas.map(r => (
+            <button className="rcp-row" key={r.id} onClick={() => onAdd(r, meal)}>
+              <div className="rcp-main">
+                <span className="rcp-name">{r.name}</span>
+                <span className="rcp-ingr">{r.ingr}</span>
+              </div>
+              <div className="rcp-macro"><b>{r.kcal}</b><span>Б {r.p}</span></div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function WaterMini({ profile, date, onChange }) {
   const goal = Math.round(profile.weight * 30)
   const ml = store.getWater()[date] || 0
@@ -526,10 +617,10 @@ function PortionEdit({ entry, onSave, onClose }) {
 
 const TABS = [
   { k: 'search', label: 'Поиск' }, { k: 'recent', label: 'Частые' }, { k: 'fav', label: 'Избранное' },
-  { k: 'dishes', label: 'Мои блюда' }, { k: 'manual', label: 'Вручную' }
+  { k: 'tpl', label: 'Шаблоны' }, { k: 'dishes', label: 'Мои блюда' }, { k: 'manual', label: 'Вручную' }
 ]
 
-function AddPanel({ meal, onAdd, onAddDish, onManual, onClose, onChange }) {
+function AddPanel({ meal, onAdd, onAddDish, onManual, onAddTemplate, onClose, onChange }) {
   const [tab, setTab] = useState('search')
   const [q, setQ] = useState('')
   const [sel, setSel] = useState(null)
@@ -579,6 +670,7 @@ function AddPanel({ meal, onAdd, onAddDish, onManual, onClose, onChange }) {
   const recent = store.frequentFoods(16).map(id => byId[id]).filter(Boolean)
   const favList = fav.map(id => byId[id]).filter(Boolean)
   const dishes = store.getDishes()
+  const templates = store.getMealTemplates()
   const localRes = searchFoods(q).slice(0, 60)
 
   return (
@@ -633,6 +725,21 @@ function AddPanel({ meal, onAdd, onAddDish, onManual, onClose, onChange }) {
             </div>
           ) : <div className="empty" style={{ marginTop: 12 }}><Icon name="apple" size={28} /><p>Собери блюдо из нескольких продуктов и сохрани — добавляй в один тап.</p></div>}
         </>
+      )}
+      {tab === 'tpl' && (
+        templates.length ? (
+          <div className="exlist">
+            {templates.map(t => (
+              <div className="foodrow" key={t.id}>
+                <button className="foodrow-main" onClick={() => onAddTemplate(t, meal)}>
+                  <span className="foodrow-name">{t.name}</span>
+                  <span className="foodrow-sub">{t.items.length} поз. · {t.items.reduce((a, i) => a + (i.kcal || 0), 0)} ккал</span>
+                </button>
+                <button className="delbtn" onClick={() => { store.removeMealTemplate(t.id); force(x => x + 1) }} aria-label="Удалить"><Icon name="trash" size={16} /></button>
+              </div>
+            ))}
+          </div>
+        ) : <div className="empty" style={{ marginTop: 12 }}><Icon name="star" size={28} /><p>Сохрани приём как шаблон (звёздочка у приёма) — и добавляй его сюда в один тап.</p></div>
       )}
       {tab === 'manual' && (
         <div className="manualcard">
