@@ -44,7 +44,7 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
   const focusReady = focus.filter(f => f.days == null || f.days >= 2)
   const detail = recoveryDetail()
   const freshCount = detail.filter(d => d.state !== 'recovering').length
-  const readyPct = trainedCount ? Math.round(detail.reduce((a, d) => a + d.pct, 0) / detail.length * 100) : 100
+  const readyPct = trainedCount ? Math.round(detail.reduce((a, d) => a + d.pct, 0) / detail.length * 20) * 5 : 100
   const CIRC = 2 * Math.PI * 27
   const weekday = new Date().toLocaleDateString('ru-RU', { weekday: 'long' })
 
@@ -123,7 +123,7 @@ export default function Home({ profile, go, onMuscle, onTrain, userName }) {
             {detail.map(d => {
               const col = d.pct < 0.4 ? '#ff4d4d' : d.pct < 0.85 ? '#f5a623' : '#22c55e'
               const tl = d.state === 'fresh' ? 'свежая' : d.state === 'ready' ? 'готова' : (d.hoursLeft >= 24 ? '~' + Math.round(d.hoursLeft / 24) + ' дн' : '~' + d.hoursLeft + ' ч')
-              return <MiniRing key={d.group} pct={d.pct} color={col} center={Math.round(d.pct * 100)} label={GROUP_META[d.group].label} sub={tl} onClick={() => setSheetG(d.group)} />
+              return <MiniRing key={d.group} pct={d.pct} color={col} center={Math.round(d.pct * 20) * 5} label={GROUP_META[d.group].label} sub={tl} onClick={() => setSheetG(d.group)} />
             })}
           </div>
           </>

@@ -19,17 +19,17 @@ import { store } from './storage.js'
 import { initTelegram, tgBackButton, haptic, tgUserName } from './tg.js'
 
 const TABS = [
-  { key: 'home', label: 'Главная', icon: 'home' },
+  { key: 'home', label: 'Сегодня', icon: 'home' },
   { key: 'workout', label: 'Тренировки', icon: 'dumbbell' },
-  { key: 'catalog', label: 'Каталог', icon: 'book' },
+  { key: 'nutrition', label: 'Питание', icon: 'nutrition' },
   { key: 'progress', label: 'Прогресс', icon: 'activity' },
   { key: 'more', label: 'Профиль', icon: 'grid' }
 ]
 const SECONDARY = {
-  profile: 'Профиль', nutrition: 'Калории и КБЖУ', water: 'Дневник воды',
+  profile: 'Профиль', catalog: 'Каталог упражнений', water: 'Дневник воды',
   measures: 'Замеры тела', timer: 'Таймер отдыха', calculators: 'Калькуляторы'
 }
-const TAB_TITLE = { workout: 'Тренировки', catalog: 'Каталог упражнений', progress: 'Прогресс', more: 'Профиль' }
+const TAB_TITLE = { workout: 'Тренировки', nutrition: 'Питание', progress: 'Прогресс', more: 'Профиль' }
 
 export default function App() {
   const [profile, setProfile] = useState(null)
