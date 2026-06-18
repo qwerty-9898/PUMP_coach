@@ -1781,3 +1781,12 @@ body {
 .daynav-lbl { flex: 1 1 auto; text-align: center; font-weight: 700; font-size: 14px; text-transform: capitalize; }
 .daynav-streak { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 6px 11px; border-radius: 20px; }
 .daynav-today { flex: 0 0 auto; font-size: 12.5px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border: 1px solid rgba(255,90,31,.4); border-radius: 10px; padding: 7px 11px; }
+
+/* ===== Тренерство: таймер ±, замена, советы ===== */
+.rest-adj { display: flex; gap: 10px; margin: 10px 0; }
+.rest-adj button { padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; background: rgba(255,255,255,.06); border: 1px solid var(--line); color: var(--text); }
+.ex-easy { display: inline-flex; align-items: center; gap: 6px; margin: 8px 0 2px; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border: 1px solid rgba(255,90,31,.3); border-radius: 9px; padding: 7px 11px; }
+.coach-card { border: 1px solid rgba(255,90,31,.30) !important; box-shadow: 0 0 0 1px rgba(255,90,31,.05), 0 6px 26px rgba(255,90,31,.10) !important; background: linear-gradient(180deg, rgba(255,90,31,.055), var(--card2)) !important; margin-bottom: 14px; }
+.coach-tip { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; line-height: 1.4; padding: 9px 11px; border-radius: 12px; margin-top: 8px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+.coach-tip svg { flex: 0 0 auto; margin-top: 2px; }
+.coach-tip.good svg { color: #34d399; } .coach-tip.warn svg { color: #ff8a3d; } .coach-tip.info svg { color: #6db9ff; }

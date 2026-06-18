@@ -16,6 +16,21 @@ const WARMUP = [
   '1–2 разминочных подхода первого упражнения с лёгким весом'
 ]
 function parseLoad(str) { const m = (str || '').match(/(\d+(\.\d+)?)/); return m ? Number(m[1]) : '' }
+function beep() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext
+    if (!Ctx) return
+    const ctx = new Ctx()
+    const o = ctx.createOscillator(), g = ctx.createGain()
+    o.type = 'sine'; o.frequency.value = 880
+    o.connect(g); g.connect(ctx.destination)
+    g.gain.setValueAtTime(0.0001, ctx.currentTime)
+    g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.02)
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35)
+    o.start(); o.stop(ctx.currentTime + 0.37)
+    setTimeout(() => { try { ctx.close() } catch (e) {} }, 600)
+  } catch (e) {}
+}
 
 export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
   const blocks = buildBlocks(session.exercises, session.ss || [])
@@ -28,6 +43,7 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
   const [logs, setLogs] = useState({})
   const [resting, setResting] = useState(false)
   const [left, setLeft] = useState(rest)
+  const [restLen, setRestLen] = useState(rest)
   const [curW, setCurW] = useState('')
   const [curR, setCurR] = useState('')
   const [prFlash, setPrFlash] = useState(false)
@@ -65,12 +81,12 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
   useEffect(() => {
     if (resting) {
       ref.current = setInterval(() => setLeft(l => {
-        if (l <= 1) { clearInterval(ref.current); setResting(false); haptic('medium'); return rest }
+        if (l <= 1) { clearInterval(ref.current); setResting(false); beep(); haptic('medium'); return restLen }
         return l - 1
       }), 1000)
     }
     return () => clearInterval(ref.current)
-  }, [resting, rest])
+  }, [resting, restLen])
 
   function recordSet(warm) {
     if (!ex) return
@@ -88,12 +104,12 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
     if (np < slots.length) {
       const nextSlot = slots[np]
       // в суперсете не отдыхаем при переходе A→B (sub===1), отдыхаем перед новым раундом (sub===0)
-      if (!block.super || nextSlot.sub === 0) { setLeft(rest); setResting(true) }
+      if (!block.super || nextSlot.sub === 0) { setLeft(restLen); setResting(true) }
     }
   }
   function nextBlock() {
     if (bi + 1 >= blocks.length) { finishAll(); return }
-    setBi(bi + 1); setSlotPos(0); setResting(false); setLeft(rest); window.scrollTo(0, 0)
+    setBi(bi + 1); setSlotPos(0); setResting(false); setLeft(restLen); window.scrollTo(0, 0)
   }
   function finishAll() {
     const date = todayKey()
@@ -111,7 +127,7 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
     onFinish && onFinish()
     setPhase('done')
   }
-  function skipRest() { clearInterval(ref.current); setResting(false); setLeft(rest) }
+  function skipRest() { clearInterval(ref.current); setResting(false); setLeft(restLen) }
 
   if (phase === 'warmup') {
     return (
@@ -199,6 +215,10 @@ export default function GuidedWorkout({ session, profile, onExit, onFinish }) {
         <div className="restbox">
           <span className="rest-lbl">Отдых</span>
           <span className="rest-time">{mm}:{ss}</span>
+          <div className="rest-adj">
+            <button onClick={() => { setRestLen(v => Math.max(15, v - 15)); setLeft(l => Math.max(1, l - 15)) }}>−15 с</button>
+            <button onClick={() => { setRestLen(v => v + 15); setLeft(l => l + 15) }}>+15 с</button>
+          </div>
           <button className="cta sm ghost-cta" onClick={skipRest}>Пропустить отдых</button>
         </div>
       ) : blockDone ? (

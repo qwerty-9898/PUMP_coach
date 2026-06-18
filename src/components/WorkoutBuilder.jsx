@@ -62,6 +62,13 @@ export default function WorkoutBuilder({ program, profile, initialGroup, initial
     const exs = [...session.exercises]; exs[i] = shapeExercise(alt, session.scheme)
     setSession({ ...session, exercises: exs })
   }
+  function swapEasy(i) {
+    const ex = session.exercises[i]
+    const alt = pickAlternative({ group: ex.group, equip: 'dumbbell', level: profile.level, excludeIds: session.exercises.map(e => e.id), favorites })
+    if (!alt) return
+    const exs = [...session.exercises]; exs[i] = shapeExercise(alt, session.scheme)
+    setSession({ ...session, exercises: exs })
+  }
   function toggleSS(i) {
     setSession(s => {
       const ss = new Set(s.ss || [])
@@ -135,12 +142,12 @@ export default function WorkoutBuilder({ program, profile, initialGroup, initial
       </button>
 
       {session && <Session session={session} profile={profile} saved={saved}
-        onSave={saveWorkout} onGuide={() => setGuided(true)} onRegen={regen} onSwap={swap} onSaveRoutine={saveRoutine} onToggleSS={toggleSS} />}
+        onSave={saveWorkout} onGuide={() => setGuided(true)} onRegen={regen} onSwap={swap} onSwapEasy={swapEasy} onSaveRoutine={saveRoutine} onToggleSS={toggleSS} />}
     </section>
   )
 }
 
-function Session({ session, profile, saved, onSave, onGuide, onRegen, onSwap, onSaveRoutine, onToggleSS }) {
+function Session({ session, profile, saved, onSave, onGuide, onRegen, onSwap, onSwapEasy, onSaveRoutine, onToggleSS }) {
   const ssSet = new Set(session.ss || [])
   const stats = sessionStats(session)
   const last = session.exercises.length - 1
@@ -198,6 +205,9 @@ function Session({ session, profile, saved, onSave, onGuide, onRegen, onSwap, on
                 <button className="swapbtn" onClick={() => onSwap(i)} aria-label="Заменить"><Icon name="refresh" size={16} /></button>
               </div>
               <div className="ex-tip"><Icon name="info" size={14} /> {ex.tip}</div>
+              {ex.equip === 'gym' && (
+                <button className="ex-easy" onClick={() => onSwapEasy(i)}><Icon name="refresh" size={13} /> Нет тренажёра? Домашний вариант</button>
+              )}
             </div>
             {i < last && (
               <div className="ss-link">

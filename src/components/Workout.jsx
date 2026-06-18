@@ -6,6 +6,7 @@ import WeekSchedule from './WeekSchedule.jsx'
 import Icon from './Icon.jsx'
 import { PROGRAMS, recommendProgram } from '../data/programs.js'
 import { store } from '../storage.js'
+import { coachTips } from '../engine/coach.js'
 
 export default function Workout({ profile, initialGroup, initialPlan }) {
   const recommended = recommendProgram(profile)
@@ -24,6 +25,12 @@ export default function Workout({ profile, initialGroup, initialPlan }) {
   return (
     <div className="screen">
       {!program && <ProgramPicker selected={programId || store.getActiveProgram()} recommended={recommended} onSelect={select} equip={profile.equip} />}
+      {program && (() => { const tips = coachTips(profile); return tips.length > 0 && (
+        <div className="card coach-card">
+          <span className="card-kicker" style={{ marginBottom: 10, display: 'inline-flex' }}><Icon name="bolt" size={15} /> Совет тренера</span>
+          {tips.map((t, i) => <div className={'coach-tip ' + t.tone} key={i}><Icon name={t.icon} size={14} /> {t.text}</div>)}
+        </div>
+      ) })()}
       {program && <>
         <button className="plan-cta" onClick={() => setShowPlan(true)}>
           <span className="plan-cta-ic"><Icon name="flag" size={18} /></span>
